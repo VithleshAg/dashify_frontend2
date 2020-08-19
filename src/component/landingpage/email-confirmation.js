@@ -3,6 +3,7 @@ import Logo from "./img/Logo.png";
 import { Link } from "react-router-dom";
 import { Row, Col } from "react-bootstrap";
 import Axios from "axios";
+import { send_varification_link } from "../apis/user";
 import Loader from "react-loader-spinner";
 
 class EmailConfirmation extends React.Component {
@@ -19,10 +20,11 @@ class EmailConfirmation extends React.Component {
 
     if (username) {
       // this.setState({ loading: true });
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/send-varification-link",
-        data
-      )
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/send-varification-link",
+      //   data
+      // )
+      send_varification_link(data)
         .then(res => {
           console.log(res);
           // this.setState({ loading: false });

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Chart from "react-google-charts";
 import { PieChart } from "react-minimal-pie-chart";
 import Axios from "axios";
+import { all_connection_of_one_location } from "./apis/social_platforms";
 import Spinner from "./common/Spinner";
 import Loader2 from "react-loader-spinner";
 import Rating from "react-rating";
@@ -12,6 +13,13 @@ const Yelpconfig = {
       "bearer XkjWF9GSy19xRS_yytCtISMaViqsPuXGmQiTzzAdcRHHNJmISD9bnHisRb8tgF5H7xVuMnbcybxOvEHHM7o91yTFKcGO7KrERhOSMS9NtRiPQNq9tCxMl61oD10pXnYx",
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "http://localhost"
+  }
+};
+
+const DnbConfig = {
+  headers: {
+    "x-dnb-user": "P200000A3A7EC40D0DD41748DA62B835",
+    "x-dnb-pwd": "iit2mumbai"
   }
 };
 
@@ -90,6 +98,12 @@ export default class Overview extends Component {
     foursquareReviews: [],
     foursquareDetails:"",
     foursquareReviewlength:"-",
+
+    dnbFinancialConditionText:"-",
+    dnbHistoryRatingText:"-",
+    dnbRiskLevelDescription:"-",
+    dnbRiskScore:"-",
+    dnbStandardRating:"-",
 
     appleReviews: [],
     appleRating:"-",
@@ -200,6 +214,7 @@ export default class Overview extends Component {
 
     var yelpUrl,
       fourUrl,
+      dnbUrl,
       appleUrl,
       citysearchUrl,
       instaUrl,
@@ -217,12 +232,12 @@ export default class Overview extends Component {
       location_id: this.props.match.params.locationId
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    )
-      .then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(response => {
         console.log("all connections", response);
         response.data.data.map(l => {
           if (l.Social_Platform.Platform == "Facebook") {
@@ -258,6 +273,17 @@ export default class Overview extends Component {
             fourUrl = l.Social_Platform.Other_info.split(",")[0]
               .slice(7)
               .split("/")[5];
+          }
+
+          if (l.Social_Platform.Platform == "Dnb") {
+            this.setState({
+              all_connections: [
+                ...this.state.all_connections,
+                { name: "Dnb" }
+              ]
+            });
+
+            dnbUrl = l.Social_Platform.Other_info;
           }
 
           if (l.Social_Platform.Platform == "Apple") {
@@ -673,11 +699,88 @@ export default class Overview extends Component {
           ).then(res => {
             console.log("foursquare data", res.data);
             this.setState({
-              foursquareReviews: res.data.response.venue.tips.groups[0].items,
+              foursquareReviews: res.data.response.venue.tips.groups[0] ? res.data.response.venue.tips.groups[0].items : [],
               foursquareDetails: res.data.response.venue,
             foursquareReviewlength: res.data.response.venue.tips.count
             });
           });
+        }
+
+        // For Dnb
+        if (dnbUrl) {
+
+          var today = new Date();
+    var date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate() +
+      "T" +
+      today.getHours() +
+      ":" +
+      today.getMinutes() +
+      ":" +
+      today.getSeconds();
+
+    const data = {
+      ApplicationTransactionID: "1234",
+      ServiceTransactionID: "5678",
+      //    TransactionTimestamp: "2001-12-17T09:30:47Z"
+      TransactionTimestamp: date
+    };
+
+    Axios.post(
+      "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/Authentication/V2.0/",
+      data,
+      DnbConfig
+    )
+      .then(resp => {
+        console.log("DNB authentication", resp.data);
+        // this.setState({ token: resp.data.AuthenticationDetail.Token });
+        const DnbAuthorization = {
+          headers: { Authorization: resp.data.AuthenticationDetail.Token }
+        };
+
+        Axios.get(
+          "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/RTNG_TRND",
+        DnbAuthorization
+        ).then(res => {
+          console.log("DNB data1", res.data);
+          this.setState({
+            dnbStandardRating: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.DNBStandardRating.DNBStandardRating,
+            dnbHistoryRatingText: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.HistoryRatingText.$,
+            dnbFinancialConditionText: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.FinancialConditionText.$
+          });
+        });
+
+        Axios.get(
+          "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/SER",
+        DnbAuthorization
+        ).then(res => {
+          console.log("DNB data2", res.data);
+          this.setState({
+            dnbRiskScore: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.SupplierEvaluationRiskScore[0].RiskScore
+          
+          });
+        });
+
+        Axios.get(
+          "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/VIAB_RAT",
+        DnbAuthorization
+        ).then(res => {
+          console.log("DNB data3", res.data);
+          this.setState({
+            dnbRiskLevelDescription: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.DNBViabilityRating.ViabilityScore.RiskLevelDescription.$
+          
+          });
+        });
+
+      })
+      .catch(resp => {
+        console.log("DNB authentication error", resp.data);
+      });
+
         }
 
         // for apple
@@ -903,6 +1006,12 @@ export default class Overview extends Component {
       foursquareReviews,
       foursquareReviewlength,
       foursquareDetails,
+
+      dnbFinancialConditionText,
+    dnbHistoryRatingText,
+    dnbRiskLevelDescription,
+    dnbRiskScore,
+    dnbStandardRating,
 
       appleReviews,
       appleRating,
@@ -1646,13 +1755,44 @@ export default class Overview extends Component {
                   </div>
                   <div className="liks">
                     <span>Rating</span>
-                    <h4>{foursquareDetails.rating}</h4>
+                    <h4>{foursquareDetails.rating ? foursquareDetails.rating : "-"}</h4>
                     {/* <div className="countbox">+10.3%</div> */}
                   </div>
                   <div className="liks">
                     <span>Reviews</span>
                     <h4>{foursquareReviewlength}</h4>
                     {/* <div className="countbox">+10.3%</div> */}
+                  </div>
+                </div>
+              ])
+            : ""}
+
+{data.name == "Dnb"
+            ? (total_social_overview = [
+                ...total_social_overview,
+                <div className="socailsbox">
+                  <div className="iconbxo">
+                    <img src={require("../images/dnb.jpg")} alt="DandB" />
+                  </div>
+                  <div className="liks">
+                    <span>Financial Condition</span>
+                    <h4>{dnbFinancialConditionText}</h4>
+                  </div>
+                  <div className="liks">
+                    <span>History Rating</span>
+                    <h4>{dnbHistoryRatingText}</h4>
+                  </div>
+                  <div className="liks">
+                    <span>Risk Level</span>
+                    <h4>{dnbRiskLevelDescription}</h4>
+                  </div>
+                  <div className="liks">
+                    <span>Risk Score</span>
+                    <h4>{dnbRiskScore}</h4>
+                  </div>
+                  <div className="liks">
+                    <span>Standard Rating</span>
+                    <h4>{dnbStandardRating}</h4>
                   </div>
                 </div>
               ])
@@ -1767,6 +1907,22 @@ export default class Overview extends Component {
                     <img
                       src={require("../images/foursquare.png")}
                       alt="foursquare"
+                      height="65"
+                      width="65"
+                    />
+                  </a>
+                </li>
+              ])
+            : ""}
+
+{data.name == "Dnb"
+            ? (total_listing_images = [
+                ...total_listing_images,
+                <li>
+                  <a>
+                    <img
+                      src={require("../images/dnb.jpg")}
+                      alt="DandB"
                       height="65"
                       width="65"
                     />

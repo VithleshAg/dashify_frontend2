@@ -4,6 +4,8 @@ import FacebookLogin from "react-facebook-login";
 // import InstagramLogin from "react-instagram-login";
 import GoogleLogin from "react-google-login";
 import Axios from "axios";
+import { all_connection_of_one_location,add_social_account,remove_social_account } from "./apis/social_platforms";
+import { location_by_id,business_categories,business_states } from "./apis/location";
 // import qs from "querystring";
 import qs from "qs";
 import Spinner from "./common/Spinner";
@@ -94,6 +96,7 @@ export default class ViewListing extends Component {
     linkedinName: "",
     yelpName: "",
     foursquareName: "",
+    dnbName: "",
     appleName: "",
     citysearchName: "",
     hereName: "",
@@ -111,6 +114,7 @@ export default class ViewListing extends Component {
     googleIsLoggedIn: false,
     linkedinIsLoggedIn: false,
     foursquareIsLoggedIn: false,
+    dnbIsLoggedIn: false,
     appleIsLoggedIn: false,
     citysearchIsLoggedIn: false,
     hereIsLoggedIn: false,
@@ -125,6 +129,7 @@ export default class ViewListing extends Component {
     googleId: "",
     linkedinId: "",
     foursquareId: "",
+    dnbId: "",
     appleId: "",
     citysearchId: "",
     hereId: "",
@@ -146,455 +151,485 @@ export default class ViewListing extends Component {
   };
 
   async componentDidMount() {
-    const data = {
-      location_id: this.props.match.params.locationId
-    };
-    var googleToken,
-      linkedinToken,
-      fbtoken,
-      fbPageId,
-      fbData,
-      googleData,
-      linkedinData;
-
-    let { pdf_data } = this.state;
-
-    var today = new Date();
-    today =
-      today.getDate() +
-      "-" +
-      (today.getMonth() + 1) +
-      "-" +
-      today.getFullYear();
-    this.setState({ today });
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    )
-      .then(resp => {
-        console.log("get all connections", resp);
-        this.setState({ allListings: resp.data.data });
-
-        if (this.state.allListings) {
-          this.state.allListings.map(l => {
-            if (l.Social_Platform.Platform == "Facebook") {
-              fbtoken = l.Social_Platform.Token;
-              fbPageId = l.Social_Platform.Other_info;
-              fbData = l;
-            }
-
-            if (l.Social_Platform.Platform == "Google") {
-              googleToken = l.Social_Platform.Token;
-              googleData = l;
-            }
-
-            if (l.Social_Platform.Platform == "Linkedin") {
-              linkedinToken = l.Social_Platform.Token;
-              linkedinData = l;
-            }
-
-            if (l.Social_Platform.Platform == "Foursquare") {
-              console.log("yes four");
-              this.setState({
-                foursquareIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Foursquare",
-                    image: require("../images/foursquare.png"),
-                    username: l.Social_Platform.Username,
-                    status: true,
-                    link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                foursquareId: l.id,
-                foursquareName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Foursquare" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Instagram") {
-              console.log("yes Instagram");
-              this.setState({
-                instaIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Instagram",
-                    image: require("../images/instagram.png"),
-                    username: l.Social_Platform.Username,
-                    status: true,
-                    link:
-                      "https://www.instagram.com/" +
-                      l.Social_Platform.Other_info.split(",")[0].slice(7) +
-                      "/",
-                    date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                instaId: l.id,
-                instaName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Instagram" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Yelp") {
-              console.log("yes yelp");
-              this.setState({
-                yelpIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Yelp",
-                    image: require("../images/yelp.png"),
-                    username: l.Social_Platform.Username,
-                    status: true,
-                    link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                yelpId: l.id,
-                yelpName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Yelp" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Apple") {
-              console.log("yes Apple");
-              this.setState({
-                appleIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Apple",
-                    image: require("../images/apple.png"),
-                    username: l.Social_Platform.Username,
-                    status: true,
-                    link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                appleId: l.id,
-                appleName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Apple" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Citysearch") {
-              console.log("Citysearch data", l);
-              this.setState({
-                citysearchIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Citysearch",
-                    image: require("../images/citysearch.jpg"),
-                    username: l.Social_Platform.Username,
-                    status: true,
-                    link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                citysearchId: l.id,
-                citysearchName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Citysearch" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Zillow") {
-              console.log("Zillow data", l);
-              this.setState({
-                zillowIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Zillow",
-                    image: require("../images/zillow.png"),
-                    username: l.Social_Platform.Username,
-                    status: true
-                    // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    // date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                zillowId: l.id,
-                zillowName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Zillow" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Tomtom") {
-              console.log("Tomtom data", l);
-              this.setState({
-                tomtomIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Tomtom",
-                    image: require("../images/tomtom.png"),
-                    username: l.Social_Platform.Username,
-                    status: true
-                    // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    // date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                tomtomId: l.id,
-                tomtomName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Tomtom" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Zomato") {
-              console.log("Zomato data", l);
-              this.setState({
-                zomatoIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Zomato",
-                    image: require("../images/zomato.png"),
-                    username: l.Social_Platform.Username,
-                    status: true
-                    // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    // date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                zomatoId: l.id,
-                zomatoName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Zomato" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Avvo") {
-              console.log("Avvo data", l);
-              this.setState({
-                avvoIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Avvo",
-                    image: require("../images/avvo.png"),
-                    username: l.Social_Platform.Username,
-                    status: true
-                    // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    // date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                avvoId: l.id,
-                avvoName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Avvo" }
-                ]
-              });
-            }
-
-            if (l.Social_Platform.Platform == "Here") {
-              console.log("yes here");
-              this.setState({
-                hereIsLoggedIn: true,
-                pdf_data: [
-                  ...this.state.pdf_data,
-                  {
-                    listing: "Here",
-                    image: require("../images/here.png"),
-                    username: l.Social_Platform.Username,
-                    status: true
-                    // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
-                    // date: l.Social_Platform.Update_Date.split("T")[0]
-                  }
-                ],
-                hereId: l.id,
-                hereName: l.Social_Platform.Username,
-                all_connections: [
-                  ...this.state.all_connections,
-                  { name: "Here" }
-                ]
-              });
-            }
-          });
-
-          const GoogleConfig = {
-            headers: { Authorization: "Bearer " + googleToken }
-          };
-
-          // for facebook
-          if (fbtoken) {
-            Axios.get(
-              "https://graph.facebook.com/me/accounts/?access_token=" + fbtoken
-            ).then(res => {
-              var fbPageAccessToken;
-              for (let i = 0; i < res.data.data.length; i++) {
-                if (res.data.data[i].id == fbPageId) {
-                  fbPageAccessToken = res.data.data[i].access_token;
-                }
+    if(this.props.match.params.locationId != "null"){
+      const data = {
+        location_id: this.props.match.params.locationId
+      };
+      var googleToken,
+        linkedinToken,
+        fbtoken,
+        fbPageId,
+        fbData,
+        googleData,
+        linkedinData;
+  
+      let { pdf_data } = this.state;
+  
+      var today = new Date();
+      today =
+        today.getDate() +
+        "-" +
+        (today.getMonth() + 1) +
+        "-" +
+        today.getFullYear();
+      this.setState({ today });
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+      //   data,
+      //   DjangoConfig
+      // )
+      all_connection_of_one_location(data,DjangoConfig).then(resp => {
+          console.log("get all connections", resp);
+          this.setState({ allListings: resp.data.data });
+  
+          if (this.state.allListings) {
+            this.state.allListings.map(l => {
+              if (l.Social_Platform.Platform == "Facebook") {
+                fbtoken = l.Social_Platform.Token;
+                fbPageId = l.Social_Platform.Other_info;
+                fbData = l;
               }
-              Axios.get(
-                "https://graph.facebook.com/" +
-                  fbPageId +
-                  "/insights/page_engaged_users,page_impressions,page_views_total,page_call_phone_clicks_logged_in_unique,page_get_directions_clicks_logged_in_unique,page_website_clicks_logged_in_unique?period=month&access_token=" +
-                  fbPageAccessToken
-              ).then(resp => {
-                console.log("fbid", fbData.id);
+  
+              if (l.Social_Platform.Platform == "Google") {
+                googleToken = l.Social_Platform.Token;
+                googleData = l;
+              }
+  
+              if (l.Social_Platform.Platform == "Linkedin") {
+                linkedinToken = l.Social_Platform.Token;
+                linkedinData = l;
+              }
+  
+              if (l.Social_Platform.Platform == "Foursquare") {
+                console.log("yes four");
                 this.setState({
-                  fbIsLoggedIn: true,
+                  foursquareIsLoggedIn: true,
                   pdf_data: [
                     ...this.state.pdf_data,
                     {
-                      listing: "Facebook",
-                      image: require("../images/facebook.png"),
-                      username: fbData.Social_Platform.Username,
+                      listing: "Foursquare",
+                      image: require("../images/foursquare.png"),
+                      username: l.Social_Platform.Username,
                       status: true,
-                      link: "https://www.facebook.com/" + fbPageId,
-                      date: fbData.Social_Platform.Update_Date.split("T")[0]
+                      link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      date: l.Social_Platform.Update_Date.split("T")[0]
                     }
                   ],
-                  fbId: fbData.id,
-                  fbName: fbData.Social_Platform.Username,
+                  foursquareId: l.id,
+                  foursquareName: l.Social_Platform.Username,
                   all_connections: [
                     ...this.state.all_connections,
-                    { name: "Facebook" }
+                    { name: "Foursquare" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Dnb") {
+                console.log("yes DNB");
+                this.setState({
+                  dnbIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Dnb",
+                      image: require("../images/dnb.jpg"),
+                      username: l.Social_Platform.Username,
+                      status: true,
+                      // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  dnbId: l.id,
+                  dnbName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Dnb" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Instagram") {
+                console.log("yes Instagram");
+                this.setState({
+                  instaIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Instagram",
+                      image: require("../images/instagram.png"),
+                      username: l.Social_Platform.Username,
+                      status: true,
+                      link:
+                        "https://www.instagram.com/" +
+                        l.Social_Platform.Other_info.split(",")[0].slice(7) +
+                        "/",
+                      date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  instaId: l.id,
+                  instaName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Instagram" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Yelp") {
+                console.log("yes yelp");
+                this.setState({
+                  yelpIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Yelp",
+                      image: require("../images/yelp.png"),
+                      username: l.Social_Platform.Username,
+                      status: true,
+                      link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  yelpId: l.id,
+                  yelpName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Yelp" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Apple") {
+                console.log("yes Apple");
+                this.setState({
+                  appleIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Apple",
+                      image: require("../images/apple.png"),
+                      username: l.Social_Platform.Username,
+                      status: true,
+                      link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  appleId: l.id,
+                  appleName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Apple" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Citysearch") {
+                console.log("Citysearch data", l);
+                this.setState({
+                  citysearchIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Citysearch",
+                      image: require("../images/citysearch.jpg"),
+                      username: l.Social_Platform.Username,
+                      status: true,
+                      link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  citysearchId: l.id,
+                  citysearchName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Citysearch" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Zillow") {
+                console.log("Zillow data", l);
+                this.setState({
+                  zillowIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Zillow",
+                      image: require("../images/zillow.png"),
+                      username: l.Social_Platform.Username,
+                      status: true,
+                      // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  zillowId: l.id,
+                  zillowName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Zillow" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Tomtom") {
+                console.log("Tomtom data", l);
+                this.setState({
+                  tomtomIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Tomtom",
+                      image: require("../images/tomtom.png"),
+                      username: l.Social_Platform.Username,
+                      status: true
+                      // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      // date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  tomtomId: l.id,
+                  tomtomName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Tomtom" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Zomato") {
+                console.log("Zomato data", l);
+                this.setState({
+                  zomatoIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Zomato",
+                      image: require("../images/zomato.png"),
+                      username: l.Social_Platform.Username,
+                      status: true
+                      // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      // date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  zomatoId: l.id,
+                  zomatoName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Zomato" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Avvo") {
+                console.log("Avvo data", l);
+                this.setState({
+                  avvoIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Avvo",
+                      image: require("../images/avvo.png"),
+                      username: l.Social_Platform.Username,
+                      status: true
+                      // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      // date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  avvoId: l.id,
+                  avvoName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Avvo" }
+                  ]
+                });
+              }
+  
+              if (l.Social_Platform.Platform == "Here") {
+                console.log("yes here");
+                this.setState({
+                  hereIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Here",
+                      image: require("../images/here.png"),
+                      username: l.Social_Platform.Username,
+                      status: true
+                      // link: l.Social_Platform.Other_info.split(",")[0].slice(7),
+                      // date: l.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  hereId: l.id,
+                  hereName: l.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Here" }
+                  ]
+                });
+              }
+            });
+  
+            const GoogleConfig = {
+              headers: { Authorization: "Bearer " + googleToken }
+            };
+  
+            // for facebook
+            if (fbtoken) {
+              Axios.get(
+                "https://graph.facebook.com/me/accounts/?access_token=" + fbtoken
+              ).then(res => {
+                var fbPageAccessToken;
+                for (let i = 0; i < res.data.data.length; i++) {
+                  if (res.data.data[i].id == fbPageId) {
+                    fbPageAccessToken = res.data.data[i].access_token;
+                  }
+                }
+                Axios.get(
+                  "https://graph.facebook.com/" +
+                    fbPageId +
+                    "/insights/page_engaged_users,page_impressions,page_views_total,page_call_phone_clicks_logged_in_unique,page_get_directions_clicks_logged_in_unique,page_website_clicks_logged_in_unique?period=month&access_token=" +
+                    fbPageAccessToken
+                ).then(resp => {
+                  console.log("fbid", fbData.id);
+                  this.setState({
+                    fbIsLoggedIn: true,
+                    pdf_data: [
+                      ...this.state.pdf_data,
+                      {
+                        listing: "Facebook",
+                        image: require("../images/facebook.png"),
+                        username: fbData.Social_Platform.Username,
+                        status: true,
+                        link: "https://www.facebook.com/" + fbPageId,
+                        date: fbData.Social_Platform.Update_Date.split("T")[0]
+                      }
+                    ],
+                    fbId: fbData.id,
+                    fbName: fbData.Social_Platform.Username,
+                    all_connections: [
+                      ...this.state.all_connections,
+                      { name: "Facebook" }
+                    ]
+                  });
+                });
+              });
+            }
+  
+            // Google
+            if (googleToken) {
+              Axios.get(
+                "https://mybusiness.googleapis.com/v4/accounts/",
+                GoogleConfig
+              ).then(res => {
+                console.log("google data", res.data);
+                console.log("google data", googleData);
+                this.setState({
+                  googleIsLoggedIn: true,
+                  pdf_data: [
+                    ...this.state.pdf_data,
+                    {
+                      listing: "Google",
+                      image: require("../images/google.png"),
+                      username: googleData.Social_Platform.Username,
+                      status: true,
+                      date: googleData.Social_Platform.Update_Date.split("T")[0]
+                    }
+                  ],
+                  googleId: googleData.id,
+                  googleName: googleData.Social_Platform.Username,
+                  all_connections: [
+                    ...this.state.all_connections,
+                    { name: "Google" }
                   ]
                 });
               });
-            });
-          }
-
-          // Google
-          if (googleToken) {
-            Axios.get(
-              "https://mybusiness.googleapis.com/v4/accounts/",
-              GoogleConfig
-            ).then(res => {
-              console.log("google data", res.data);
-              console.log("google data", googleData);
+            }
+  
+            // Linkedin
+            if (linkedinToken) {
               this.setState({
-                googleIsLoggedIn: true,
+                linkedinIsLoggedIn: true,
                 pdf_data: [
                   ...this.state.pdf_data,
                   {
-                    listing: "Google",
-                    image: require("../images/google.png"),
-                    username: googleData.Social_Platform.Username,
+                    listing: "Linkedin",
+                    image: require("../images/linkedin.png"),
+                    username: linkedinData.Social_Platform.Username,
                     status: true,
-                    date: googleData.Social_Platform.Update_Date.split("T")[0]
+                    date: linkedinData.Social_Platform.Update_Date.split("T")[0]
                   }
                 ],
-                googleId: googleData.id,
-                googleName: googleData.Social_Platform.Username,
+                linkedinId: linkedinData.id,
+                linkedinName: linkedinData.Social_Platform.Username,
                 all_connections: [
                   ...this.state.all_connections,
-                  { name: "Google" }
+                  { name: "Linkedin" }
                 ]
               });
-            });
+            }
           }
-
-          // Linkedin
-          if (linkedinToken) {
-            this.setState({
-              linkedinIsLoggedIn: true,
-              pdf_data: [
-                ...this.state.pdf_data,
-                {
-                  listing: "Linkedin",
-                  image: require("../images/linkedin.png"),
-                  username: linkedinData.Social_Platform.Username,
-                  status: true,
-                  date: linkedinData.Social_Platform.Update_Date.split("T")[0]
-                }
-              ],
-              linkedinId: linkedinData.id,
-              linkedinName: linkedinData.Social_Platform.Username,
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Linkedin" }
-              ]
-            });
-          }
-        }
-      })
-      .catch(resp => {
-        console.log(resp);
-      });
-
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-      data,
-      DjangoConfig
-    )
-      .then(resp => {
-        this.setState({ state: "Loading....", category: "Loading...." });
-        Axios.get(
-          "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/states",
-          DjangoConfig
-        ).then(resp1 => {
-          resp1.data.status.map((s, i) =>
-            s.id == resp.data.location.State
-              ? this.setState({ state: s.State_name })
-              : ""
-          );
+        })
+        .catch(resp => {
+          console.log(resp);
         });
-
-        Axios.get(
-          "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
-          DjangoConfig
-        ).then(resp1 => {
-          resp1.data.BusinessCategory.map((b, i) =>
-            b.id == resp.data.location.Business_category
-              ? this.setState({ category: b.Category_Name })
-              : ""
-          );
+  
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+      //   data,
+      //   DjangoConfig
+      // )
+      location_by_id(data,DjangoConfig).then(resp => {
+          this.setState({ state: "Loading....", category: "Loading...." });
+          // Axios.get(
+          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/states",
+          //   DjangoConfig
+          // )
+          business_states(DjangoConfig).then(resp1 => {
+            resp1.data.status.map((s, i) =>
+              s.id == resp.data.location.State
+                ? this.setState({ state: s.State_name })
+                : ""
+            );
+          });
+  
+          // Axios.get(
+          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
+          //   DjangoConfig
+          // )
+          business_categories(DjangoConfig).then(resp1 => {
+            resp1.data.BusinessCategory.map((b, i) =>
+              b.id == resp.data.location.Business_category
+                ? this.setState({ category: b.Category_Name })
+                : ""
+            );
+          });
+  
+          console.log(resp.data);
+          this.setState({
+            location: resp.data.location,
+            name: resp.data.location.Location_name,
+  
+            address: resp.data.location.Address_1,
+  
+            phone: resp.data.location.Phone_no,
+  
+            about: resp.data.location.About_Business,
+  
+            city: resp.data.location.City,
+            postalCode: resp.data.location.Zipcode,
+            logo: resp.data.location.Business_Logo,
+            cover: resp.data.location.Business_Cover_Image,
+            otherImage: resp.data.location.Df_location_image,
+  
+            loader: false
+          });
+        })
+        .catch(res => {
+          console.log("error in view listing", res);
+          this.setState({ loader: false });
         });
-
-        console.log(resp.data);
-        this.setState({
-          location: resp.data.location,
-          name: resp.data.location.Location_name,
-
-          address: resp.data.location.Address_1,
-
-          phone: resp.data.location.Phone_no,
-
-          about: resp.data.location.About_Business,
-
-          city: resp.data.location.City,
-          postalCode: resp.data.location.Zipcode,
-          logo: resp.data.location.Business_Logo,
-          cover: resp.data.location.Business_Cover_Image,
-          otherImage: resp.data.location.Df_location_image,
-
-          loader: false
-        });
-      })
-      .catch(res => {
-        console.log("error in view listing", res);
-        this.setState({ loader: false });
-      });
+    } else {
+      this.setState({ loader: false });
+    }
   }
 
   componentClicked = e => {
@@ -689,22 +724,23 @@ export default class ViewListing extends Component {
           Other_info: "861qygnjkytfwe"
         };
 
-        Axios.post(
-          "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-          data,
-          DjangoConfig
-        )
-          .then(resp => {
+        // Axios.post(
+        //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+        //   data,
+        //   DjangoConfig
+        // )
+        add_social_account(data,DjangoConfig).then(resp => {
             console.log("linkedin location response", resp.data);
 
             const data2 = {
               location_id: this.props.match.params.locationId
             };
-            Axios.post(
-              "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-              data2,
-              DjangoConfig
-            ).then(resp => {
+            // Axios.post(
+            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+            //   data2,
+            //   DjangoConfig
+            // )
+            all_connection_of_one_location(data2,DjangoConfig).then(resp => {
               console.log("get all connections", resp);
               this.setState({ allListings: resp.data.data });
 
@@ -760,12 +796,12 @@ export default class ViewListing extends Component {
     var name = e.target.name;
     const data = { location_connect_social_id: e.target.id };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/location-connect-remove-with-social-media",
-      data,
-      DjangoConfig
-    )
-      .then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/location-connect-remove-with-social-media",
+    //   data,
+    //   DjangoConfig
+    // )
+    remove_social_account(data,DjangoConfig).then(resp => {
         console.log(resp);
 
         this.setState({ [name]: false });
@@ -871,6 +907,7 @@ export default class ViewListing extends Component {
         <div className="rightside_title">
           <h1>Listing</h1>
         </div>
+        {this.props.match.params.locationId != "null" ? <div>
         <div className="tablediv">
           <div className="row">
             <div className="col-md-6">
@@ -1495,6 +1532,71 @@ export default class ViewListing extends Component {
               </div>
             </div>
 
+            {/* DNB */}
+            <div className="conntend">
+              <div className="row d-flex ">
+                <div className="col-md-4">
+                  <div className="f-connect">
+                    <div className="yelp-icon">
+                      <img
+                        src={require("../images/dnb.jpg")}
+                        alt="DandB"
+                      />
+                    </div>
+                    <div className="yelp-text">
+                      {this.state.dnbIsLoggedIn ? (
+                        <div>
+                          <p>Connected</p>
+                          <h4>{this.state.dnbName} </h4>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  {this.state.dnbIsLoggedIn ? (
+                    <button
+                      className="disconnect_btn"
+                      id={this.state.dnbId}
+                      name="dnbIsLoggedIn"
+                      onClick={this.disconnectAccount}
+                    >
+                      Disconnect a account
+                    </button>
+                  ) : (
+                    <a href="/dnblogin" className="connect_btn">
+                      Connect a account
+                    </a>
+                  )}
+                </div>
+
+                <div className="col-md-5">
+                  {this.state.dnbIsLoggedIn ? (
+                    <div className="refres_box enble_refresh">
+                      <i>
+                        <img src={require("../images/sync-refresh.svg")} />
+                      </i>
+
+                      <span>Syncing</span>
+                    </div>
+                  ) : (
+                    <div className="refres_box disble_refresh">
+                      <i>
+                        <img
+                          src={require("../images/sync_disabled-24px.svg")}
+                        />
+                      </i>
+
+                      <span>Connect your account to sync the listings</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* google */}
 
             <div className="conntend">
@@ -1538,6 +1640,7 @@ export default class ViewListing extends Component {
                         //for server
                         // clientId="759599444436-5litbq8gav4ku8sj01o00uh6lsk8ebr0.apps.googleusercontent.com"
                         buttonText="Login"
+                        scope="https://www.googleapis.com/auth/business.manage"
                         onSuccess={this.responseGoogle}
                         onFailure={this.responseErrorGoogle}
                         cookiePolicy={"single_host_origin"}
@@ -1964,6 +2067,9 @@ export default class ViewListing extends Component {
           </div>
           {/* </div> */}
         </div>
+        </div> : <div className="analytics-whice">
+            <div className="box-space2"><h4>Connect Location first</h4></div></div>}
+        
       </div>
     }
     </div>

@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Axios from "axios";
+import { all_connection_of_one_location } from "./apis/social_platforms";
 import { NavLink } from "react-router-dom";
 
 const DjangoConfig = {
@@ -35,11 +36,12 @@ export default class ReviewGenerationCampaign extends Component {
     const data = {
       location_id: this.props.match.params.locationId
     };
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    ).then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(response => {
       var googleToken, appleUrl;
       response.data.data.map(l => {
         if (l.Social_Platform.Platform == "Google") {

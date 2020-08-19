@@ -4,6 +4,8 @@ import Loader from "react-loader-spinner";
 import { Link, Redirect } from "react-router-dom";
 import { Row, Col } from "react-bootstrap";
 import Axios from "axios";
+import { login, account_activate, logout } from "../apis/user";
+
 // import setAuthToken from '../utils/setAuthToken';
 
 class Login extends React.Component {
@@ -23,6 +25,8 @@ class Login extends React.Component {
   componentDidMount = async () => {
     await this.isAlreadyLogin();
 
+    await this.notLogout();
+
     console.log("props and param", this.props.match.params.param1);
 
     if (this.props.match.params.param1) {
@@ -33,10 +37,11 @@ class Login extends React.Component {
         pera_2: param2
       };
 
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/account-activate",
-        data
-      )
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/account/account-activate",
+      //   data
+      // )
+      account_activate(data)
         .then(res => {
           console.log("account activation", res);
           alert(res.data.messgae);
@@ -59,6 +64,27 @@ class Login extends React.Component {
     localStorage.getItem("RememberMe") == "true"
       ? this.setState({ isAlreadyLogin: true })
       : this.setState({ isAlreadyLogin: false });
+  };
+
+  notLogout = () => {
+    if (
+      localStorage.getItem("UserToken") != null &&
+      localStorage.getItem("RememberMe") != "true"
+    ) {
+      this.logout();
+    }
+  };
+
+  logout = () => {
+    // localStorage.clear();
+    // logout()
+    //   .then(res => {
+    //     console.log("sucess");
+    //     console.log(res);
+    //   })
+    //   .catch(res => {
+    //     console.log("error in Logout");
+    //   });
   };
 
   submitHandler = event => {
@@ -98,13 +124,15 @@ class Login extends React.Component {
 
       this.setState({ loading: true });
 
-      Axios.post(
-        // "https://cors-anywhere.herokuapp.com/http://18.216.54.114/account/login"
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/login",
-        data
-      )
+      // Axios.post(
+      //   // "https://cors-anywhere.herokuapp.com/http://18.216.54.114/account/login"
+      //   "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/account/login",
+      //   data
+      // )
+      login(data)
         .then(async res => {
-          console.log(res);
+          console.log("login success", res.data);
+          console.log("login error", res.data);
           await localStorage.setItem("RememberMe", this.state.RememberMe);
           await localStorage.setItem("UserToken", res.data.Token);
           await localStorage.setItem("UserId", res.data.user_info[0].id);
@@ -118,9 +146,19 @@ class Login extends React.Component {
           // setAuthToken(res.data.Token)
           await this.setState({ isSuccessLogin: true, loading: false });
         })
-        .catch(res =>
-          this.setState({ wrong: "Wrong credentials", loading: false })
-        );
+        .catch(res => {
+          if (res.message == "Request failed with status code 400") {
+            this.setState({
+              wrong:
+                "Username and pasword is incorrect & may be your account is not activate",
+              loading: false
+            });
+          } else if (res.data.detail == "CSRF Failed: CSRF cookie not set.") {
+            this.setState({ wrong: "Already login", loading: false });
+          } else {
+            this.setState({ wrong: "Server error", loading: false });
+          }
+        });
     }
   };
 
@@ -142,10 +180,12 @@ class Login extends React.Component {
     console.log("param", param2);
 
     if (this.state.isSuccessLogin) {
-      return <Redirect to="/dashboard" />;
+      // return <Redirect to="/dashboard" />;
+      window.location.assign("/dashboard");
     }
     if (this.state.isAlreadyLogin) {
-      return <Redirect to="/dashboard" />;
+      // return <Redirect to="/dashboard" />;
+      window.location.assign("/dashboard");
     }
     return (
       <div>

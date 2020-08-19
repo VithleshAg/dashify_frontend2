@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Loader from "react-loader-spinner";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
+import { add_social_account } from "./apis/social_platforms";
 
 class AvvoLogin extends Component {
   state = {
@@ -86,11 +87,12 @@ class AvvoLogin extends Component {
               Other_info: this.state.url
             };
 
-            Axios.post(
-              "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-              data,
-              DjangoConfig
-            )
+            // Axios.post(
+            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+            //   data,
+            //   DjangoConfig
+            // )
+            add_social_account(data, DjangoConfig)
               .then(resp => {
                 console.log("Avvo resp", resp.data);
                 this.setState({ isUrl: true, loading: false });

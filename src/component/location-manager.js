@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import Axios from "axios";
 import Spinner from "./common/Spinner";
+import { all_location } from "./apis/location";
 
 const DjangoConfig = {
   headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
@@ -21,11 +22,13 @@ export default class ViewLocations extends Component {
     const data = {
       user_id: localStorage.getItem("UserId")
     };
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-locations",
-      data,
-      DjangoConfig1
-    )
+
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-locations",
+    //   data,
+    //   DjangoConfig1
+    // )
+    all_location(data, DjangoConfig1)
       .then(res => {
         console.log(res);
         console.log(res.data.all_location);

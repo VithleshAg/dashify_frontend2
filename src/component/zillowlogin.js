@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Loader from "react-loader-spinner";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
+import { add_social_account } from "./apis/social_platforms";
 
 class ZillowLogin extends Component {
   state = {
@@ -69,11 +70,12 @@ class ZillowLogin extends Component {
         .then(res => {
           console.log("zillow checking data", res.data);
           if (res.data.message.text == "Request successfully processed") {
-            Axios.post(
-              "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-              data,
-              DjangoConfig
-            )
+            // Axios.post(
+            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+            //   data,
+            //   DjangoConfig
+            // )
+            add_social_account(data, DjangoConfig)
               .then(resp => {
                 console.log("zillow resp", resp.data);
                 this.setState({ isUrl: true, loading: false });

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Loader from "react-loader-spinner";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
+import { add_social_account } from "./apis/social_platforms";
 
 const Yelpconfig = {
   headers: {
@@ -77,11 +78,12 @@ class YelpLogin extends Component {
     )
       .then(resp => {
         if (resp.data.reviews) {
-          Axios.post(
-            "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-            data,
-            DjangoConfig
-          )
+          // Axios.post(
+          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+          //   data,
+          //   DjangoConfig
+          // )
+          add_social_account(data, DjangoConfig)
             .then(resp => {
               console.log(resp);
               this.setState({ isUrl: true, loading: false });

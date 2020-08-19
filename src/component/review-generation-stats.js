@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Axios from "axios";
+import { all_connection_of_one_location } from "./apis/social_platforms";
 import Spinner from "./common/Spinner";
 import { PieChart } from "react-minimal-pie-chart";
 import Chart from "react-google-charts";
@@ -258,16 +259,18 @@ export default class ReviewGenerationStats extends Component {
       citysearchUrl,
       fbtoken,
       fbPageId,
-      googleToken,locationIdGoogle;
+      googleToken,
+      locationIdGoogle;
     const data = {
       location_id: this.props.match.params.locationId
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    )
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig)
       .then(response => {
         console.log(response);
 
@@ -376,28 +379,31 @@ export default class ReviewGenerationStats extends Component {
             console.log(res.data);
             localStorage.setItem("accountId", res.data.accounts[0].name);
 
-              Axios.get(
-                "https://mybusiness.googleapis.com/v4/" +
+            Axios.get(
+              "https://mybusiness.googleapis.com/v4/" +
                 locationIdGoogle +
-                  "/reviews",
-                GoogleConfig
-              ).then(respo => {
-                console.log("google reviews", respo.data);
-                this.setState({
-                  google_reviews: respo.data.reviews ? respo.data.reviews : "",
-                  google_all_reviews: respo.data.reviews ? respo.data.reviews.length : 0,
-                  google_average_rating: respo.data.averageRating ? respo.data.averageRating : 0,
-                  isGoogleLoggedIn: true
-                });
-                this.monthlyLineGraph();
-                this.setState({
-                  all_connections: [
-                    ...this.state.all_connections,
-                    { name: "Google" }
-                  ]
-                });
+                "/reviews",
+              GoogleConfig
+            ).then(respo => {
+              console.log("google reviews", respo.data);
+              this.setState({
+                google_reviews: respo.data.reviews ? respo.data.reviews : "",
+                google_all_reviews: respo.data.reviews
+                  ? respo.data.reviews.length
+                  : 0,
+                google_average_rating: respo.data.averageRating
+                  ? respo.data.averageRating
+                  : 0,
+                isGoogleLoggedIn: true
               });
-            
+              this.monthlyLineGraph();
+              this.setState({
+                all_connections: [
+                  ...this.state.all_connections,
+                  { name: "Google" }
+                ]
+              });
+            });
           });
         }
 

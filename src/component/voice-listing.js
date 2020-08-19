@@ -1,6 +1,20 @@
 import React, { Component } from "react";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
+import { all_connection_of_one_location } from "./apis/social_platforms";
+import {
+  location_by_id,
+  business_categories,
+  business_states
+} from "./apis/location";
+import {
+  faqs_by_id,
+  edit_faq,
+  all_faq_by_location_id,
+  delete_faq,
+  all_faq,
+  add_faq
+} from "./apis/voice";
 import GoogleLogin from "react-google-login";
 import Spinner from "./common/Spinner";
 
@@ -90,11 +104,12 @@ class UpdateFaq extends Component {
       faq_id: this.props.faqid
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-faqs-by-id",
-      data,
-      DjangoConfig
-    ).then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-faqs-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    faqs_by_id(data, DjangoConfig).then(resp => {
       console.log(resp);
       this.setState({
         que: resp.data.all_faqs.question,
@@ -231,16 +246,18 @@ export default class VoiceListing extends Component {
     }
 
     if (is_ans && is_que) {
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/edit-faq",
-        data,
-        DjangoConfig
-      ).then(resp => {
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/edit-faq",
+      //   data,
+      //   DjangoConfig
+      // )
+      edit_faq(data, DjangoConfig).then(resp => {
         console.log(resp);
-        Axios.get(
-          "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs",
-          DjangoConfig
-        ).then(resp => {
+        // Axios.get(
+        //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs",
+        //   DjangoConfig
+        // )
+        all_faq(DjangoConfig).then(resp => {
           console.log(resp);
           this.setState({ allFaq: resp.data.all_faqs, update: false });
         });
@@ -263,16 +280,18 @@ export default class VoiceListing extends Component {
       faq_id: nameid
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/delete-faq",
-      data,
-      DjangoConfig
-    ).then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/delete-faq",
+    //   data,
+    //   DjangoConfig
+    // )
+    delete_faq(data, DjangoConfig).then(resp => {
       console.log(resp);
-      Axios.get(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs",
-        DjangoConfig
-      ).then(resp => {
+      // Axios.get(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs",
+      //   DjangoConfig
+      // )
+      all_faq(DjangoConfig).then(resp => {
         console.log(resp);
         this.setState({ allFaq: resp.data.all_faqs });
       });
@@ -292,16 +311,18 @@ export default class VoiceListing extends Component {
     };
 
     console.log(this.state.allFaq);
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/add",
-      data,
-      DjangoConfig
-    ).then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/add",
+    //   data,
+    //   DjangoConfig
+    // )
+    add_faq(data, DjangoConfig).then(resp => {
       console.log(resp);
-      Axios.get(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs",
-        DjangoConfig
-      ).then(resp => {
+      // Axios.get(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs",
+      //   DjangoConfig
+      // )
+      all_faq(DjangoConfig).then(resp => {
         console.log(resp);
         this.setState({ allFaq: resp.data.all_faqs });
       });
@@ -356,17 +377,19 @@ export default class VoiceListing extends Component {
       location_id: this.props.match.params.locationId
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-      data,
-      DjangoConfig
-    ).then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    location_by_id(data, DjangoConfig).then(resp => {
       console.log("hi");
       this.setState({ state: "Loading....", category: "Loading...." });
-      Axios.get(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/states",
-        DjangoConfig
-      ).then(resp1 => {
+      // Axios.get(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/states",
+      //   DjangoConfig
+      // )
+      business_states(DjangoConfig).then(resp1 => {
         resp1.data.status.map((s, i) =>
           s.id == resp.data.location.State
             ? this.setState({ state: s.State_name })
@@ -374,10 +397,11 @@ export default class VoiceListing extends Component {
         );
       });
 
-      Axios.get(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
-        DjangoConfig
-      ).then(resp1 => {
+      // Axios.get(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
+      //   DjangoConfig
+      // )
+      business_categories(DjangoConfig).then(resp1 => {
         resp1.data.BusinessCategory.map((b, i) =>
           b.id == resp.data.location.Business_category
             ? this.setState({ category: b.Category_Name })
@@ -410,11 +434,12 @@ export default class VoiceListing extends Component {
       location_id: this.props.match.params.locationId
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs-by-location-id",
-      datal,
-      DjangoConfig
-    ).then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/voice-faq/get-all-faqs-by-location-id",
+    //   datal,
+    //   DjangoConfig
+    // )
+    all_faq_by_location_id(datal, DjangoConfig).then(resp => {
       console.log(resp);
       this.setState({ allFaq: resp.data.all_faqs });
     });
@@ -428,11 +453,12 @@ export default class VoiceListing extends Component {
       }
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    )
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig)
       .then(resp => {
         console.log("get all connections", resp);
         this.setState({ allListings: resp.data.data });
@@ -491,6 +517,7 @@ export default class VoiceListing extends Component {
                 var fouro = res.data.response.venue;
                 if (
                   fouro.categories &&
+                  fouro.hours &&
                   fouro.hours.dayData &&
                   fouro.name &&
                   fouro.location.city &&
@@ -761,6 +788,7 @@ export default class VoiceListing extends Component {
                         //for server
                         // clientId="759599444436-5litbq8gav4ku8sj01o00uh6lsk8ebr0.apps.googleusercontent.com"
                         buttonText="Optimize"
+                        scope="https://www.googleapis.com/auth/business.manage"
                         onSuccess={this.responseGoogle}
                         onFailure={this.responseErrorGoogle}
                         cookiePolicy={"single_host_origin"}

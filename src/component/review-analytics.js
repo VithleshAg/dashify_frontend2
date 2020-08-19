@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Axios from "axios";
+import { all_connection_of_one_location } from "./apis/social_platforms";
 import Chart from "react-google-charts";
 import Spinner from "./common/Spinner";
 
@@ -88,11 +89,12 @@ export default class ReviewAnalytics extends Component {
       location_id: this.props.match.params.locationId
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    ).then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(response => {
       console.log(response);
 
       this.setState({ loader: false });
@@ -323,7 +325,7 @@ export default class ReviewAnalytics extends Component {
         ).then(res => {
           console.log("foursquare data", res.data.response.venue);
           this.setState({
-            foursquareReviews: res.data.response.venue.tips.groups[0].items,
+            foursquareReviews: res.data.response.venue.tips.groups[0] ? res.data.response.venue.tips.groups[0].items :[],
             foursquareDetails: res.data.response.venue,
             foursquareReviewCount: res.data.response.venue.tips.count
           });
@@ -625,18 +627,17 @@ export default class ReviewAnalytics extends Component {
         ? this.state.foursquareDetails.rating / 2
         : 0) +
       (this.state.fb_average_rating ? this.state.fb_average_rating : 0) +
-      (this.state.appleRating ? this.state.appleRating : 0) +
-      (this.state.citysearchRating ? this.state.citysearchRating : 0) +
+      (this.state.appleRating && (this.state.appleRating != "-") ? this.state.appleRating : 0) +
+      (this.state.citysearchRating && (this.state.citysearchRating != "-") ? this.state.citysearchRating : 0) +
       (this.state.hereRating != "-" ? this.state.hereRating : 0) +
       (this.state.zillowRating != "-" ? this.state.zillowRating : 0) +
       (this.state.tomtomRating != "-" ? this.state.tomtomRating : 0) +
       (this.state.avvoRating != "-" ? this.state.avvoRating : 0) +
       (this.state.zomatoRating != "-" ? this.state.zomatoRating : 0);
+      
+      // console.log("all rating",this.state.yelpDetails.rating,this.state.googleReviews.averageRating,this.state.foursquareDetails.rating,this.state.fb_average_rating,this.state.appleRating,this.state.citysearchRating,this.state.hereRating,this.state.zillowRating,this.state.tomtomRating,this.state.avvoRating,this.state.zomatoRating)
 
     overAllRating = a == 0 ? "-" : overAllRating / a;
-    console.log(overAllRating);
-
-    console.log("revewCount");
 
     overAllReviewCount =
       (this.state.fbReviews ? this.state.fbReviews : 0) +

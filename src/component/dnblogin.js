@@ -4,14 +4,14 @@ import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
 import { add_social_account } from "./apis/social_platforms";
 
-const Zomatoconfig = {
+const DnbConfig = {
   headers: {
-    "user-key": "5a09665cb72fa8f5a661296e9ed00af4",
-    Accept: "application/json"
+    "x-dnb-user": "P200000A3A7EC40D0DD41748DA62B835",
+    "x-dnb-pwd": "iit2mumbai"
   }
 };
 
-class ZomatoLogin extends Component {
+class DnbLogin extends Component {
   state = {
     url: "",
     username: "",
@@ -22,13 +22,50 @@ class ZomatoLogin extends Component {
     password_error: "",
     url_error: "",
     wrong: "",
-    loading: false
+    loading: false,
+    token: ""
+  };
+
+  componentDidMount = () => {
+    var today = new Date();
+    var date =
+      today.getFullYear() +
+      "-" +
+      (today.getMonth() + 1) +
+      "-" +
+      today.getDate() +
+      "T" +
+      today.getHours() +
+      ":" +
+      today.getMinutes() +
+      ":" +
+      today.getSeconds();
+
+    const data = {
+      ApplicationTransactionID: "1234",
+      ServiceTransactionID: "5678",
+      //    TransactionTimestamp: "2001-12-17T09:30:47Z"
+      TransactionTimestamp: date
+    };
+
+    Axios.post(
+      "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/Authentication/V2.0/",
+      data,
+      DnbConfig
+    )
+      .then(resp => {
+        console.log("DNB authentication", resp.data);
+        this.setState({ token: resp.data.AuthenticationDetail.Token });
+      })
+      .catch(resp => {
+        console.log("DNB authentication error", resp.data);
+        alert("Admin side error");
+      });
   };
 
   onSubmit = e => {
     e.preventDefault();
 
-    let isError = false;
     this.setState({
       username_error: "",
       password_error: "",
@@ -40,67 +77,75 @@ class ZomatoLogin extends Component {
       this.setState({
         username_error: "Enter your Email"
       });
-      isError = true;
     }
     if (this.state.password == "") {
       this.setState({ password_error: "Enter your password" });
-      isError = true;
     }
     if (this.state.url == "") {
-      this.setState({ url_error: "Enter your restaurant id" });
+      this.setState({ url_error: "Enter Company DUNS Number" });
       console.log("i am in console");
-      isError = true;
     }
+    this.setState({ loading: true });
 
     const DjangoConfig = {
       headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
     };
 
-    const data = {
-      location_id: localStorage.getItem("locationId"),
-      Platform: "Zomato",
-      Token: "",
-      Username: this.state.username,
-      Email: this.state.username,
-      Password: this.state.password,
-      Connect_status: "Connect",
-      Other_info: this.state.url
+    const DnbAuthorization = {
+      headers: { Authorization: this.state.token }
     };
 
-    if (isError == false) {
-      this.setState({ loading: true });
-      Axios.get(
-        "https://developers.zomato.com/api/v2.1/restaurant?res_id=" +
-          this.state.url,
-        Zomatoconfig
-      )
-        .then(res => {
-          console.log("zomato checking data", res.data);
+    Axios.get(
+      "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V6.0/organizations?match=true&MatchTypeText=Basic&DUNSNumber=" +
+        this.state.url,
+      DnbAuthorization
+    )
+      .then(resp => {
+        console.log("DNB result", resp.data);
 
-          // Axios.post(
-          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-          //   data,
-          //   DjangoConfig
-          // )
+        if (
+          resp.data.MatchResponse &&
+          resp.data.MatchResponse.TransactionResult &&
+          resp.data.MatchResponse.TransactionResult.ResultText == "Success"
+        ) {
+          const data = {
+            location_id: localStorage.getItem("locationId"),
+            Platform: "Dnb",
+            Token: this.state.token,
+            Username:
+              resp.data.MatchResponse.MatchResponseDetail.MatchCandidate[0]
+                .OrganizationPrimaryName.OrganizationName.$,
+            Email: this.state.username,
+            Password: this.state.password,
+            Connect_status: "Connect",
+            Other_info: this.state.url
+          };
           add_social_account(data, DjangoConfig)
             .then(resp => {
-              console.log("zomato resp", resp.data);
+              console.log("add social account", resp.data);
               this.setState({ isUrl: true, loading: false });
             })
             .catch(resp => {
-              alert("Invalid Zomato id");
-              console.log("Zomato resp", resp.data);
+              console.log("add social account error", resp);
               this.setState({
-                // wrong: "Invalid Zillow Email",
+                wrong: "Something went wrong",
                 loading: false
               });
             });
-        })
-        .catch(res => {
-          alert("Invalid Zomato id");
-          this.setState({ loading: false });
+        } else {
+          this.setState({
+            wrong: "No match found for the requested Duns number.",
+            loading: false
+          });
+        }
+      })
+      .catch(resp => {
+        console.log("DNB error", resp);
+        this.setState({
+          wrong: "No match found for the requested Duns number.",
+          loading: false
         });
-    }
+      });
   };
 
   render() {
@@ -119,7 +164,7 @@ class ZomatoLogin extends Component {
     return (
       <div>
         <div className="foursquer-logo">
-          <img src={require("../images/zomato.png")} alt="Zomato" />
+          <img src={require("../images/dnb.jpg")} alt="DandB" />
         </div>
         <div className="login_form">
           <form onSubmit={this.onSubmit}>
@@ -137,12 +182,12 @@ class ZomatoLogin extends Component {
                 <div style={{ color: "red" }}>{this.state.wrong}</div>
               )}
               <p>
-                <label htmlFor="url">Zomato Restaurant Id</label>
+                <label htmlFor="url">Company DUNS Number</label>
                 <input
                   type="text"
                   id="url"
                   value={this.state.url}
-                  placeholder="18740397"
+                  placeholder="804735132"
                   onChange={e => this.setState({ url: e.target.value })}
                 />
                 <div style={{ color: "red" }}>{this.state.url_error}</div>
@@ -178,4 +223,4 @@ class ZomatoLogin extends Component {
   }
 }
 
-export default ZomatoLogin;
+export default DnbLogin;

@@ -12,6 +12,7 @@ import Login from "./component/landingpage/login";
 import Signup from "./component/landingpage/signup";
 import Forgot from "./component/landingpage/forgot.js";
 import FourSquareLogin from "./component/foursquarelogin";
+import DnbLogin from "./component/dnblogin";
 import AppleLogin from "./component/applelogin";
 import CitySearchLogin from "./component/citysearchlogin";
 import HereLogin from "./component/herelogin";
@@ -55,6 +56,7 @@ class App extends Component {
             <Route exact path="/instagramlogin" component={InstagramLogin} />
             <Route exact path="/yelplogin" component={YelpLogin} />
             <Route exact path="/foursquarelogin" component={FourSquareLogin} />
+            <Route exact path="/dnblogin" component={DnbLogin} />
             <Route exact path="/applelogin" component={AppleLogin} />
             <Route exact path="/citysearchlogin" component={CitySearchLogin} />
             <Route exact path="/herelogin" component={HereLogin} />

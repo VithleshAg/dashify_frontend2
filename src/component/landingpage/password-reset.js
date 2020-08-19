@@ -3,6 +3,7 @@ import Logo from "./img/Logo.png";
 import { Link, Redirect } from "react-router-dom";
 import { Row, Col } from "react-bootstrap";
 import Axios from "axios";
+import { reset_password } from "../apis/user";
 import Loader from "react-loader-spinner";
 // import setAuthToken from '../utils/setAuthToken';
 
@@ -42,10 +43,11 @@ class PasswordReset extends React.Component {
       };
       this.setState({ loading: true });
 
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/reset-password",
-        data
-      )
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/reset-password",
+      //   data
+      // )
+      reset_password(data)
         .then(res => {
           console.log(res);
           this.setState({ loading: false });

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Loader from "react-loader-spinner";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
+import { add_social_account } from "./apis/social_platforms";
 import Spinner from "./common/Spinner";
 
 const DjangoConfig = {
@@ -12,7 +13,7 @@ class ConnectedAccounts extends Component {
   state = {
     loading: false,
     isUrl: false,
-
+    loader: true,
     all_pages: []
   };
 
@@ -24,7 +25,10 @@ class ConnectedAccounts extends Component {
         fb_accessToken
     ).then(res => {
       console.log("facebook response", res.data.data);
-      this.setState({ all_pages: res.data.data });
+      this.setState({
+        all_pages: res.data.data ? res.data.data : [],
+        loader: false
+      });
     });
   };
 
@@ -45,11 +49,12 @@ class ConnectedAccounts extends Component {
       Other_info: this.state.all_pages[index].id
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-      data,
-      DjangoConfig
-    )
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+    //   data,
+    //   DjangoConfig
+    // )
+    add_social_account(data, DjangoConfig)
       .then(resp => {
         console.log("facebook page response", resp);
         // this.setState({
@@ -150,8 +155,20 @@ class ConnectedAccounts extends Component {
             </div>
           </div>
 
-          {this.state.all_pages.length == 0 ? (
+          {this.state.loader ? (
             <Spinner />
+          ) : this.state.all_pages.length == 0 ? (
+            <div className="listdata" key="no fb page">
+              <div className="row d-flex">
+                <div className="col-md-12">
+                  <div className="authordata ">
+                    <div className="authordatatext">
+                      <h3>No Facebook Business page to connect</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           ) : (
             <div>{allPages}</div>
           )}

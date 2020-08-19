@@ -4,6 +4,7 @@ import Loader from "react-loader-spinner";
 import { Link, Redirect } from "react-router-dom";
 import { Row, Col } from "react-bootstrap";
 import Axios from "axios";
+import { signup, get_all_user } from "../apis/user";
 // import Button from 'react-bootstrap/Button';
 
 // import Card from 'react-bootstrap/Card';
@@ -35,9 +36,10 @@ class Signup extends React.Component {
   };
 
   componentDidMount = () => {
-    Axios.get(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/get-all-user"
-    )
+    // Axios.get(
+    //   "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/account/get-all-user"
+    // )
+    get_all_user()
       .then(res => {
         this.setState({
           all_users: res.data.user_info
@@ -70,10 +72,11 @@ class Signup extends React.Component {
 
     if (this.state.any_error == false && this.state.terms_condition == true) {
       this.setState({ loading: true });
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/register",
-        data
-      )
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/account/register",
+      //   data
+      // )
+      signup(data)
         .then(resp => {
           this.setState({ loading: false });
           console.log("resp", resp);
@@ -337,8 +340,6 @@ class Signup extends React.Component {
                       </Col>
                     </Row>
                     <Row>
-                      
-
                       <Col md="6" className="mb-3">
                         <label
                           htmlFor="defaultFormRegisterEmailEx2"

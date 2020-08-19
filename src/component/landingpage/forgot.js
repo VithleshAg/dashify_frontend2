@@ -3,6 +3,7 @@ import Logo from "./img/Logo.png";
 import { Link } from "react-router-dom";
 import { Row, Col } from "react-bootstrap";
 import Axios from "axios";
+import { get_link_of_forget_password } from "../apis/user";
 import Loader from "react-loader-spinner";
 
 class Login extends React.Component {
@@ -20,10 +21,11 @@ class Login extends React.Component {
     };
     if (this.state.Email) {
       this.setState({ loading: true });
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/get-link-of-forget-password",
-        data
-      )
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/get-link-of-forget-password",
+      //   data
+      // )
+      get_link_of_forget_password(data)
         .then(res => {
           console.log(res);
           this.setState({ error: "", loading: false });

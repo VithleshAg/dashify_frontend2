@@ -1,5 +1,14 @@
 import React, { Component } from "react";
 import Axios from "axios";
+import {
+  business_categories,
+  location_by_id,
+  edit_location_by_id,
+  edit_location_operations_hours_by_id,
+  edit_location_payment_by_id,
+  update_images_by_location_id,
+  add_other_images_by_location_id
+} from "./apis/location";
 import Spinner from "./common/Spinner";
 import Loader from "react-loader-spinner";
 
@@ -119,11 +128,12 @@ export default class LocationManager extends Component {
     const data = {
       location_id: locationId
     };
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-      data,
-      DjangoConfig
-    ).then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    location_by_id(data,DjangoConfig).then(resp => {
       console.log(resp.data);
       this.setState({
         location: resp.data.location,
@@ -151,10 +161,11 @@ export default class LocationManager extends Component {
         otherImages: resp.data.location.Df_location_image,
         loader: false
       });
-      Axios.get(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
-        DjangoConfig
-      ).then(resp1 => {
+      // Axios.get(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
+      //   DjangoConfig
+      // )
+      business_categories(DjangoConfig).then(resp1 => {
         resp1.data.BusinessCategory.map((b, i) =>
           b.id == resp.data.location.Business_category
             ? this.setState({ category: b.Category_Name })
@@ -198,12 +209,12 @@ export default class LocationManager extends Component {
 
     this.setState({ businessDetailsLoading: true });
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-Business-by-id",
-      data,
-      DjangoConfig
-    )
-      .then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-Business-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    edit_location_by_id(data,DjangoConfig).then(resp => {
         console.log(resp);
 
         this.setState({ detailEdit: false, businessDetailsLoading: false });
@@ -254,23 +265,23 @@ export default class LocationManager extends Component {
 
     this.setState({ paymentLoading: true });
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-payment-method-by-id",
-      data,
-      DjangoConfig
-    )
-      .then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-payment-method-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    edit_location_payment_by_id(data,DjangoConfig).then(resp => {
         console.log(resp);
         this.setState({ paymentEdit: false });
         const data1 = {
           location_id: locationId
         };
-        Axios.post(
-          "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-          data1,
-          DjangoConfig
-        )
-          .then(resp1 => {
+        // Axios.post(
+        //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+        //   data1,
+        //   DjangoConfig
+        // )
+        location_by_id(data1,DjangoConfig).then(resp1 => {
             this.setState({
               payment: resp1.data.location.Df_location_payments,
               paymentLoading: false
@@ -372,12 +383,12 @@ export default class LocationManager extends Component {
       }
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-operations-hours-by-id",
-      data,
-      DjangoConfig
-    )
-      .then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-operations-hours-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    edit_location_operations_hours_by_id(data,DjangoConfig).then(resp => {
         console.log(resp);
         this.setState({ hourEdit: false });
         // window.location.reload(false);
@@ -385,12 +396,12 @@ export default class LocationManager extends Component {
         const data1 = {
           location_id: locationId
         };
-        Axios.post(
-          "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-          data1,
-          DjangoConfig
-        )
-          .then(resp1 => {
+        // Axios.post(
+        //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+        //   data1,
+        //   DjangoConfig
+        // )
+        location_by_id(data1,DjangoConfig).then(resp1 => {
             this.setState({
               hours: resp1.data.location.Df_location_poen_hour,
               operatingHoursLoading: false
@@ -472,24 +483,24 @@ export default class LocationManager extends Component {
 
     this.setState({ specialTimeLoading: true });
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-operations-hours-by-id",
-      data,
-      DjangoConfig
-    )
-      .then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-operations-hours-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    edit_location_operations_hours_by_id(data,DjangoConfig).then(resp => {
         console.log(resp);
         this.setState({ add_special_hour: false });
 
         const data1 = {
           location_id: locationId
         };
-        Axios.post(
-          "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-          data1,
-          DjangoConfig
-        )
-          .then(resp1 => {
+        // Axios.post(
+        //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+        //   data1,
+        //   DjangoConfig
+        // )
+        location_by_id(data1,DjangoConfig).then(resp1 => {
             this.setState({
               hours: resp1.data.location.Df_location_poen_hour,
               specialTimeLoading: false
@@ -539,21 +550,21 @@ export default class LocationManager extends Component {
         [name]: e.target.result
       };
 
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/update-images-files-by-location-id",
-        data,
-        DjangoConfig
-      )
-        .then(resp => {
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/update-images-files-by-location-id",
+      //   data,
+      //   DjangoConfig
+      // )
+      update_images_by_location_id(data,DjangoConfig).then(resp => {
           const data1 = {
             location_id: locationId
           };
-          Axios.post(
-            "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-            data1,
-            DjangoConfig
-          )
-            .then(resp1 => {
+          // Axios.post(
+          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+          //   data1,
+          //   DjangoConfig
+          // )
+          location_by_id(data1,DjangoConfig).then(resp1 => {
               this.setState({
                 LocationDetails: resp1.data.location,
                 logoLoading: false,
@@ -589,21 +600,21 @@ export default class LocationManager extends Component {
 
       this.setState({ otherImagesLoading: true });
 
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/add-other-images-files-by-location-id",
-        data,
-        DjangoConfig
-      )
-        .then(resp => {
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/add-other-images-files-by-location-id",
+      //   data,
+      //   DjangoConfig
+      // )
+      add_other_images_by_location_id(data,DjangoConfig).then(resp => {
           const data1 = {
             location_id: locationId
           };
-          Axios.post(
-            "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-            data1,
-            DjangoConfig
-          )
-            .then(resp1 => {
+          // Axios.post(
+          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+          //   data1,
+          //   DjangoConfig
+          // )
+          location_by_id(data1,DjangoConfig).then(resp1 => {
               this.setState({
                 otherImages: resp1.data.location.Df_location_image,
                 otherImagesLoading: false

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Loader from "react-loader-spinner";
 import { Link, Redirect } from "react-router-dom";
 import Axios from "axios";
+import { add_social_account } from "./apis/social_platforms";
 import Spinner from "./common/Spinner";
 
 const DjangoConfig = {
@@ -32,11 +33,12 @@ class TomtomRelatedLocation extends Component {
       Other_info: data.dataSources ? data.dataSources.poiDetails[0].id : "-"
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-      data2,
-      DjangoConfig
-    )
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+    //   data2,
+    //   DjangoConfig
+    // )
+    add_social_account(data2, DjangoConfig)
       .then(resp => {
         console.log("Tomtom register response", resp.data);
         this.setState({ isUrl: true, loading: false });

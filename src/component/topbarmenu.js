@@ -1,7 +1,10 @@
 import React, { Component } from "react";
 import SelectSearch from "react-select-search";
 import Axios from "axios";
-import { Redirect, NavLink } from "react-router-dom";
+import { logout } from "./apis/user";
+import { all_location } from "./apis/location";
+import { all_connection_of_one_location } from "./apis/social_platforms";
+import { Link, Redirect, NavLink } from "react-router-dom";
 import ViewLocations from "./location-manager";
 
 const DjangoConfig = {
@@ -48,7 +51,7 @@ export default class Topbarmenu extends Component {
 
     localStorage.setItem("locationId", e.target.value);
 
-    console.log(window.location.href);
+    // console.log(window.location.href);
 
     window.location.assign(
       "dashboard#/locations/" + e.target.value + "/view-location"
@@ -57,12 +60,12 @@ export default class Topbarmenu extends Component {
   };
 
   logout = () => {
-    console.log("logout");
-    localStorage.removeItem("UserToken");
+    localStorage.clear()
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/logout"
-    )
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/logout"
+    // )
+    logout()
       .then(res => {
         console.log("sucess");
         console.log(res);
@@ -81,11 +84,12 @@ export default class Topbarmenu extends Component {
     const data = {
       user_id: localStorage.getItem("UserId")
     };
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-locations",
-      data,
-      DjangoConfig1
-    )
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-locations",
+    //   data,
+    //   DjangoConfig1
+    // )
+    all_location(data, DjangoConfig1)
       .then(res => {
         console.log(res);
         console.log(res.data.all_location);
@@ -104,11 +108,12 @@ export default class Topbarmenu extends Component {
       location_id
     };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data2,
-      DjangoConfig
-    ).then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data2,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data2, DjangoConfig).then(response => {
       response.data.data.map(l => {
         if (l.Social_Platform.Platform == "Facebook") {
           fbtoken = l.Social_Platform.Token;

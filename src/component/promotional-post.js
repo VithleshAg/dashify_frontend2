@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import Axios from "axios";
+import { all_connection_of_one_location } from "./apis/social_platforms";
 import Spinner from "./common/Spinner";
 import Loader2 from "react-loader-spinner";
 
@@ -185,12 +186,12 @@ export default class PromotionalPost extends Component {
       show_states: last_week
     });
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    )
-      .then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(response => {
         this.setState({ loader: false });
         var googleToken;
         response.data.data.map(l => {
@@ -252,11 +253,12 @@ export default class PromotionalPost extends Component {
       couponCode
     } = this.state;
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    ).then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(response => {
       var googleToken;
       response.data.data.map(l => {
         if (l.Social_Platform.Platform == "Google") {
@@ -332,11 +334,12 @@ export default class PromotionalPost extends Component {
       redeemOnlineUrl,
       couponCode
     } = this.state;
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    ).then(async response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(async response => {
       var googleToken;
       response.data.data.map(l => {
         if (l.Social_Platform.Platform == "Google") {
@@ -504,11 +507,12 @@ export default class PromotionalPost extends Component {
     const data = {
       location_id: this.props.match.params.locationId
     };
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    ).then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(response => {
       var googleToken;
       response.data.data.map(l => {
         if (l.Social_Platform.Platform == "Google") {

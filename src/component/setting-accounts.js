@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { NavLink } from "react-router-dom";
 import Axios from "axios";
+import { get_link_of_forget_password } from "./apis/user";
 
 export default class SettingAccounts extends Component {
   changePassword = () => {
@@ -8,11 +9,13 @@ export default class SettingAccounts extends Component {
     const data = {
       email_id: userEmail
     };
+
     if (userEmail) {
-      Axios.post(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/get-link-of-forget-password",
-        data
-      )
+      // Axios.post(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/get-link-of-forget-password",
+      //   data
+      // )
+      get_link_of_forget_password(data)
         .then(res => {
           console.log(res);
           alert("Reset Password link sent to your Mail");

@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import Axios from "axios";
+import { all_connection_of_one_location } from "./apis/social_platforms";
+import { location_by_id,business_categories,business_states } from "./apis/location";
 import Rating from "react-rating";
 import Spinner from "./common/Spinner";
 import { breakStatement } from "@babel/types";
@@ -184,12 +186,12 @@ export default class ReviewTracking extends Component {
     };
 
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-      data,
-      DjangoConfig
-    )
-      .then(response => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
+    //   data,
+    //   DjangoConfig
+    // )
+    all_connection_of_one_location(data, DjangoConfig).then(response => {
         console.log(response);
 
         response.data.data.map(l => {
@@ -464,10 +466,9 @@ export default class ReviewTracking extends Component {
               fourUrl +
               "?client_id=TEUSFAUY42IR0HGTPSWO1GFLC5WHX3PIBKVICAQRZQA0MTD1&client_secret=CYBQFK0YRBPFE54NARAEJCG2NLBARIU2OOIJNE0AZOHWZTXU&v=20180323"
           ).then(res => {
-            console.log("four");
-            console.log(res.data.response.venue.tips.groups[0].items);
+            console.log("foursquare data",res.data);
             this.setState({
-              foursquareReviews: res.data.response.venue.tips.groups[0].items,
+              foursquareReviews: res.data.response.venue.tips.groups[0]?res.data.response.venue.tips.groups[0].items:[],
               foursquareDetails: res.data.response.venue,
               foursquareReviewCount: res.data.response.venue.tips.count,
               active_listing: [...this.state.active_listing, "Foursquare"]
@@ -854,16 +855,18 @@ export default class ReviewTracking extends Component {
       });
 
     // getting business address
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-      data,
-      DjangoConfig
-    ).then(resp => {
+    // Axios.post(
+    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
+    //   data,
+    //   DjangoConfig
+    // )
+    location_by_id(data, DjangoConfig).then(resp => {
       // this.setState({ state: "Loading....", category: "Loading...." });
-      Axios.get(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/states",
-        DjangoConfig
-      ).then(resp1 => {
+      // Axios.get(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/states",
+      //   DjangoConfig
+      // )
+      business_states(DjangoConfig).then(resp1 => {
         resp1.data.status.map((s, i) =>
           s.id == resp.data.location.State
             ? this.setState({ state: s.State_name })
@@ -871,10 +874,11 @@ export default class ReviewTracking extends Component {
         );
       });
 
-      Axios.get(
-        "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
-        DjangoConfig
-      ).then(resp1 => {
+      // Axios.get(
+      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
+      //   DjangoConfig
+      // )
+      business_categories(DjangoConfig).then(resp1 => {
         resp1.data.BusinessCategory.map((b, i) =>
           b.id == resp.data.location.Business_category
             ? this.setState({ category: b.Category_Name })
@@ -2930,7 +2934,15 @@ export default class ReviewTracking extends Component {
                     </div>
 
                     <div role="tabpanel" className="tab-pane " id="Foursquare">
-                      {foursquareAllReviews}
+                      {foursquareAllReviews.length != 0 ? (
+                        foursquareAllReviews
+                      ) : (
+                        <div className="whitebox">
+                          <div className="text_viewahor">
+                            <h4>No review</h4>
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div role="tabpanel" className="tab-pane " id="Yelp">
