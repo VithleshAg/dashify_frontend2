@@ -75,6 +75,10 @@ export default class Overview extends Component {
     fengaged: "-",
     fimpressions: "-",
 
+    hereDetails: "",
+    hereRating: "-",
+    hereReviews: "-",
+
     avvoDetails: "",
     avvoRating: "-",
     avvoReviews: "-",
@@ -221,6 +225,7 @@ export default class Overview extends Component {
       zillowUrl,
       avvoUrl,
       zomatoUrl,
+      hereUrl,
       tomtomUrl,
       linkedinUrl,
       avvoToken,
@@ -245,55 +250,27 @@ export default class Overview extends Component {
             fbPageId = l.Social_Platform.Other_info;
           }
           if (l.Social_Platform.Platform == "Google") {
-            console.log("yes google");
-            googleToken = l.Social_Platform.Token;
+            googleToken = l.Social_Platform.Token; 
             this.setState({
               google_token: googleToken,
               locationIdGoogle: l.Social_Platform.Other_info
-            });
+            }); 
           }
-          if (l.Social_Platform.Platform == "Yelp") {
-            // console.log("yes yelp");
-            // console.log(l.Social_Platform.Other_info.split(",")[0].slice(7));
-            // yelpUrl = l.Social_Platform.Other_info.split(",")[0].slice(7);
-            this.setState({
-              all_connections: [...this.state.all_connections, { name: "Yelp" }]
-            });
+          if (l.Social_Platform.Platform == "Yelp") {            
             yelpUrl = l.Social_Platform.Other_info.split(",")[0].slice(7);
           }
 
           if (l.Social_Platform.Platform == "Foursquare") {
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Foursquare" }
-              ]
-            });
-
             fourUrl = l.Social_Platform.Other_info.split(",")[0]
               .slice(7)
               .split("/")[5];
           }
 
           if (l.Social_Platform.Platform == "Dnb") {
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Dnb" }
-              ]
-            });
-
             dnbUrl = l.Social_Platform.Other_info;
           }
 
           if (l.Social_Platform.Platform == "Apple") {
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Apple" }
-              ]
-            });
-
             appleUrl = l.Social_Platform.Other_info.split(",")[0]
               .slice(7)
               .split("/")[6]
@@ -301,45 +278,22 @@ export default class Overview extends Component {
           }
 
           if (l.Social_Platform.Platform == "Instagram") {
-            console.log("yes instagram");
             console.log(
               "instagram id",
               l.Social_Platform.Other_info.split(",")[0].slice(7)
             );
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Instagram" }
-              ]
-            });
             instaUrl = l.Social_Platform.Other_info.split(",")[0].slice(7);
           }
 
           if (l.Social_Platform.Platform == "Citysearch") {
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Citysearch" }
-              ]
-            });
-
             citysearchUrl = l.Social_Platform.Other_info.split(",")[0]
               .slice(7)
               .split("/")[4];
           }
           if (l.Social_Platform.Platform == "Here") {
-            this.setState({
-              all_connections: [...this.state.all_connections, { name: "Here" }]
-            });
+            hereUrl = l.Social_Platform.Other_info;
           }
           if (l.Social_Platform.Platform == "Zillow") {
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Zillow" }
-              ]
-            });
-
             zillowUrl = l.Social_Platform.Other_info;
           }
 
@@ -369,7 +323,7 @@ export default class Overview extends Component {
           headers: { Authorization: "Bearer " + googleToken }
         };
 
-        // for imstagram
+        // for instagram
         // if (fbtoken) {
         //   Axios.get(
         //     "https://www.instagram.com/oauth/authorize?client_id=708019883077720&redirect_uri=https://digimonk.com/auth/&scope=user_profile,user_media&response_type=code"
@@ -405,12 +359,12 @@ export default class Overview extends Component {
             ).then(resp => {
               console.log("facebook data2", resp.data);
               this.setState({
-                fViews: resp.data.data[2].values[0].value,
-                fWebClicks: resp.data.data[5].values[0].value,
-                fcalls: resp.data.data[3].values[0].value,
-                fdirection: resp.data.data[4].values[0].value,
-                fengaged: resp.data.data[0].values[0].value,
-                fimpressions: resp.data.data[1].values[0].value
+                fViews: resp.data.data[2] && resp.data.data[2].values[0] ?resp.data.data[2].values[0].value : "-",
+                fWebClicks: resp.data.data[5] && resp.data.data[5].values[0] ?resp.data.data[5].values[0].value : "-",
+                fcalls: resp.data.data[3] && resp.data.data[3].values[0] ? resp.data.data[3].values[0].value : "-",
+                fdirection: resp.data.data[4] && resp.data.data[4].values[0] ?resp.data.data[4].values[0].value : "-",
+                fengaged: resp.data.data[0] && resp.data.data[0].values[0] ?resp.data.data[0].values[0].value : "-",
+                fimpressions: resp.data.data[1] && resp.data.data[1].values[0] ? resp.data.data[1].values[0].value : "-"
               });
             });
             Axios.get(
@@ -420,7 +374,7 @@ export default class Overview extends Component {
                 fbPageAccessToken
             ).then(res => {
               console.log("fb reviews", res.data);
-              this.setState({ fbReviews: res.data.data });
+              this.setState({ fbReviews: res.data.data ? res.data.data : [] });
             });
             Axios.get(
               "https://graph.facebook.com/" +
@@ -518,6 +472,34 @@ export default class Overview extends Component {
           });
         }
 
+        // here
+        if (hereUrl) {
+          Axios.get(hereUrl).then(res => {
+            console.log("Here data", res.data);
+            this.setState({hereDetails:res.data})
+  
+            if(res.data.media){
+              let hereRating =
+              res.data.media.ratings.items.length >= 1
+                ? res.data.media.ratings.items[0].average
+                : "-";
+            let hereReviews =
+              res.data.media.ratings.items.length >= 1
+                ? res.data.media.ratings.items[0].count
+                : "-";
+            this.setState({
+              hereRating,
+              hereReviews: hereReviews,
+              all_connections: [...this.state.all_connections, { name: "Here" }]
+            });
+            } else {
+            this.setState({
+              all_connections: [...this.state.all_connections, { name: "Here" }]
+            });
+          }
+          });
+        }
+
         //for instagram
         if (instaUrl) {
           Axios.get("https://www.instagram.com/" + instaUrl + "/?__a=1").then(
@@ -542,6 +524,12 @@ export default class Overview extends Component {
               });
             }
           );
+          this.setState({
+            all_connections: [
+              ...this.state.all_connections,
+              { name: "Instagram" }
+            ]
+          });
         }
 
         // for yelp
@@ -578,6 +566,9 @@ export default class Overview extends Component {
           });
 
           });
+          this.setState({
+            all_connections: [...this.state.all_connections, { name: "Yelp" }]
+          });
         }
 
         // for zillow
@@ -592,6 +583,12 @@ export default class Overview extends Component {
               zillowReviews: resp.data.response.results.proReviews.review,
               zillowDetails: resp.data.response.results.proInfo
             });
+          });
+          this.setState({
+            all_connections: [
+              ...this.state.all_connections,
+              { name: "Zillow" }
+            ]
           });
         }
 
@@ -648,45 +645,49 @@ export default class Overview extends Component {
           });
         }
 
-        if (tomtomUrl && tomtomUrl != "-") {
-          Axios.get(
-            "https://api.tomtom.com/search/2/poiDetails.json?key=BVtLuLXu3StRT6YXupe4H9cbtugU3i10&id=" +
-              tomtomUrl
-          ).then(res => {
-            console.log("tomtom data", res.data);
-
-            let tomtomRating = res.data.result.rating
-              ? parseFloat(res.data.result.rating.value) / 2
-              : 0;
-
-            let tomtomReviews = parseInt(res.data.result.rating.totalRatings);
-
-            var tomtomNewReviews = 0;
-            for (let i = 0; i < res.data.result.reviews.length; i++) {
-              let create_time1 = res.data.result.reviews[i];
-              if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
-                if (
-                  parseInt(create_time1.slice(5, 7)) ==
-                  today.getMonth() + 1
-                ) {
-                  if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
-                    tomtomNewReviews++;
+        if (tomtomUrl) {
+          if(tomtomUrl != "-"){
+            Axios.get(
+              "https://api.tomtom.com/search/2/poiDetails.json?key=BVtLuLXu3StRT6YXupe4H9cbtugU3i10&id=" +
+                tomtomUrl
+            ).then(res => {
+              console.log("tomtom data", res.data);
+  
+              let tomtomRating = res.data.result.rating
+                ? parseFloat(res.data.result.rating.value) / 2
+                : 0;
+  
+              let tomtomReviews = parseInt(res.data.result.rating.totalRatings);
+  
+              var tomtomNewReviews = 0;
+              for (let i = 0; i < res.data.result.reviews.length; i++) {
+                let create_time1 = res.data.result.reviews[i];
+                if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
+                  if (
+                    parseInt(create_time1.slice(5, 7)) ==
+                    today.getMonth() + 1
+                  ) {
+                    if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
+                      tomtomNewReviews++;
+                    }
                   }
                 }
               }
-            }
-            this.setState({
-              tomtomDetails: res.data,
-              tomtomRating,
-              tomtomReviews,
-              tomtomNewReviews
+              this.setState({
+                tomtomDetails: res.data,
+                tomtomRating,
+                tomtomReviews,
+                tomtomNewReviews
+              });
+              
             });
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Tomtom" }
-              ]
-            });
+          }
+          
+          this.setState({
+            all_connections: [
+              ...this.state.all_connections,
+              { name: "Tomtom" }
+            ]
           });
         }
 
@@ -704,66 +705,71 @@ export default class Overview extends Component {
             foursquareReviewlength: res.data.response.venue.tips.count
             });
           });
+          this.setState({
+            all_connections: [
+              ...this.state.all_connections,
+              { name: "Foursquare" }
+            ]
+          });
         }
 
         // For Dnb
         if (dnbUrl) {
 
           var today = new Date();
-    var date =
-      today.getFullYear() +
-      "-" +
-      (today.getMonth() + 1) +
-      "-" +
-      today.getDate() +
-      "T" +
-      today.getHours() +
-      ":" +
-      today.getMinutes() +
-      ":" +
-      today.getSeconds();
+          var date =
+            today.getFullYear() +
+              "-" +
+            (today.getMonth() + 1) +
+              "-" +
+            today.getDate() +
+              "T" +
+            today.getHours() +
+              ":" +
+            today.getMinutes() +
+              ":" +
+            today.getSeconds();
 
-    const data = {
-      ApplicationTransactionID: "1234",
-      ServiceTransactionID: "5678",
-      //    TransactionTimestamp: "2001-12-17T09:30:47Z"
-      TransactionTimestamp: date
-    };
+          const data = {
+            ApplicationTransactionID: "1234",
+            ServiceTransactionID: "5678",
+            //    TransactionTimestamp: "2001-12-17T09:30:47Z"
+            TransactionTimestamp: date
+          };
 
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/Authentication/V2.0/",
-      data,
-      DnbConfig
-    )
-      .then(resp => {
-        console.log("DNB authentication", resp.data);
-        // this.setState({ token: resp.data.AuthenticationDetail.Token });
-        const DnbAuthorization = {
-          headers: { Authorization: resp.data.AuthenticationDetail.Token }
-        };
+          Axios.post(
+            "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/Authentication/V2.0/",
+              data,
+              DnbConfig
+            )
+          .then(resp => {
+            console.log("DNB authentication", resp.data);
+          // this.setState({ token: resp.data.AuthenticationDetail.Token });
+          const DnbAuthorization = {
+            headers: { Authorization: resp.data.AuthenticationDetail.Token }
+          };
 
-        Axios.get(
-          "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/RTNG_TRND",
-        DnbAuthorization
-        ).then(res => {
-          console.log("DNB data1", res.data);
-          this.setState({
-            dnbStandardRating: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.DNBStandardRating.DNBStandardRating,
-            dnbHistoryRatingText: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.HistoryRatingText.$,
-            dnbFinancialConditionText: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.FinancialConditionText.$
+          Axios.get(
+            "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/RTNG_TRND",
+              DnbAuthorization
+            ).then(res => {
+              console.log("DNB data1", res.data);
+            this.setState({
+              dnbStandardRating: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.DNBStandardRating.DNBStandardRating,
+              dnbHistoryRatingText: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.HistoryRatingText.$,
+              dnbFinancialConditionText: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.FinancialConditionText.$
+            });
           });
-        });
 
-        Axios.get(
-          "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/SER",
-        DnbAuthorization
-        ).then(res => {
-          console.log("DNB data2", res.data);
-          this.setState({
-            dnbRiskScore: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.SupplierEvaluationRiskScore[0].RiskScore
-          
+          Axios.get(
+            "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/SER",
+          DnbAuthorization
+          ).then(res => {
+            console.log("DNB data2", res.data);
+            this.setState({
+              dnbRiskScore: res.data.OrderProductResponse.OrderProductResponseDetail.Product.Organization.Assessment.SupplierEvaluationRiskScore[0].RiskScore
+            });
           });
-        });
 
         Axios.get(
           "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V5.0/organizations/"+dnbUrl+"/products/VIAB_RAT",
@@ -779,6 +785,13 @@ export default class Overview extends Component {
       })
       .catch(resp => {
         console.log("DNB authentication error", resp.data);
+      });
+
+      this.setState({
+        all_connections: [
+          ...this.state.all_connections,
+          { name: "Dnb" }
+        ]
       });
 
         }
@@ -806,10 +819,15 @@ export default class Overview extends Component {
             appleReviews: res.data.feed.entry
           });
           });
+          this.setState({
+            all_connections: [
+              ...this.state.all_connections,
+              { name: "Apple" }
+            ]
+          });
         }
 
         if (citysearchUrl) {
-          console.log("inside citysearchUrl");
           Axios.get(
             "https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/reviews/v2/search/where?listing_id=" +
               citysearchUrl +
@@ -855,6 +873,13 @@ export default class Overview extends Component {
 
 
           });
+
+          this.setState({
+            all_connections: [
+              ...this.state.all_connections,
+              { name: "Citysearch" }
+            ]
+          });
         }
 
         this.setState({ loader: false });
@@ -872,18 +897,17 @@ export default class Overview extends Component {
     const GoogleConfig = {
       headers: { Authorization: "Bearer " + this.state.google_token }
     };
-    Axios.get(
-      "https://mybusiness.googleapis.com/v4/" +
-        localStorage.getItem("accountId") +
-        "/locations",
-      GoogleConfig
-    ).then(resp => {
-      console.log(resp.data);
+    // Axios.get(
+    //   `https://mybusiness.googleapis.com/v4/${localStorage.getItem("accountId")}/locations`,
+    //   GoogleConfig
+    // ).then(resp => {
+    //   console.log(resp.data);
 
-      localStorage.setItem("locationIdover", resp.data.locations[0].name);
+      // localStorage.setItem("locationIdover", resp.data.locations[0].name);
 
       const reportInsights = {
-        locationNames: [localStorage.getItem("locationIdover")],
+        // locationNames: [localStorage.getItem("locationIdover")],
+        locationNames: [this.state.locationIdGoogle],
         basicRequest: {
           metricRequests: [
             {
@@ -907,17 +931,18 @@ export default class Overview extends Component {
         }
       };
       Axios.post(
-        "https://mybusiness.googleapis.com/v4/accounts/101169599313855130194/locations:reportInsights",
+        `https://mybusiness.googleapis.com/v4/${localStorage.getItem("accountId")}/locations:reportInsights`,
         reportInsights,
         GoogleConfig
       )
         .then(res => {
-          console.log(res);
-
+          console.log("google report insight",res.data);
+          if(res.data.locationMetrics[0]){
           this.setState({
             metric: res.data.locationMetrics[0].metricValues,
             loading: false
           });
+        }
         })
         .catch(res => {
           console.log("error in overview");
@@ -925,7 +950,7 @@ export default class Overview extends Component {
             loading: false
           });
         });
-    });
+    // });
   };
 
   google_reply_submit = () => {
@@ -1030,6 +1055,10 @@ export default class Overview extends Component {
       avvoRating,
       avvoReviews,
 
+      hereDetails,
+    hereRating,
+    hereReviews,
+
       zomatoDetails,
       zomatoRating,
       zomatoReviews,
@@ -1088,9 +1117,9 @@ export default class Overview extends Component {
         }
       });
     }
-    console.log(direction);
-    console.log(phone);
-    console.log(website);
+    // console.log(direction);
+    // console.log(phone);
+    // console.log(website);
 
     if (direction.length > 0) {
       for (var i = 0; i < direction.length; i++) {
@@ -1121,7 +1150,7 @@ export default class Overview extends Component {
     // let fb_show_review_notification = [];
     let total_notifications = [];
 
-    if (fb_notification.unseen_message_count > 0) {
+    if (fb_notification && fb_notification.unseen_message_count > 0) {
       total_notifications = [
         ...total_notifications,
         <div className="notification-box">
@@ -1151,7 +1180,7 @@ export default class Overview extends Component {
       ];
     }
 
-    if (fb_notification.unread_notif_count > 0) {
+    if (fb_notification && fb_notification.unread_notif_count > 0) {
       total_notifications = [
         ...total_notifications,
         <div className="notification-box">
@@ -1205,6 +1234,7 @@ export default class Overview extends Component {
               }
               className="notification_btn"
             >
+              
               Reply
             </a>
           </div>
@@ -1767,20 +1797,33 @@ export default class Overview extends Component {
               ])
             : ""}
 
+{data.name == "Here"
+            ? (total_social_overview = [
+                ...total_social_overview,
+                <div className="socailsbox">
+                  <div className="iconbxo">
+                    <img src={require("../images/here.png")} alt="Here" />
+                  </div>
+                  <div className="liks">
+                    <span>Rating</span>
+                    <h4>{hereRating}</h4>
+                    {/* <div className="countbox">+10.3%</div> */}
+                  </div>
+                  <div className="liks">
+                    <span>Reviews</span>
+                    <h4>{hereReviews}</h4>
+                    {/* <div className="countbox">+10.3%</div> */}
+                  </div>
+                </div>
+              ])
+            : ""}
+
 {data.name == "Dnb"
             ? (total_social_overview = [
                 ...total_social_overview,
                 <div className="socailsbox">
                   <div className="iconbxo">
                     <img src={require("../images/dnb.jpg")} alt="DandB" />
-                  </div>
-                  <div className="liks">
-                    <span>Financial Condition</span>
-                    <h4>{dnbFinancialConditionText}</h4>
-                  </div>
-                  <div className="liks">
-                    <span>History Rating</span>
-                    <h4>{dnbHistoryRatingText}</h4>
                   </div>
                   <div className="liks">
                     <span>Risk Level</span>
@@ -1790,10 +1833,21 @@ export default class Overview extends Component {
                     <span>Risk Score</span>
                     <h4>{dnbRiskScore}</h4>
                   </div>
+                  {/* <div className="liks">
+                    <span>Financial Condition</span>
+                    <h4>{dnbFinancialConditionText}</h4>
+                  </div>
                   <div className="liks">
-                    <span>Standard Rating</span>
+                    <span>History Rating</span>
+                    <h4>{dnbHistoryRatingText}</h4>
+                  </div> */}
+                  <div className="liks">
+                    {/* <span>Standard Rating</span> */}
+                    <span>Rating</span>
                     <h4>{dnbStandardRating}</h4>
                   </div>
+                  
+                  
                 </div>
               ])
             : ""}
@@ -2201,7 +2255,7 @@ export default class Overview extends Component {
                             )}
                           </div>
                         ) : (
-                          <h3>No listings connected, Please connect</h3>
+                          <h3>Please connect some listings</h3>
                         )}
                       </div>
                     </div>
@@ -2444,7 +2498,7 @@ export default class Overview extends Component {
                     {/* <img src={require('../images/chart-colum.jpg')} alt=""/> */}
 
                     {isGoogleLoggedIn ? (
-                      this.state.loading ? (
+                      this.state.metric.length > 0 ? this.state.loading ? (
                         <div style={{ textAlign: "center" }}>
                           <Loader2
                             type="Oval"
@@ -2469,7 +2523,7 @@ export default class Overview extends Component {
                           // For tests
                           rootProps={{ "data-testid": "3" }}
                         />
-                      )
+                      ) : <h4>No analytics of this Google account</h4>
                     ) : (
                       <h4>Please connect Google to see graph</h4>
                     )}

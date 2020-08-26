@@ -145,11 +145,7 @@ export default class ProfileAnalytics extends Component {
     city: "",
     postalCode: "",
     category: "",
-    state: "",
-
-    redirect_to_connectedaccounts: false,
-    redirect_to_google_connectedaccounts: false,
-    google_redirect_data: ""
+    state: ""
   };
 
   componentClicked = e => {
@@ -167,8 +163,9 @@ export default class ProfileAnalytics extends Component {
     };
     await localStorage.setItem("fb_token", response.accessToken);
     await localStorage.setItem("fb_data", JSON.stringify(fb_data));
-
-    this.setState({ redirect_to_connectedaccounts: true });
+    this.props.history.push({
+      pathname: `/connectedaccounts/profile-analytics`,
+    })
   };
 
   responseErrorGoogle = response => {
@@ -186,10 +183,9 @@ export default class ProfileAnalytics extends Component {
       location_id: this.props.match.params.locationId,
       redirect_to: "/profile-analytics"
     };
-    this.setState({
-      redirect_to_google_connectedaccounts: true,
-      google_redirect_data: state
-    });
+    this.props.history.push({
+      pathname: `/google-connectedaccounts/${encodeURIComponent(JSON.stringify(state))}`,
+    })
   };
 
   componentDidMount() {
@@ -535,17 +531,17 @@ export default class ProfileAnalytics extends Component {
         ).then(resp => {
           console.log(resp.data);
           this.setState({
-            fViews: resp.data.data[2].values[1].value,
-            fWeb: resp.data.data[5].values[1].value,
-            fcalls: resp.data.data[3].values[1].value,
-            fdirection: resp.data.data[4].values[1].value,
-            fclicks: resp.data.data[0].values[1].value,
+            fViews: resp.data.data[2] && resp.data.data[2].values[1]?resp.data.data[2].values[1].value : "-",
+            fWeb: resp.data.data[5] && resp.data.data[5].values[1]? resp.data.data[5].values[1].value : "-",
+            fcalls: resp.data.data[3] && resp.data.data[3].values[1] ?resp.data.data[3].values[1].value : "-",
+            fdirection: resp.data.data[4] && resp.data.data[4].values[1] ? resp.data.data[4].values[1].value : "-",
+            fclicks: resp.data.data[0] && resp.data.data[0].values[1] ? resp.data.data[0].values[1].value : "-",
 
-            fViews1: resp.data.data[2].values[1].value,
-            fWeb1: resp.data.data[5].values[1].value,
-            fcalls1: resp.data.data[3].values[1].value,
-            fdirection1: resp.data.data[4].values[1].value,
-            fclicks1: resp.data.data[0].values[1].value,
+            fViews1: resp.data.data[2] && resp.data.data[2].values[1]?resp.data.data[2].values[1].value : "0",
+            fWeb1: resp.data.data[5] && resp.data.data[5].values[1]? resp.data.data[5].values[1].value : "0",
+            fcalls1: resp.data.data[3] && resp.data.data[3].values[1] ?resp.data.data[3].values[1].value : "0",
+            fdirection1: resp.data.data[4] && resp.data.data[4].values[1] ? resp.data.data[4].values[1].value : "0",
+            fclicks1: resp.data.data[0] && resp.data.data[0].values[1] ? resp.data.data[0].values[1].value : "0",
 
             fbIsLoggedIn: true
           });
@@ -613,34 +609,37 @@ export default class ProfileAnalytics extends Component {
       GoogleConfig
     )
       .then(res => {
-        console.log(res.data.locationMetrics[0]);
 
-        this.setState({
-          in: res.data.locationMetrics[0].metricValues,
-          profileViews:
-            parseInt(
-              res.data.locationMetrics[0].metricValues[0].totalValue.value
-            ) +
-            parseInt(
-              res.data.locationMetrics[0].metricValues[1].totalValue.value
-            ),
-          gWeb: res.data.locationMetrics[0].metricValues[5].totalValue.value,
-          gcalls: res.data.locationMetrics[0].metricValues[6].totalValue.value,
-          gdirection:
-            res.data.locationMetrics[0].metricValues[7].totalValue.value,
-          profileViews1:
-            parseInt(
-              res.data.locationMetrics[0].metricValues[0].totalValue.value
-            ) +
-            parseInt(
-              res.data.locationMetrics[0].metricValues[1].totalValue.value
-            ),
-          gWeb1: res.data.locationMetrics[0].metricValues[5].totalValue.value,
-          gcalls1: res.data.locationMetrics[0].metricValues[6].totalValue.value,
-          gdirection1:
-            res.data.locationMetrics[0].metricValues[7].totalValue.value,
-          loading: false
-        });
+        if(res.data.locationMetrics[0] && res.data.locationMetrics[0].metricValues[0] && res.data.locationMetrics[0].metricValues[1] && res.data.locationMetrics[0].metricValues[5] && res.data.locationMetrics[0].metricValues[6] && res.data.locationMetrics[0].metricValues[7]){
+          this.setState({
+            in: res.data.locationMetrics[0].metricValues,
+            profileViews:
+              parseInt(
+                res.data.locationMetrics[0].metricValues[0].totalValue.value
+              ) +
+              parseInt(
+                res.data.locationMetrics[0].metricValues[1].totalValue.value
+              ),
+            gWeb: res.data.locationMetrics[0].metricValues[5].totalValue.value,
+            gcalls: res.data.locationMetrics[0].metricValues[6].totalValue.value,
+            gdirection:
+              res.data.locationMetrics[0].metricValues[7].totalValue.value,
+            profileViews1:
+              parseInt(
+                res.data.locationMetrics[0].metricValues[0].totalValue.value
+              ) +
+              parseInt(
+                res.data.locationMetrics[0].metricValues[1].totalValue.value
+              ),
+            gWeb1: res.data.locationMetrics[0].metricValues[5].totalValue.value,
+            gcalls1: res.data.locationMetrics[0].metricValues[6].totalValue.value,
+            gdirection1:
+              res.data.locationMetrics[0].metricValues[7].totalValue.value,
+            loading: false
+          });
+        } else {
+          this.setState({loading : false})
+        }
       })
       .catch(res => {
         console.log(res);
@@ -790,28 +789,6 @@ export default class ProfileAnalytics extends Component {
         click: parseInt(fclicks)
       }
     ];
-
-    if (this.state.redirect_to_connectedaccounts) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/connectedaccounts",
-            state: { redirect_to: "/profile-analytics" }
-          }}
-        />
-      );
-    }
-
-    if (this.state.redirect_to_google_connectedaccounts) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/google-connectedaccounts",
-            state: this.state.google_redirect_data
-          }}
-        />
-      );
-    }
 
     return (
       <div>

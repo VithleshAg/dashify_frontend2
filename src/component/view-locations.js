@@ -1973,12 +1973,11 @@ export default class LocationManager extends Component {
                         this.state.otherImages[i] != undefined ? (
                           <div className="col-md-3">
                             <div className="imgup">
-                              <img
+                              {this.state.otherImages[i].Image ? <img
                                 height="100"
                                 width="100"
-                                src={this.state.otherImages[i].Image}
-                                alt="Starred Business covers image"
-                              />
+                                src={this.state.otherImages[i].Image}  
+                              /> : <h5>Starred Business Cover Image</h5> }
                             </div>
                           </div>
                         ) : (

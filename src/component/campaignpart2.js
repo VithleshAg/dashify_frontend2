@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import Loader from "react-loader-spinner";
 import Axios from "axios";
 
 const DjangoConfig = {
@@ -9,11 +10,15 @@ const DjangoConfig = {
 
 export default class CampaignPart2 extends Component {
   state = {
-    cmapign_name: "",
     email_sendto_error: {},
-    email_sendto_name: [],
-    email_sendto_email: {},
-    add_customer: 2
+    contact_sendto_error: {},
+    name_sendto_error: {},
+    sendto_name: { 0: "" },
+    sendto_email: { 0: "" },
+    sendto_contact: { 0: "" },
+    add_customer: 1,
+    wrong: "",
+    loading: false
   };
 
   componentDidMount = () => {
@@ -23,105 +28,128 @@ export default class CampaignPart2 extends Component {
   submitHandler = event => {
     event.preventDefault();
 
-    var { cmapign_name, email_sendto_name, email_sendto_email } = this.state;
+    var {
+      email_sendto_error,
+      contact_sendto_error,
+      name_sendto_error,
+      sendto_name,
+      sendto_email,
+      sendto_contact
+    } = this.state;
 
-    let {
-      email_from,
-      all_site_name,
-      all_site_url,
-      email_replyto,
-      email_subject,
-      email_heading,
-      email_content,
-      review_by_google,
-      review_by_apple,
-      google_placeid,
-      appleId
-    } = this.props.location.state.promotional_data;
+    this.setState({ wrong: "" });
 
-    var emails;
+    let isError = false;
 
-    Object.values(email_sendto_email).map((value, i) => {
-      emails = { ...emails, [i]: value };
-    });
-
-    var additional_link_image1 = "",
-      additional_link_image2 = "";
-
-    Object.values(all_site_url).map((value, i) => {
-      if (i == 0) {
-        additional_link_image1 =
-          '<br /><img src="https://img.techpowerup.org/200624/t-logo.jpg" alt="Review" height=100 width=100 /><p>' +
-          all_site_name[i] +
-          "</p><br /><button><a href=" +
-          all_site_url[i] +
-          ">Review</a></button>";
-      }
-      if (i == 1) {
-        additional_link_image2 =
-          "<br /><h1>" +
-          all_site_name[i] +
-          "</h1><br /><button><a href=" +
-          all_site_url[i] +
-          ">Review</a></button>";
-      }
-    });
-
-    var message_content;
-
-    const google_link =
-      "https://search.google.com/local/writereview?placeid=" + google_placeid;
-    const apple_link =
-      "https://apps.apple.com/us/app/appname/id" +
-      appleId +
-      "?action=write-review";
-    console.log("google_link", google_link);
-    const google_link_image =
-      '<br /><img src="https://img.techpowerup.org/200617/googlemap.png" alt="Google Map" height=100 width=100 /><p>Google</p><br /><button><a href=' +
-      google_link +
-      ">Review</a></button>";
-
-    const apple_link_image =
-      '<br /><img src="https://img.techpowerup.org/200623/apple.png" alt="Apple" height=100 width=100 /><p>Apple</p><br /><button><a href=' +
-      apple_link +
-      ">Review</a></button>";
-
-    message_content =
-      '<div style="background-color: lightgrey;padding: 25px;margin: 20px;"><div style="background-color: white;padding: 25px;margin: 20px;"><p>Hi,</p><b>' +
-      email_heading +
-      "</b></div><br /><div background-color: white;padding: 25px;margin: 20px;><p>" +
-      email_content +
-      "</p>";
-
-    if (review_by_google && review_by_apple) {
-      message_content += google_link_image + apple_link_image;
-    } else if (review_by_google) {
-      message_content += google_link_image;
-    } else if (review_by_apple) {
-      message_content += apple_link_image;
+    if (JSON.stringify(email_sendto_error).includes("Invalid Email")) {
+      isError = true;
+    } else if (
+      JSON.stringify(contact_sendto_error).includes("Invalid Phone No.")
+    ) {
+      isError = true;
     }
-    message_content +=
-      additional_link_image1 + additional_link_image2 + "</div></div>";
 
-    const email_sending_data = {
-      subject: email_subject,
-      message_content,
-      emails
-    };
+    if (!isError) {
+      var emails,
+        names,
+        contact,
+        send_limit = 0;
 
-    console.log("email_sending_data", email_sending_data);
-
-    Axios.post(
-      "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/send_email",
-      email_sending_data,
-      DjangoConfig
-    )
-      .then(resp => {
-        console.log("Email sended", resp);
-      })
-      .catch(resp => {
-        console.log("email sending error", resp);
+      Object.values(sendto_email).map((value, i) => {
+        if (value) {
+          emails = { ...emails, [i]: value };
+        } else {
+          this.setState(prevState => ({
+            email_sendto_error: {
+              ...prevState.email_sendto_error,
+              [i]: "Email can not be empty"
+            }
+          }));
+          isError = true;
+        }
       });
+      Object.values(sendto_name).map((value, i) => {
+        if (value) {
+          names = { ...names, [i]: value };
+          send_limit = i + 1;
+        } else {
+          this.setState(prevState => ({
+            name_sendto_error: {
+              ...prevState.name_sendto_error,
+              [i]: "Name can not be empty"
+            }
+          }));
+          isError = true;
+        }
+      });
+      Object.values(sendto_contact).map((value, i) => {
+        if (value) {
+          contact = { ...contact, [i]: value };
+        } else {
+          this.setState(prevState => ({
+            contact_sendto_error: {
+              ...prevState.contact_sendto_error,
+              [i]: "Phone No. can not be empty"
+            }
+          }));
+          isError = true;
+        }
+      });
+
+      if (!isError) {
+        const email_adding_data = {
+          camp_id: this.props.match.params.campaign_id,
+          emails,
+          names,
+          contact
+        };
+        this.setState({ loading: true });
+
+        Axios.post(
+          "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/campaign/add-emails-in-campaign",
+          email_adding_data,
+          DjangoConfig
+        )
+          .then(resp => {
+            if (resp.data.messgae == "Email add in database successfully.") {
+              const data = {
+                camp_id: this.props.match.params.campaign_id,
+                send_limit
+              };
+              Axios.post(
+                "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/campaign/send-emaills",
+                data,
+                DjangoConfig
+              )
+                .then(resp => {
+                  if (resp.data.messgae == "Send All Email.") {
+                    alert("Sent succesfully");
+                  } else {
+                    alert("Server error");
+                  }
+                  this.setState({ loading: false });
+                })
+                .catch(resp => {
+                  console.log("email sending error", resp);
+                  alert("Server error");
+                  this.setState({ loading: false });
+                });
+            } else {
+              alert("Server error");
+              this.setState({ loading: false });
+            }
+          })
+          .catch(resp => {
+            console.log("email adding error", resp);
+            alert("Server error");
+            this.setState({ loading: false });
+          });
+      } else {
+        this.setState({ wrong: "Remove above errors" });
+      }
+    } else {
+      this.setState({ wrong: "Remove above errors" });
+    }
   };
 
   changeHandler = event => {
@@ -129,78 +157,113 @@ export default class CampaignPart2 extends Component {
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  check_email_or_phone = event => {
-    let email_error = false;
-    let phone_error = false;
+  // check_email_or_phone = event => {
+  //   let email_error = false;
+  //   let phone_error = false;
 
-    this.setState({ email_replyto_error: "" });
+  //   this.setState({ email_replyto_error: "" });
 
-    this.setState({ [event.target.name]: event.target.value });
+  //   this.setState({ [event.target.name]: event.target.value });
 
-    var email = event.target.value,
-      emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
-    if (!emailReg.test(email) || email == "") {
-      email_error = true;
-    }
+  //   var email = event.target.value,
+  //     emailReg = /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/;
+  //   if (!emailReg.test(email) || email == "") {
+  //     email_error = true;
+  //   }
 
-    //validate phone
-    var phone = event.target.value,
-      intRegex = /[0-9 -()+]+$/;
-    if (phone.length < 6 || !intRegex.test(phone)) {
-      phone_error = true;
-    }
-    if (phone_error && email_error) {
-      this.setState({ email_replyto_error: "Invalid email / Phone No." });
-    }
+  //   //validate phone
+  //   var phone = event.target.value,
+  //     intRegex = /[0-9 -()+]+$/;
+  //   if (phone.length < 6 || !intRegex.test(phone)) {
+  //     phone_error = true;
+  //   }
+  //   if (phone_error && email_error) {
+  //     this.setState({ email_replyto_error: "Invalid email / Phone No." });
+  //   }
 
-    console.log(
-      "email_error phone_error email_replyto",
-      email_error,
-      phone_error,
-      event.target.value
-    );
-  };
+  //   console.log(
+  //     "email_error phone_error email_replyto",
+  //     email_error,
+  //     phone_error,
+  //     event.target.value
+  //   );
+  // };
 
   add_fname = () => {
     var fname = [];
     for (let i = 0; i < this.state.add_customer; i++) {
       fname.push(
-        <input
-          type="text"
-          className="form-control mt-30"
-          placeholder="Enter First Name"
-        />
+        <div>
+          <div className="col-md-12 mb-30">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Enter Name"
+              name={i}
+              onChange={this.customer_name_function}
+              value={this.state.sendto_name[i]}
+              required
+            />
+            <div style={{ color: "red" }}>
+              {this.state.name_sendto_error[i]}
+            </div>
+          </div>
+          {/* <div className="col-md-2">
+            <button onClick="" className="btn">
+              Cancel
+            </button>
+          </div> */}
+        </div>
       );
     }
     console.log(fname);
     return fname;
   };
 
-  add_lname = () => {
-    var lname = [];
-    for (let i = 0; i < this.state.add_customer; i++) {
-      lname.push(
-        <input
-          type="text"
-          className="form-control mt-30"
-          placeholder="Enter First Name"
-        />
-      );
-    }
-    console.log(lname);
-    return lname;
-  };
+  // add_lname = () => {
+  //   var lname = [];
+  //   for (let i = 0; i < this.state.add_customer; i++) {
+  //     lname.push(
+  //       <input
+  //           type="text"
+  //           className="form-control mt-30"
+  //           placeholder="Enter last name"
+  //           name={i}
+  //           onChange={this.customer_phone_function}
+  //           value={this.state.sendto_contact[i]}
+  //           required
+  //         />
+  //     );
+  //   }
+  //   console.log(lname);
+  //   return lname;
+  // };
 
   add_phone = () => {
     var phone = [];
     for (let i = 0; i < this.state.add_customer; i++) {
       phone.push(
-        <input
-          type="email"
-          className="form-control mt-30"
-          placeholder="Enter Phone No."
-          readonly
-        />
+        <div>
+          <div className="col-md-12 mb-30">
+            <input
+              type="number"
+              className="form-control"
+              placeholder="8102232456"
+              name={i}
+              onChange={this.customer_contact_function}
+              value={this.state.sendto_contact[i]}
+              required
+            />
+            <div style={{ color: "red" }}>
+              {this.state.contact_sendto_error[i]}
+            </div>
+          </div>
+          {/* <div className="col-md-2">
+            <button onClick="" className="btn">
+              Cancel
+            </button>
+          </div> */}
+        </div>
       );
     }
 
@@ -213,16 +276,25 @@ export default class CampaignPart2 extends Component {
     for (let i = 0; i < this.state.add_customer; i++) {
       email.push(
         <div>
-          <input
-            type="text"
-            className="form-control mt-30"
-            placeholder="Enter Email Address"
-            name={i}
-            onChange={this.customer_email_function}
-            value={this.state.email_sendto_email[i]}
-            required
-          />
-          <div style={{ color: "red" }}>{this.state.email_sendto_error[i]}</div>
+          <div className="col-md-12 mb-30">
+            <input
+              type="email"
+              className="form-control"
+              placeholder="Enter Email Address"
+              name={i}
+              onChange={this.customer_email_function}
+              value={this.state.sendto_email[i]}
+              required
+            />
+            <div style={{ color: "red" }}>
+              {this.state.email_sendto_error[i]}
+            </div>
+          </div>
+          {/* <div className="col-md-2">
+            <button onClick="" className="btn">
+              Cancel
+            </button>
+          </div> */}
         </div>
       );
     }
@@ -252,8 +324,57 @@ export default class CampaignPart2 extends Component {
     }
 
     this.setState(prevState => ({
-      email_sendto_email: {
-        ...prevState.email_sendto_email,
+      sendto_email: {
+        ...prevState.sendto_email,
+        [event.target.name]: event.target.value
+      }
+    }));
+    console.log("state", this.state);
+  };
+
+  customer_contact_function = event => {
+    event.persist();
+
+    this.setState(prevState => ({
+      contact_sendto_error: {
+        ...prevState.contact_sendto_error,
+        [event.target.name]: ""
+      }
+    }));
+
+    var contact = event.target.value;
+    // intRegex = /[0-9 -()+]+$/;
+    if (contact.length != 10) {
+      this.setState(prevState => ({
+        contact_sendto_error: {
+          ...prevState.contact_sendto_error,
+          [event.target.name]: "Invalid Phone No."
+        }
+      }));
+    }
+
+    this.setState(prevState => ({
+      sendto_contact: {
+        ...prevState.sendto_contact,
+        [event.target.name]: event.target.value
+      }
+    }));
+    console.log("state", this.state);
+  };
+
+  customer_name_function = event => {
+    event.persist();
+
+    this.setState(prevState => ({
+      name_sendto_error: {
+        ...prevState.name_sendto_error,
+        [event.target.name]: ""
+      }
+    }));
+
+    this.setState(prevState => ({
+      sendto_name: {
+        ...prevState.sendto_name,
         [event.target.name]: event.target.value
       }
     }));
@@ -263,16 +384,40 @@ export default class CampaignPart2 extends Component {
   add_customer_function = event => {
     event.preventDefault();
     console.log("add customer button clicked");
+
+    this.setState(prevState => ({
+      sendto_name: {
+        ...prevState.sendto_name,
+        [this.state.add_customer]: ""
+      }
+    }));
+    this.setState(prevState => ({
+      sendto_contact: {
+        ...prevState.sendto_contact,
+        [this.state.add_customer]: ""
+      }
+    }));
+    this.setState(prevState => ({
+      sendto_email: {
+        ...prevState.sendto_email,
+        [this.state.add_customer]: ""
+      }
+    }));
+
     this.setState({ add_customer: this.state.add_customer + 1 });
   };
 
   render() {
     const {
-      cmapign_name,
+      campaign_name,
       email_sendto_error,
-      email_sendto_name,
-      email_sendto_email,
-      add_customer
+      contact_sendto_error,
+      name_sendto_error,
+      sendto_name,
+      sendto_email,
+      add_customer,
+      wrong,
+      loading
     } = this.state;
 
     return (
@@ -317,35 +462,30 @@ export default class CampaignPart2 extends Component {
                         </div>
                       </div>
 
-                      <div className="col-md-6">
+                      <div className="col-md-12">
                         <div className="form-group">
-                          <label>Customer first name</label>
+                          <label>Customer Name</label>
                           {this.add_fname()}
                         </div>
                       </div>
 
-                      <div className="col-md-6">
+                      {/* <div className="col-md-6">
                         <div className="form-group">
                           <label>Customer last name</label>
                           {this.add_lname()}
                         </div>
-                      </div>
+                      </div> */}
 
                       <div className="col-md-12">
                         <div className="form-group">
-                          <label>Customer Email/Phone number</label>
-                          {/* <input
-                          type="text"
-                          className="form-control"
-                          onChange={this.check_email_or_phone}
-                          value={email_replyto}
-                          name="email_replyto"
-                          placeholder="customerone12@gmail.com"
-                        />
-                        <div style={{ color: "red" }}>
-                          {this.state.email_replyto_error}
-                        </div> */}
+                          <label>Customer Email</label>
                           {this.add_email()}
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="form-group">
+                          <label>Customer Phone number</label>
+                          {this.add_phone()}
                         </div>
                       </div>
 
@@ -391,6 +531,21 @@ export default class CampaignPart2 extends Component {
                 <div className="step2 mt-30">
                   <div className="formbox">
                     <div className="row">
+                      {loading ? (
+                        <div style={{ textAlign: "center" }}>
+                          <Loader
+                            type="Oval"
+                            color="#00BFFF"
+                            height={25}
+                            width={25}
+                            // timeout={3000} //3 secs
+                          />
+                        </div>
+                      ) : (
+                        <div style={{ color: "red", textAlign: "center" }}>
+                          {wrong}
+                        </div>
+                      )}
                       <div className="col-md-6">
                         <button className="gen_btn">
                           Create a new review generation

@@ -67,57 +67,59 @@ class TomtomRelatedLocation extends Component {
     // console.log("tomtom location items", all_locations.results);
 
     const allLocations = all_locations.results.map((l, i) => {
-      return (
-        <form onSubmit={this.onSubmit(l)}>
-          <div className="listdata" key={l.id}>
-            <div className="row d-flex">
-              <div className="col-md-3">
-                <div className="authordata ">
-                  <div className="authordatatext">
-                    <h3>{l.poi.name}</h3>
+      if (l.poi) {
+        return (
+          <form onSubmit={this.onSubmit(l)}>
+            <div className="listdata" key={l.id}>
+              <div className="row d-flex">
+                <div className="col-md-3">
+                  <div className="authordata ">
+                    <div className="authordatatext">
+                      <h3>{l.poi.name}</h3>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  <div className="text-center">
+                    <h4>{l.address.freeformAddress}</h4>
+                    <br />
+                    <h4>
+                      <b>Call: </b>
+                      {l.poi.phone}
+                    </h4>
+                    <br />
+                    <h4>
+                      <b>Id: </b>
+                      {l.dataSources ? l.dataSources.poiDetails[0].id : "-"}
+                    </h4>
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  <div className="text-center phonenumber">
+                    {l.poi.categories
+                      ? l.poi.categories.map(data => (
+                          <div style={{ marginTop: 10 }}>
+                            <h4>
+                              <b>{data}</b>
+                            </h4>
+                          </div>
+                        ))
+                      : "-"}
+                  </div>
+                </div>
+
+                <div className="col-md-3">
+                  <div className="action">
+                    <button type="submit">connect</button>
                   </div>
                 </div>
               </div>
-
-              <div className="col-md-3">
-                <div className="text-center">
-                  <h4>{l.address.freeformAddress}</h4>
-                  <br />
-                  <h4>
-                    <b>Call: </b>
-                    {l.poi.phone}
-                  </h4>
-                  <br />
-                  <h4>
-                    <b>Id: </b>
-                    {l.dataSources ? l.dataSources.poiDetails[0].id : "-"}
-                  </h4>
-                </div>
-              </div>
-
-              <div className="col-md-3">
-                <div className="text-center phonenumber">
-                  {l.poi.categories
-                    ? l.poi.categories.map(data => (
-                        <div style={{ marginTop: 10 }}>
-                          <h4>
-                            <b>{data}</b>
-                          </h4>
-                        </div>
-                      ))
-                    : "-"}
-                </div>
-              </div>
-
-              <div className="col-md-3">
-                <div className="action">
-                  <button type="submit">connect</button>
-                </div>
-              </div>
             </div>
-          </div>
-        </form>
-      );
+          </form>
+        );
+      }
     });
 
     return (

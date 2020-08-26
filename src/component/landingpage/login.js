@@ -153,7 +153,10 @@ class Login extends React.Component {
                 "Username and pasword is incorrect & may be your account is not activate",
               loading: false
             });
-          } else if (res.data.detail == "CSRF Failed: CSRF cookie not set.") {
+          } else if (
+            res.data &&
+            res.data.detail == "CSRF Failed: CSRF cookie not set."
+          ) {
             this.setState({ wrong: "Already login", loading: false });
           } else {
             this.setState({ wrong: "Server error", loading: false });

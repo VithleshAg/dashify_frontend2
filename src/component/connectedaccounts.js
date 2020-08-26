@@ -78,11 +78,9 @@ class ConnectedAccounts extends Component {
     if (this.state.isUrl) {
       return (
         <Redirect
-          to={
-            "/locations/" +
-            localStorage.getItem("locationId") +
-            this.props.location.state.redirect_to
-          }
+          to={`/locations/${localStorage.getItem("locationId")}/${
+            this.props.match.params.redirect_to
+          }`}
         />
       );
     }

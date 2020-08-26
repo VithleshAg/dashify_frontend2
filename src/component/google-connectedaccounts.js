@@ -13,13 +13,25 @@ class GoogleConnectedAccounts extends Component {
     loading: false,
     isUrl: false,
     loader: true,
-    all_pages: []
+    all_pages: [],
+    google_props: ""
   };
 
-  componentDidMount = () => {
-    console.log("all props", this.props);
+  componentDidMount = async () => {
+    console.log(
+      "all props",
+      JSON.parse(decodeURIComponent(this.props.match.params.state))
+    );
+    await this.setState({
+      google_props: JSON.parse(
+        decodeURIComponent(this.props.match.params.state)
+      )
+    });
+
     const GoogleConfig = {
-      headers: { Authorization: "Bearer " + this.props.location.state.Token }
+      headers: {
+        Authorization: "Bearer " + this.state.google_props.Token
+      }
     };
 
     Axios.get(
@@ -47,7 +59,7 @@ class GoogleConnectedAccounts extends Component {
     e.preventDefault();
     this.setState({ loading: true });
 
-    const g_data = this.props.location.state;
+    const g_data = this.state.google_props;
 
     const data = {
       location_id: g_data.location_id,
@@ -84,7 +96,7 @@ class GoogleConnectedAccounts extends Component {
           to={
             "/locations/" +
             localStorage.getItem("locationId") +
-            this.props.location.state.redirect_to
+            this.state.google_props.redirect_to
           }
         />
       );

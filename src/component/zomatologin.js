@@ -52,21 +52,6 @@ class ZomatoLogin extends Component {
       isError = true;
     }
 
-    const DjangoConfig = {
-      headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
-    };
-
-    const data = {
-      location_id: localStorage.getItem("locationId"),
-      Platform: "Zomato",
-      Token: "",
-      Username: this.state.username,
-      Email: this.state.username,
-      Password: this.state.password,
-      Connect_status: "Connect",
-      Other_info: this.state.url
-    };
-
     if (isError == false) {
       this.setState({ loading: true });
       Axios.get(
@@ -77,11 +62,29 @@ class ZomatoLogin extends Component {
         .then(res => {
           console.log("zomato checking data", res.data);
 
-          // Axios.post(
-          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-          //   data,
-          //   DjangoConfig
-          // )
+          const DjangoConfig = {
+            headers: {
+              Authorization: "Token " + localStorage.getItem("UserToken")
+            }
+          };
+
+          const data = {
+            location_id: localStorage.getItem("locationId"),
+            Platform: "Zomato",
+            Token: "",
+            Username: res.data.name,
+            Email: this.state.username,
+            Password: this.state.password,
+            Connect_status: "Connect",
+            Other_info: this.state.url
+          };
+
+          Axios.post(
+            "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+            data,
+            DjangoConfig
+          );
+
           add_social_account(data, DjangoConfig)
             .then(resp => {
               console.log("zomato resp", resp.data);

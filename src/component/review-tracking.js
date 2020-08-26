@@ -297,8 +297,10 @@ export default class ReviewTracking extends Component {
               fbtoken
           ).then(res => {
             console.log("facebook data", res.data);
-            this.setState({ fbAccounts: res.data.data });
-            var fbPageAccessToken;
+            
+            if(res.data.data){
+              var fbPageAccessToken;
+              this.setState({ fbAccounts: res.data.data });
             for (let i = 0; i < res.data.data.length; i++) {
               if (res.data.data[i].id == fbPageId) {
                 fbPageAccessToken = res.data.data[i].access_token;
@@ -311,6 +313,8 @@ export default class ReviewTracking extends Component {
                 fbPageAccessToken
             ).then(res => {
               console.log("fb page data", res.data);
+              if(res.data.data){
+                
               this.setState({
                 fbReviews: res.data.data,
                 active_listing: [...this.state.active_listing, "Facebook"]
@@ -329,7 +333,9 @@ export default class ReviewTracking extends Component {
                   ]
                 });
               }
+              }
             });
+            }
           });
         }
 
@@ -341,23 +347,29 @@ export default class ReviewTracking extends Component {
               "/reviews",
             Yelpconfig
           ).then(resp => {
-            console.log(resp.data.reviews);
-            this.setState({
-              yelpReviews: resp.data.reviews,
-              active_listing: [...this.state.active_listing, "Yelp"]
-            });
-            this.yelp_star_counting(resp.data.reviews);
-
-            if (this.state.yelpReviews.length != 0) {
+            console.log("yelp reviews",resp.data.reviews);
+            if(resp.data.reviews){
               this.setState({
-                pdf_data1: [
-                  ...this.state.pdf_data1,
-                  {
-                    name: "Yelp",
-                    image: require("../images/yelp.png"),
-                    data: this.state.yelpReviews
-                  }
-                ]
+                yelpReviews: resp.data.reviews, 
+                active_listing: [...this.state.active_listing, "Yelp"]
+              });
+              this.yelp_star_counting(resp.data.reviews);
+  
+              if (this.state.yelpReviews.length != 0) {
+                this.setState({
+                  pdf_data1: [
+                    ...this.state.pdf_data1,
+                    {
+                      name: "Yelp",
+                      image: require("../images/yelp.png"),
+                      data: this.state.yelpReviews
+                    }
+                  ]
+                });
+              }
+            } else {
+              this.setState({
+                active_listing: [...this.state.active_listing, "Yelp"]
               });
             }
           });
@@ -367,8 +379,7 @@ export default class ReviewTracking extends Component {
               yelpUrl.slice(25),
             Yelpconfig
           ).then(resp => {
-            console.log("hii");
-            console.log(resp.data);
+            console.log("yelp data",resp.data);
             this.setState({ yelpDetails: resp.data });
             if (resp.data.rating) {
               this.setState({
@@ -391,70 +402,74 @@ export default class ReviewTracking extends Component {
             "https://mybusiness.googleapis.com/v4/accounts/",
             GoogleConfig
           ).then(res => {
-            console.log(res.data);
-            localStorage.setItem("accountId", res.data.accounts[0].name);
+            console.log("google account data",res.data);
 
-            Axios.get(
-              "https://mybusiness.googleapis.com/v4/" +
-                localStorage.getItem("accountId") +
-                "/locations",
-              GoogleConfig
-            ).then(resp => {
-              console.log(resp.data);
-
-              localStorage.setItem(
-                "locationIdGoogle",
-                resp.data.locations[0].name
-              );
-
+            if(res.data.accounts[0]){
               Axios.get(
                 "https://mybusiness.googleapis.com/v4/" +
-                  localStorage.getItem("locationIdGoogle") +
-                  "/reviews",
+                res.data.accounts[0].name +
+                  "/locations",
                 GoogleConfig
-              ).then(respo => {
-                console.log("google reviews", respo.data);
-                this.setState({
-                  googleReviews: respo.data,
-                  active_listing: [...this.state.active_listing, "Google"]
-                });
-                if (respo.data.averageRating) {
-                  this.setState({
-                    pdf_data2: [
-                      ...this.state.pdf_data2,
-                      {
-                        name: "Google",
-                        image: require("../images/google.png"),
-                        data: respo.data.averageRating
+              ).then(resp => {
+                console.log("google location data",resp.data);
+  
+                if(resp.data.locations[0]){
+                  Axios.get(
+                    "https://mybusiness.googleapis.com/v4/" +
+                    resp.data.locations[0].name +
+                      "/reviews",
+                    GoogleConfig
+                  ).then(respo => {
+                    console.log("google reviews", respo.data);
+                    
+                    if(respo.data){
+                      this.setState({
+                        active_listing: [...this.state.active_listing, "Google"]
+                      });
+                      if (respo.data.averageRating) {
+                        this.setState({
+                          pdf_data2: [
+                            ...this.state.pdf_data2,
+                            {
+                              name: "Google",
+                              image: require("../images/google.png"),
+                              data: respo.data.averageRating
+                            }
+                          ]
+                        });
                       }
-                    ]
+      
+                      if (
+                        this.state.googleReviews &&
+                        this.state.googleReviews.length != 0
+                      ) {
+                        if (
+                          this.state.googleReviews.reviews &&
+                          this.state.googleReviews.reviews.length != 0
+                        ) {
+                          this.setState({
+                            pdf_data1: [
+                              ...this.state.pdf_data1,
+                              {
+                                name: "Google",
+                                image: require("../images/google.png"),
+                                data: this.state.googleReviews.reviews
+                              }
+                            ]
+                          });
+                        }
+                      }
+                      this.google_star_counting(respo.data);
+                    } else {
+                      this.setState({
+                        googleReviews: respo.data,
+                        active_listing: [...this.state.active_listing, "Google"]
+                      });
+                    }
                   });
                 }
-
-                if (
-                  this.state.googleReviews &&
-                  this.state.googleReviews.length != 0
-                ) {
-                  if (
-                    this.state.googleReviews.reviews &&
-                    this.state.googleReviews.reviews.length != 0
-                  ) {
-                    this.setState({
-                      pdf_data1: [
-                        ...this.state.pdf_data1,
-                        {
-                          name: "Google",
-                          image: require("../images/google.png"),
-                          data: this.state.googleReviews.reviews
-                        }
-                      ]
-                    });
-                  }
-                }
-
-                this.google_star_counting(respo.data);
               });
-            });
+            }
           });
         }
 
@@ -513,11 +528,11 @@ export default class ReviewTracking extends Component {
           Axios.get("https://www.instagram.com/" + instaUrl + "/?__a=1").then(
             res => {
               console.log("instagram data in json", res.data);
-              console.log(
-                "instagram data in json",
-                res.data.graphql.user.edge_owner_to_timeline_media.edges[0].node
-                  .shortcode
-              );
+              // console.log(
+              //   "instagram data in json",
+              //   res.data.graphql.user.edge_owner_to_timeline_media.edges[0].node
+              //     .shortcode
+              // );
 
               res.data.graphql.user.edge_owner_to_timeline_media.edges.map(
                 (post, i) => {
@@ -572,25 +587,27 @@ export default class ReviewTracking extends Component {
           ).then(res => {
             console.log("apple data in json", res.data.feed.entry);
 
-            this.setState({
-              appleReviews: res.data.feed.entry,
-              appleDetails: res,
-              appleReviewCount: res.data.feed.entry.length,
-              active_listing: [...this.state.active_listing, "Apple"]
-            });
-            this.apple_star_counting(res.data.feed.entry);
-
-            if (this.state.appleReviews.length != 0) {
+            if(res.data.feed.entry){
               this.setState({
-                pdf_data1: [
-                  ...this.state.pdf_data1,
-                  {
-                    name: "Apple",
-                    image: require("../images/apple.png"),
-                    data: this.state.appleReviews
-                  }
-                ]
+                appleReviews: res.data.feed.entry,
+                appleDetails: res,
+                appleReviewCount: res.data.feed.entry.length,
+                active_listing: [...this.state.active_listing, "Apple"]
               });
+              this.apple_star_counting(res.data.feed.entry);
+  
+              if (this.state.appleReviews.length != 0) {
+                this.setState({
+                  pdf_data1: [
+                    ...this.state.pdf_data1,
+                    {
+                      name: "Apple",
+                      image: require("../images/apple.png"),
+                      data: this.state.appleReviews
+                    }
+                  ]
+                });
+              }
             }
           });
         }
@@ -603,94 +620,98 @@ export default class ReviewTracking extends Component {
           ).then(res => {
             console.log("zillow data in json", res.data);
 
-            this.setState({
-              zillowReviews: res.data.response.results.proReviews.review,
-              zillowDetails: res.data,
-              zillowReviewCount: parseInt(
-                res.data.response.results.proInfo.reviewCount
-              ),
-              zillowAvgRating: parseFloat(
-                res.data.response.results.proInfo.avgRating
-              ),
-              active_listing: [...this.state.active_listing, "Zillow"]
-            });
-
-            if (res.data.response.results.proInfo.avgRating) {
+            if(res.data.response.results){
               this.setState({
-                pdf_data2: [
-                  ...this.state.pdf_data2,
-                  {
-                    name: "Zillow",
-                    image: require("../images/zillow.png"),
-                    data: parseFloat(
-                      res.data.response.results.proInfo.avgRating
-                    )
-                  }
-                ]
+                zillowReviews: res.data.response.results.proReviews.review,
+                zillowDetails: res.data,
+                zillowReviewCount: parseInt(
+                  res.data.response.results.proInfo.reviewCount
+                ),
+                zillowAvgRating: parseFloat(
+                  res.data.response.results.proInfo.avgRating
+                ),
+                active_listing: [...this.state.active_listing, "Zillow"]
               });
-            }
-
-            if (this.state.zillowReviews.length != 0) {
-              this.setState({
-                pdf_data1: [
-                  ...this.state.pdf_data1,
-                  {
-                    name: "Zillow",
-                    image: require("../images/zillow.png"),
-                    data: this.state.zillowReviews
-                  }
-                ]
-              });
+  
+              if (res.data.response.results.proInfo.avgRating) {
+                this.setState({
+                  pdf_data2: [
+                    ...this.state.pdf_data2,
+                    {
+                      name: "Zillow",
+                      image: require("../images/zillow.png"),
+                      data: parseFloat(
+                        res.data.response.results.proInfo.avgRating
+                      )
+                    }
+                  ]
+                });
+              }
+  
+              if (this.state.zillowReviews.length != 0) {
+                this.setState({
+                  pdf_data1: [
+                    ...this.state.pdf_data1,
+                    {
+                      name: "Zillow",
+                      image: require("../images/zillow.png"),
+                      data: this.state.zillowReviews
+                    }
+                  ]
+                });
+              }
             }
           });
         }
 
-        if (tomtomUrl != "-") {
+        if (tomtomUrl && tomtomUrl != "-") {
           Axios.get(
             "https://api.tomtom.com/search/2/poiDetails.json?key=BVtLuLXu3StRT6YXupe4H9cbtugU3i10&id=" +
               tomtomUrl
           ).then(res => {
             console.log("tomtom data in json", res.data);
 
-            this.setState({
-              tomtomReviews: res.data.result.reviews,
-              tomtomDetails: res.data,
-              tomtomReviewCount: res.data.result.rating
-                ? parseInt(res.data.result.rating.totalRatings)
-                : 0,
-              tomtomAvgRating: res.data.result.rating
-                ? parseFloat(res.data.result.rating.value) / 2
-                : res.data.result.rating,
-              active_listing: [...this.state.active_listing, "Tomtom"]
-            });
-
-            if (this.state.tomtomAvgRating) {
+            if(res.data.result){
               this.setState({
-                pdf_data2: [
-                  ...this.state.pdf_data2,
-                  {
-                    name: "Tomtom",
-                    image: require("../images/tomtom.png"),
-                    data: this.state.tomtomAvgRating
-                  }
-                ]
+                tomtomReviews: res.data.result.reviews,
+                tomtomDetails: res.data,
+                tomtomReviewCount: res.data.result.rating
+                  ? parseInt(res.data.result.rating.totalRatings)
+                  : 0,
+                tomtomAvgRating: res.data.result.rating
+                  ? parseFloat(res.data.result.rating.value) / 2
+                  : res.data.result.rating,
+                active_listing: [...this.state.active_listing, "Tomtom"]
               });
-            }
-
-            if (
-              this.state.tomtomReviews &&
-              this.state.tomtomReviews.length != 0
-            ) {
-              this.setState({
-                pdf_data1: [
-                  ...this.state.pdf_data1,
-                  {
-                    name: "Tomtom",
-                    image: require("../images/tomtom.png"),
-                    data: this.state.tomtomReviews
-                  }
-                ]
-              });
+  
+              if (this.state.tomtomAvgRating) {
+                this.setState({
+                  pdf_data2: [
+                    ...this.state.pdf_data2,
+                    {
+                      name: "Tomtom",
+                      image: require("../images/tomtom.png"),
+                      data: this.state.tomtomAvgRating
+                    }
+                  ]
+                });
+              }
+  
+              if (
+                this.state.tomtomReviews &&
+                this.state.tomtomReviews.length != 0
+              ) {
+                this.setState({
+                  pdf_data1: [
+                    ...this.state.pdf_data1,
+                    {
+                      name: "Tomtom",
+                      image: require("../images/tomtom.png"),
+                      data: this.state.tomtomReviews
+                    }
+                  ]
+                });
+              }
             }
           });
         }
@@ -708,25 +729,27 @@ export default class ReviewTracking extends Component {
           ).then(res => {
             console.log("avvo lawyer data in json", res.data);
 
-            this.setState({
-              avvoDetails: res.data.lawyers[0],
-              avvoReviewCount: parseInt(
-                res.data.lawyers[0].client_review_count
-              ),
-              avvoAvgRating: parseFloat(res.data.lawyers[0].client_review_score)
-            });
-
-            if (this.state.avvoAvgRating) {
+            if(res.data.lawyers[0]){
               this.setState({
-                pdf_data2: [
-                  ...this.state.pdf_data2,
-                  {
-                    name: "Avvo",
-                    image: require("../images/avvo.png"),
-                    data: this.state.avvoAvgRating
-                  }
-                ]
+                avvoDetails: res.data.lawyers[0],
+                avvoReviewCount: parseInt(
+                  res.data.lawyers[0].client_review_count
+                ),
+                avvoAvgRating: parseFloat(res.data.lawyers[0].client_review_score)
               });
+  
+              if (this.state.avvoAvgRating) {
+                this.setState({
+                  pdf_data2: [
+                    ...this.state.pdf_data2,
+                    {
+                      name: "Avvo",
+                      image: require("../images/avvo.png"),
+                      data: this.state.avvoAvgRating
+                    }
+                  ]
+                });
+              }
             }
           });
           Axios.get(
@@ -736,22 +759,24 @@ export default class ReviewTracking extends Component {
             AvvoConfig
           ).then(res => {
             console.log("avvo reviews data in json", res.data);
-            this.setState({
-              avvoReviews: res.data.reviews,
-              active_listing: [...this.state.active_listing, "Avvo"]
-            });
-
-            if (this.state.avvoReviews.length != 0) {
+            if(res.data.reviews){
               this.setState({
-                pdf_data1: [
-                  ...this.state.pdf_data1,
-                  {
-                    name: "Avvo",
-                    image: require("../images/avvo.png"),
-                    data: this.state.avvoReviews
-                  }
-                ]
+                avvoReviews: res.data.reviews,
+                active_listing: [...this.state.active_listing, "Avvo"]
               });
+  
+              if (this.state.avvoReviews.length != 0) {
+                this.setState({
+                  pdf_data1: [
+                    ...this.state.pdf_data1,
+                    {
+                      name: "Avvo",
+                      image: require("../images/avvo.png"),
+                      data: this.state.avvoReviews
+                    }
+                  ]
+                });
+              }
             }
           });
         }
@@ -791,21 +816,27 @@ export default class ReviewTracking extends Component {
           ).then(res => {
             console.log("zomato reviews in json", res.data);
 
-            this.setState({
-              zomatoReviews: res.data.user_reviews,
-              active_listing: [...this.state.active_listing, "Zomato"]
-            });
-
-            if (this.state.zomatoReviews.length != 0) {
+            if(res.data.user_reviews){
               this.setState({
-                pdf_data1: [
-                  ...this.state.pdf_data1,
-                  {
-                    name: "Zomato",
-                    image: require("../images/zomato.png"),
-                    data: this.state.zomatoReviews
-                  }
-                ]
+                zomatoReviews: res.data.user_reviews,
+                active_listing: [...this.state.active_listing, "Zomato"]
+              });
+  
+              if (this.state.zomatoReviews.length != 0) {
+                this.setState({
+                  pdf_data1: [
+                    ...this.state.pdf_data1,
+                    {
+                      name: "Zomato",
+                      image: require("../images/zomato.png"),
+                      data: this.state.zomatoReviews
+                    }
+                  ]
+                });
+              }
+            } else {
+              this.setState({
+                active_listing: [...this.state.active_listing, "Zomato"]
               });
             }
           });
@@ -820,10 +851,9 @@ export default class ReviewTracking extends Component {
           ).then(res => {
             console.log("citysearchUrl response", res);
 
-            var XMLParser = require("react-xml-parser");
+            if(xml.getElementsByTagName("review")){
+              var XMLParser = require("react-xml-parser");
             var xml = new XMLParser().parseFromString(res.data); // Assume xmlText contains the example XML
-            console.log(xml);
-            console.log(xml.getElementsByTagName("review"));
             this.setState({
               citysearchReviews: xml.getElementsByTagName("review"),
               citysearchDetails: xml,
@@ -845,6 +875,12 @@ export default class ReviewTracking extends Component {
             }
 
             this.citysearch_star_counting(xml.getElementsByTagName("review"));
+            } else {
+              this.setState({
+                citysearchDetails: xml,
+                active_listing: [...this.state.active_listing, "Citysearch"]
+              });
+            }
           });
         }
         this.setState({ loader: false });

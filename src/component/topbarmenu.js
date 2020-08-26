@@ -49,18 +49,19 @@ export default class Topbarmenu extends Component {
 
     this.setState({ changev: true, locationid: e.target.value });
 
-    localStorage.setItem("locationId", e.target.value);
+    localStorage.setItem("locationId", JSON.parse(e.target.value).id);
+    localStorage.setItem("locationName", JSON.parse(e.target.value).name);
 
     // console.log(window.location.href);
 
     window.location.assign(
-      "dashboard#/locations/" + e.target.value + "/view-location"
+      "dashboard#/locations/" + JSON.parse(e.target.value).id + "/view-location"
     );
     window.location.reload(false);
   };
 
   logout = () => {
-    localStorage.clear()
+    localStorage.clear();
 
     // Axios.post(
     //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/account/logout"
@@ -253,9 +254,9 @@ export default class Topbarmenu extends Component {
     if (this.state.AllLocations.length != 0) {
       this.state.AllLocations.map(data => {
         courses = [...courses, data.Location_name];
-        if (location_id == data.id.toString()) {
-          localStorage.setItem("locationName", data.Location_name);
-        }
+        // if (location_id == data.id.toString()) {
+        //   localStorage.setItem("locationName", data.Location_name);
+        // }
       });
     }
 
@@ -538,7 +539,10 @@ export default class Topbarmenu extends Component {
                           ? filtered_posts.map((f, i) => (
                               <option
                                 key={`location-${i}`}
-                                value={f.id.toString()}
+                                value={JSON.stringify({
+                                  id: f.id.toString(),
+                                  name: f.Location_name
+                                })}
                               >
                                 {f.Location_name}
                               </option>

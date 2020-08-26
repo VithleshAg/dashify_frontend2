@@ -207,8 +207,6 @@ export default class VoiceListing extends Component {
     googleOptimized: false,
     appleOptimized: false,
 
-    redirect_to_google_connectedaccounts: false,
-    google_redirect_data: "",
     que_error: "",
     ans_error: ""
   };
@@ -481,6 +479,7 @@ export default class VoiceListing extends Component {
 
                 if (
                   res.data.primaryCategory &&
+                  res.data.regularHours &&
                   res.data.regularHours.periods &&
                   res.data.websiteUrl &&
                   res.data.locationName &&
@@ -630,25 +629,15 @@ export default class VoiceListing extends Component {
       location_id: this.props.match.params.locationId,
       redirect_to: "/voice-listing"
     };
-    this.setState({
-      redirect_to_google_connectedaccounts: true,
-      google_redirect_data: state
+    this.props.history.push({
+      pathname: `/google-connectedaccounts/${encodeURIComponent(
+        JSON.stringify(state)
+      )}`
     });
   };
 
   render() {
     console.log(this.state);
-
-    if (this.state.redirect_to_google_connectedaccounts) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/google-connectedaccounts",
-            state: this.state.google_redirect_data
-          }}
-        />
-      );
-    }
 
     if (this.state.otherImage) {
       var otherIma = (

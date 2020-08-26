@@ -262,7 +262,7 @@ export default class MainApp extends Component {
                 />
                 <Route
                   exact
-                  path="/locations/:locationId/campaignpart2"
+                  path="/locations/:locationId/campaignpart2/:campaign_id"
                   render={props => <CampaignPart2 {...props} />}
                 />
                 <Route
@@ -337,13 +337,13 @@ export default class MainApp extends Component {
                 />
                 <Route
                   exact
-                  path="/connectedaccounts"
-                  component={ConnectedAccounts}
+                  path="/connectedaccounts/:redirect_to"
+                  render={props => <ConnectedAccounts {...props} />}
                 />
                 <Route
                   exact
-                  path="/google-connectedaccounts"
-                  component={GoogleConnectedAccounts}
+                  path="/google-connectedaccounts/:state"
+                  render={props => <GoogleConnectedAccounts {...props} />}
                 />
                 <Route
                   exact

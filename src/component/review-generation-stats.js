@@ -78,7 +78,8 @@ export default class ReviewGenerationStats extends Component {
     google_fb_dataPoints: [],
     dailyClicked: false,
     monthlyClicked: true,
-    yearlyClicked: false
+    yearlyClicked: false,
+    campaign_count: "-"
   };
 
   componentDidMount = () => {
@@ -414,11 +415,15 @@ export default class ReviewGenerationStats extends Component {
               fourUrl +
               "?client_id=TEUSFAUY42IR0HGTPSWO1GFLC5WHX3PIBKVICAQRZQA0MTD1&client_secret=CYBQFK0YRBPFE54NARAEJCG2NLBARIU2OOIJNE0AZOHWZTXU&v=20180323"
           ).then(res => {
-            console.log("foursquare", res.data.response);
-            this.setState({
-              foursquare_average_rating: res.data.response.venue.rating / 2,
-              foursquare_all_reviews: res.data.response.venue.tips.count
-            });
+            console.log("foursquare", res.data);
+            if (res.data && res.data.response && res.data.response.venue) {
+              this.setState({
+                foursquare_average_rating: res.data.response.venue.rating
+                  ? res.data.response.venue.rating / 2
+                  : 0,
+                foursquare_all_reviews: res.data.response.venue.tips.count
+              });
+            }
             this.setState({
               all_connections: [
                 ...this.state.all_connections,
@@ -480,6 +485,20 @@ export default class ReviewGenerationStats extends Component {
         console.log("error in review generation stats", res);
         this.setState({ loader: false });
       });
+
+    Axios.get(
+      "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/campaign/get-all-campaign",
+      DjangoConfig
+    ).then(res => {
+      let all_campaign = res.data.all_campaign;
+      let campaign_count = 0;
+      all_campaign.map(data => {
+        if (data.BusinessLocation == this.props.match.params.locationId) {
+          campaign_count++;
+        }
+      });
+      this.setState({ campaign_count });
+    });
   };
 
   dailyLineGraph = () => {
@@ -662,8 +681,11 @@ export default class ReviewGenerationStats extends Component {
 
       all_connections,
       isFbLoggedIn,
-      isGoogleLoggedIn
+      isGoogleLoggedIn,
+      campaign_count
     } = this.state;
+
+    console.log("this.state", this.state);
 
     let a = 0;
     a =
@@ -870,17 +892,21 @@ export default class ReviewGenerationStats extends Component {
 
                     {all_connections.length != 0 ? (
                       <div>
-                        <div className="text-center mt-30">
-                          {/* <img src={require("../images/pie-chart-2.jpg")} /> */}
-                          {/* pie chart */}
-                          <PieChart
-                            data={dataMock}
-                            lineWidth={23}
-                            rounded
-                            //   style={{ height: "220px" }}
-                          />
-                          {/* pie chart */}
-                        </div>
+                        {all_reviews != 0 ? (
+                          <div className="text-center mt-30">
+                            {/* <img src={require("../images/pie-chart-2.jpg")} /> */}
+                            {/* pie chart */}
+                            <PieChart
+                              data={dataMock}
+                              lineWidth={23}
+                              rounded
+                              //   style={{ height: "220px" }}
+                            />
+                            {/* pie chart */}
+                          </div>
+                        ) : (
+                          ""
+                        )}
 
                         <div className="stats-box">
                           <div className="countboxpie">
@@ -974,7 +1000,7 @@ export default class ReviewGenerationStats extends Component {
                           <img src={require("../images/c-1.jpg")} />
                         </div>
                         <div className="icon-text">
-                          <h2>-</h2>
+                          <h2>{campaign_count}</h2>
                           <h3>Total campaign</h3>
                         </div>
                       </div>
@@ -987,11 +1013,13 @@ export default class ReviewGenerationStats extends Component {
                         </div>
                         <div className="icon-text">
                           <h2>
-                            {average_rating != 0
-                              ? average_rating.toString().slice(0, 4)
+                            {all_connections.length != 0
+                              ? average_rating != 0
+                                ? average_rating.toString().slice(0, 4)
+                                : 0
                               : "-"}
                             <div className="dropdown parsent red">
-                              <a
+                              {/* <a
                                 href="#"
                                 className="dropdown-toggle"
                                 data-toggle="dropdown"
@@ -999,7 +1027,7 @@ export default class ReviewGenerationStats extends Component {
                                 0.52%
                                 <span className="zmdi zmdi-caret-down"></span>
                               </a>
-                              {/* <div className="dropdown-menu">
+                              <div className="dropdown-menu">
                               <ul>
                                 <li>0.52%</li>
                                 <li>0.52%</li>
@@ -1019,9 +1047,9 @@ export default class ReviewGenerationStats extends Component {
                         </div>
                         <div className="icon-text">
                           <h2>
-                            {all_reviews != 0 ? all_reviews : "-"}
+                            {all_connections.length != 0 ? all_reviews : "-"}
                             <div className="dropdown parsent">
-                              <a
+                              {/* <a
                                 href="#"
                                 className="dropdown-toggle"
                                 data-toggle="dropdown"
@@ -1029,7 +1057,7 @@ export default class ReviewGenerationStats extends Component {
                                 1.34%
                                 <span className="zmdi zmdi-caret-down"></span>
                               </a>
-                              {/* <div className="dropdown-menu">
+                               <div className="dropdown-menu">
                               <ul>
                                 <li>170%</li>
                                 <li>180%</li>

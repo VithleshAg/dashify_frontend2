@@ -138,9 +138,6 @@ export default class ViewListing extends Component {
     zomatoId: "",
     avvoId: "",
     otherImage: [],
-    redirect_to_connectedaccounts: false,
-    redirect_to_google_connectedaccounts: false,
-    google_redirect_data: "",
     loader: true,
     all_connections: [],
     pdf_data: [],
@@ -662,7 +659,9 @@ export default class ViewListing extends Component {
     await localStorage.setItem("fb_token", response.accessToken);
     await localStorage.setItem("fb_data", JSON.stringify(fb_data));
 
-    this.setState({ redirect_to_connectedaccounts: true });
+    this.props.history.push({
+      pathname: `/connectedaccounts/view-listing`,
+    })
     
   };
 
@@ -681,10 +680,11 @@ export default class ViewListing extends Component {
       location_id: this.props.match.params.locationId,
       redirect_to: "/view-listing"
     };
-    this.setState({
-      redirect_to_google_connectedaccounts: true,
-      google_redirect_data: state
-    });
+    
+    this.props.history.push({
+      pathname: `/google-connectedaccounts/${encodeURIComponent(JSON.stringify(state))}`,
+    })
+
   };
 
   linkedin_handleSuccess = data => {
@@ -873,28 +873,6 @@ export default class ViewListing extends Component {
     let { all_connections, pdf_data } = this.state;
 
     const { linkedin_code, linkedin_errorMessage } = this.state;
-
-    if (this.state.redirect_to_connectedaccounts) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/connectedaccounts",
-            state: { redirect_to: "/view-listing" }
-          }}
-        />
-      );
-    }
-
-    if (this.state.redirect_to_google_connectedaccounts) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/google-connectedaccounts",
-            state: this.state.google_redirect_data
-          }}
-        />
-      );
-    }
 
     return (
       <div className="main_content">
@@ -1221,6 +1199,7 @@ export default class ViewListing extends Component {
                       // appId="3044182972316291"
                       autoLoad={false}
                       fields="name,email,picture"
+                      // fields="name,email,picture,pages_read_engagement,pages_read_user_content,Page Public Metadata Access"
                       onClick={this.componentClicked}
                       callback={this.responseFacebook}
                     />

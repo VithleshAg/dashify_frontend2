@@ -162,8 +162,9 @@ export default class ReviewAnalytics extends Component {
           "https://graph.facebook.com/me/accounts?fields=access_token,id,name,overall_star_rating,category,category_list,tasks&access_token=" +
             fbtoken
         ).then(resp => {
-          this.setState({ fbAccounts: resp.data.data });
-          var fbPageAccessToken, index;
+          this.setState({ fbAccounts: resp.data.data ? resp.data.data : [] });
+          if(resp.data.data){
+            var fbPageAccessToken, index;
           for (let i = 0; i < resp.data.data.length; i++) {
             if (resp.data.data[i].id == fbPageId) {
               fbPageAccessToken = resp.data.data[i].access_token;
@@ -203,6 +204,7 @@ export default class ReviewAnalytics extends Component {
               ]
             });
           });
+          }
         });
       }
 
@@ -216,15 +218,17 @@ export default class ReviewAnalytics extends Component {
           Yelpconfig
         ).then(resp => {
           console.log("yelp reviews", resp.data);
-          this.setState({ yelpReviews: resp.data.reviews });
+          this.setState({ yelpReviews: resp.data.reviews ? resp.data.reviews : [] });
 
           let yelp_new_reviews = 0;
-          for (let j = 0; j < resp.data.reviews.length; j++) {
-            let create_time1 = resp.data.reviews[j].time_created;
-            if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
-              if (parseInt(create_time1.slice(5, 7)) == today.getMonth() + 1) {
-                if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
-                  yelp_new_reviews++;
+          if(resp.data.reviews){
+            for (let j = 0; j < resp.data.reviews.length; j++) {
+              let create_time1 = resp.data.reviews[j].time_created;
+              if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
+                if (parseInt(create_time1.slice(5, 7)) == today.getMonth() + 1) {
+                  if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
+                    yelp_new_reviews++;
+                  }
                 }
               }
             }
@@ -243,7 +247,6 @@ export default class ReviewAnalytics extends Component {
             yelpUrl.slice(25),
           Yelpconfig
         ).then(resp => {
-          console.log("hii");
           console.log("yelp details", resp.data);
           this.setState({ yelpDetails: resp.data });
         });
@@ -261,7 +264,7 @@ export default class ReviewAnalytics extends Component {
           GoogleConfig
         ).then(res => {
           console.log(res.data);
-          localStorage.setItem("accountId", res.data.accounts[0].name);
+          // localStorage.setItem("accountId", res.data.accounts[0].name);
 
           // Axios.get(
           //   "https://mybusiness.googleapis.com/v4/" +
@@ -324,11 +327,13 @@ export default class ReviewAnalytics extends Component {
             "?client_id=TEUSFAUY42IR0HGTPSWO1GFLC5WHX3PIBKVICAQRZQA0MTD1&client_secret=CYBQFK0YRBPFE54NARAEJCG2NLBARIU2OOIJNE0AZOHWZTXU&v=20180323"
         ).then(res => {
           console.log("foursquare data", res.data.response.venue);
-          this.setState({
-            foursquareReviews: res.data.response.venue.tips.groups[0] ? res.data.response.venue.tips.groups[0].items :[],
-            foursquareDetails: res.data.response.venue,
-            foursquareReviewCount: res.data.response.venue.tips.count
-          });
+          if(res.data.response.venue){
+            this.setState({
+              foursquareReviews: res.data.response.venue.tips.groups[0] ? res.data.response.venue.tips.groups[0].items :[],
+              foursquareDetails: res.data.response.venue,
+              foursquareReviewCount: res.data.response.venue.tips.count
+            });
+          }
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -349,16 +354,18 @@ export default class ReviewAnalytics extends Component {
           let appleRating = 0;
           let appleReviews = res.data.feed.entry;
 
-          for (let i = 0; i < appleReviews.length; i++) {
-            appleRating += parseInt(appleReviews[i]["im:rating"].label);
+          if(appleReviews){
+            for (let i = 0; i < appleReviews.length; i++) {
+              appleRating += parseInt(appleReviews[i]["im:rating"].label);
+            }
+            appleRating = parseInt(
+              (appleRating / appleReviews.length).toString().slice(0, 3)
+            );
+            this.setState({
+              appleRating,
+              appleReviewCount: res.data.feed.entry ? res.data.feed.entry.length : "-"
+            });
           }
-          appleRating = parseInt(
-            (appleRating / appleReviews.length).toString().slice(0, 3)
-          );
-          this.setState({
-            appleRating,
-            appleReviewCount: res.data.feed.entry.length
-          });
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -384,15 +391,17 @@ export default class ReviewAnalytics extends Component {
           var citysearchNewReviews = 0;
           for (let i = 0; i < citysearchReviews.length; i++) {
             citysearchRating +=
-              parseInt(citysearchReviews[i].children[5].value) / 2;
+            citysearchReviews[i].children[5] ? (parseInt(citysearchReviews[i].children[5].value) / 2): 0;
 
-            let create_time1 = citysearchReviews[i].children[6].value;
+            if(citysearchReviews[i].children[6]){
+              let create_time1 = citysearchReviews[i].children[6].value;
             if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
               if (parseInt(create_time1.slice(5, 7)) == today.getMonth() + 1) {
                 if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
                   citysearchNewReviews++;
                 }
               }
+            }
             }
           }
           citysearchRating = parseInt(
@@ -418,7 +427,8 @@ export default class ReviewAnalytics extends Component {
         Axios.get(hereUrl).then(res => {
           console.log("Here data", res.data);
 
-          let hereRating =
+          if(res.data.media){
+            let hereRating =
             res.data.media.ratings.items.length >= 1
               ? res.data.media.ratings.items[0].average
               : "-";
@@ -428,14 +438,20 @@ export default class ReviewAnalytics extends Component {
               : "-";
           this.setState({
             hereRating,
-            hereReviews: hereReviews
+            hereReviews: hereReviews,
+            all_connections: [
+              ...this.state.all_connections,
+              { name: "Here" }
+            ]
           });
+          } else{
           this.setState({
             all_connections: [
               ...this.state.all_connections,
               { name: "Here" }
             ]
           });
+        }
         });
       }
 
@@ -449,16 +465,18 @@ export default class ReviewAnalytics extends Component {
         ).then(res => {
           console.log("zillow data", res.data);
 
-          let zillowRating = res.data.response.results.proInfo.avgRating
+          if(res.data.response){
+            let zillowRating = res.data.response.results.proInfo.avgRating
             ? parseFloat(res.data.response.results.proInfo.avgRating)
-            : 0;
-          let zillowReviews = parseInt(
+            : "-";
+          let zillowReviews = res.data.response.results.proInfo.reviewCount ? parseInt(
             res.data.response.results.proInfo.reviewCount
-          );
+          ) : "-";
           this.setState({
             zillowRating,
             zillowReviews
           });
+          }
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -470,23 +488,17 @@ export default class ReviewAnalytics extends Component {
 
       // tomtom
 
-      if (tomtomUrl) {
-        if (tomtomUrl == "-") {
-          this.setState({
-            tomtomRating: 0,
-            tomtomReviews: 0,
-            tomtomNewReviews: 0
-          });
-        } else {
+        if (tomtomUrl && tomtomUrl != "-") {
           Axios.get(
             "https://api.tomtom.com/search/2/poiDetails.json?key=BVtLuLXu3StRT6YXupe4H9cbtugU3i10&id=" +
               tomtomUrl
           ).then(res => {
             console.log("tomtom data", res.data);
 
-            let tomtomRating = res.data.result.rating
-              ? parseFloat(res.data.result.rating.value) / 2
-              : 0;
+            if(res.data.result && res.data.result &&  res.data.result.reviews){
+              let tomtomRating = res.data.result.rating
+              ? (parseFloat(res.data.result.rating.value) / 2)
+              : "-";
 
             let tomtomReviews = parseInt(res.data.result.rating.totalRatings);
 
@@ -509,6 +521,7 @@ export default class ReviewAnalytics extends Component {
               tomtomReviews,
               tomtomNewReviews
             });
+            }
             this.setState({
               all_connections: [
                 ...this.state.all_connections,
@@ -517,7 +530,6 @@ export default class ReviewAnalytics extends Component {
             });
           });
         }
-      }
 
       // avvo
 
@@ -534,12 +546,14 @@ export default class ReviewAnalytics extends Component {
         ).then(res => {
           console.log("avvo lawyer data in json", res.data);
 
-          let avvoRating = parseFloat(res.data.lawyers[0].client_review_score);
+          if(res.data.lawyers[0]){
+            let avvoRating = parseFloat(res.data.lawyers[0].client_review_score);
           let avvoReviews = parseInt(res.data.lawyers[0].client_review_count);
           this.setState({
             avvoRating,
             avvoReviews
           });
+          }
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -559,14 +573,16 @@ export default class ReviewAnalytics extends Component {
         ).then(res => {
           console.log("zomato data", res.data);
 
-          let zomatoRating = res.data.user_rating.aggregate_rating
+          if(res.data.user_rating && res.data.all_reviews_count){
+            let zomatoRating = res.data.user_rating.aggregate_rating
             ? parseFloat(res.data.user_rating.aggregate_rating)
-            : 0;
+            : "-";
           let zomatoReviews = parseInt(res.data.all_reviews_count);
           this.setState({
             zomatoRating,
             zomatoReviews
           });
+          }
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -1773,8 +1789,9 @@ export default class ReviewAnalytics extends Component {
               
                 {/* <img src={require('../images/pie.jpg')}/> */}
 
-                {all_connections.length != 0 ? 
+                {(overAllReviewCount != 0) && (all_connections.length != 0) ? 
                 <div className="whitechart">
+                  <h2 className="analytics_btnx">Sitewise Distribution Reviews</h2>
                   <Chart
                   width={"500px"}
                   height={"500px"}
@@ -1782,7 +1799,7 @@ export default class ReviewAnalytics extends Component {
                   loader={<div>Loading Chart</div>}
                   data={pieData}
                   options={{
-                    title: "Sitewise Distribution Reviews",
+                    title: "",
                     pieSliceText: "label",
                     legend: "none",
                     pieHole: 0.4
@@ -1792,12 +1809,11 @@ export default class ReviewAnalytics extends Component {
                 </div>: ""}
               
             </div>
-            <div className="col-md-6">
-              
+            <div className="col-md-6">            
                 {/* <img src={require('../images/pie-1.jpg')}/> */}
-
-                {all_connections.length != 0 ?
+                { (overAllRating != "-") && (all_connections.length != 0) ?
                 <div className="whitechart">
+                  <h2 className="analytics_btnx">Sitewise Distribution Of Ratings</h2>
                    <Chart
                   width={"500px"}
                   height={"300px"}
@@ -1805,7 +1821,7 @@ export default class ReviewAnalytics extends Component {
                   loader={<div>Loading Chart</div>}
                   data={columnData}
                   options={{
-                    title: "Sitewise Distribution Of Ratings",
+                    title: "",
                     width: 580,
                     height: 500,
                     bar: { groupWidth: "25%" },

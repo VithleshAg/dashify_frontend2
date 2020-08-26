@@ -12,6 +12,7 @@ const DjangoConfig = {
 
 export default class PromotionalPost extends Component {
   state = {
+    accountId:"",
     all_posts: [],
     all_posts_report: [],
     edit_post: "",
@@ -216,8 +217,7 @@ export default class PromotionalPost extends Component {
             console.log("google account", res.data);
             console.log("googleconfig", GoogleConfig);
             console.log("google data", JSON.stringify(data));
-            localStorage.setItem("accountId", res.data.accounts[0].name);
-            this.setState({isGoogleLoggedIn: true})
+            this.setState({accountId:res.data.accounts[0].name,isGoogleLoggedIn: true})
             this.google_localpost_insight();
           });
         }
@@ -228,13 +228,13 @@ export default class PromotionalPost extends Component {
       });
   }
 
-  submitHandler = event => {
+  submitHandler = async event => {
     event.preventDefault();
 
     this.setState({loader: true})
-    const data = {
-      location_id: this.props.match.params.locationId
-    };
+    // const data = {
+    //   location_id: this.props.match.params.locationId
+    // };
     var {
       summary,
       sourceUrl,
@@ -258,27 +258,29 @@ export default class PromotionalPost extends Component {
     //   data,
     //   DjangoConfig
     // )
-    all_connection_of_one_location(data, DjangoConfig).then(response => {
-      var googleToken;
-      response.data.data.map(l => {
-        if (l.Social_Platform.Platform == "Google") {
-          googleToken = l.Social_Platform.Token;
-        }
-      });
+
+    // all_connection_of_one_location(data, DjangoConfig).then(response => {
+    //   var googleToken;
+    //   response.data.data.map(l => {
+    //     if (l.Social_Platform.Platform == "Google") {
+    //       googleToken = l.Social_Platform.Token;
+    //     }
+    //   });
 
       const GoogleConfig = {
-        headers: { Authorization: "Bearer " + googleToken }
+        headers: { Authorization: "Bearer " + this.state.google_token }
       };
 
-      if (googleToken) {
-        Axios.get(
-          "https://mybusiness.googleapis.com/v4/accounts/",
-          GoogleConfig
-        ).then(async res => {
-          console.log("google account", res.data);
-          console.log("googleconfig", GoogleConfig);
-          console.log("google data", JSON.stringify(data));
-          localStorage.setItem("accountId", res.data.accounts[0].name);
+      // if (this.state.google_token) {
+      //   Axios.get(
+      //     "https://mybusiness.googleapis.com/v4/accounts/",
+      //     GoogleConfig
+      //   ).then(async res => {
+      //     console.log("google account", res.data);
+      //     console.log("googleconfig", GoogleConfig);
+      //     console.log("google data", JSON.stringify(data));
+
+          // localStorage.setItem("accountId", res.data.accounts[0].name);
 
           if (summary || sourceUrl) {
             const google_data = await this.postData();
@@ -302,12 +304,12 @@ export default class PromotionalPost extends Component {
             alert("Both Image and summary field can not be empty at same time");
             this.setState({loader: false})
           }
-        });
-      } else {
-        alert("Please connect google listing");
-        this.setState({loader: false})
-      }
-    });
+        // });
+      // } else {
+      //   alert("Please connect google listing");
+      //   this.setState({loader: false})
+      // }
+    // });
   };
 
   editPost = event => {
@@ -483,7 +485,7 @@ export default class PromotionalPost extends Component {
     let total_processing_posts = 0;
     let total_rejected_posts = 0;
 
-    data.map(value => {
+    data && data.map(value => {
       if (value.state == "LIVE") {
         total_active_posts++;
       } else if (value.state == "PROCESSING") {
@@ -591,7 +593,7 @@ export default class PromotionalPost extends Component {
 
     Axios.post(
       "https://mybusiness.googleapis.com/v4/" +
-        localStorage.getItem("accountId") +
+        this.state.accountId +
         "/locations:reportInsights",
         {
           // locationNames: [localStorage.getItem("locationIdGoogle")],
@@ -607,11 +609,14 @@ export default class PromotionalPost extends Component {
       GoogleConfig
     ).then(respo => {
       console.log("google location insight", respo.data);
-      const total_post_views =
-        respo.data.locationMetrics[0].metricValues[12].totalValue.value;
+      if(respo.data.locationMetrics && respo.data.locationMetrics[0]){
+        const total_post_views =
+        respo.data.locationMetrics[0].metricValues[12] ? respo.data.locationMetrics[0].metricValues[12].totalValue.value : "-";
       const total_post_clicks =
-        respo.data.locationMetrics[0].metricValues[13].totalValue.value;
+      respo.data.locationMetrics[0].metricValues[13] ? respo.data.locationMetrics[0].metricValues[13].totalValue.value : "-";
       this.setState({ total_post_views, total_post_clicks });
+      }
+      
     });
 
     Axios.post(
@@ -631,11 +636,14 @@ export default class PromotionalPost extends Component {
       GoogleConfig
     ).then(respo => {
       console.log("google location insight 2", respo.data);
-      const total_post_views2 =
-        respo.data.locationMetrics[0].metricValues[12].totalValue.value;
+
+        const total_post_views2 =
+        respo.data.locationMetrics && respo.data.locationMetrics[0] && respo.data.locationMetrics[0].metricValues[12] ? respo.data.locationMetrics[0].metricValues[12].totalValue.value : "-";
       const total_post_clicks2 =
-        respo.data.locationMetrics[0].metricValues[13].totalValue.value;
+      respo.data.locationMetrics && respo.data.locationMetrics[0] && respo.data.locationMetrics[0].metricValues[13] ? respo.data.locationMetrics[0].metricValues[13].totalValue.value : "-";
       this.setState({ total_post_views2, total_post_clicks2 });
+
+      
     });
 
 
@@ -646,7 +654,8 @@ export default class PromotionalPost extends Component {
       GoogleConfig
     ).then(respo => {
       console.log("google localpost data", respo.data);
-      this.posts_status(respo.data.localPosts);
+      if(respo.data && respo.data.localPosts){
+        this.posts_status(respo.data.localPosts);
       this.setState({ all_posts: respo.data.localPosts });
 
       const data = {
@@ -674,9 +683,22 @@ export default class PromotionalPost extends Component {
             : [],
           loading: false
         });
-      });
+      }).catch(res => {
+        this.setState({
+          loading: false
+        });
+      })
+      } else {
+        this.setState({
+          loading: false
+        });
+      }
 
-    });
+    }).catch(res => {
+      this.setState({
+        loading: false
+      });
+    })
   };
 
   change_states = (states, range) => async e => {

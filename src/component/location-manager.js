@@ -100,7 +100,15 @@ export default class ViewLocations extends Component {
                 <div style={{ display: "none" }}>
                   {(link = "dashboard#/locations/" + loc.id + "/view-location")}
                 </div>
-                <a href={link}>View listing</a>
+                <a
+                  href={link}
+                  onClick={() => {
+                    localStorage.setItem("locationId", loc.id.toString());
+                    localStorage.setItem("locationName", loc.Location_name);
+                  }}
+                >
+                  View listing
+                </a>
               </div>
             </div>
           </div>

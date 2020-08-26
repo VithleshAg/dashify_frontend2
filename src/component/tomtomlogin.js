@@ -133,7 +133,6 @@ class TomtomLogin extends Component {
           }
         })
         .catch(res => {
-          alert("Invalid combination of address and Business name");
           this.setState({ loading: false });
         });
     }
