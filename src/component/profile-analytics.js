@@ -1,3 +1,7 @@
+import fb1 from "../images/fb.png";
+import fb2 from "../images/fb1.png";
+
+//
 import React, { Component, PropTypes } from "react";
 import { Link, Redirect } from "react-router-dom";
 import ReactDOMServer from "react-dom/server";
@@ -164,8 +168,8 @@ export default class ProfileAnalytics extends Component {
     await localStorage.setItem("fb_token", response.accessToken);
     await localStorage.setItem("fb_data", JSON.stringify(fb_data));
     this.props.history.push({
-      pathname: `/connectedaccounts/profile-analytics`,
-    })
+      pathname: `/connectedaccounts/profile-analytics`
+    });
   };
 
   responseErrorGoogle = response => {
@@ -184,8 +188,10 @@ export default class ProfileAnalytics extends Component {
       redirect_to: "/profile-analytics"
     };
     this.props.history.push({
-      pathname: `/google-connectedaccounts/${encodeURIComponent(JSON.stringify(state))}`,
-    })
+      pathname: `/google-connectedaccounts/${encodeURIComponent(
+        JSON.stringify(state)
+      )}`
+    });
   };
 
   componentDidMount() {
@@ -377,7 +383,7 @@ export default class ProfileAnalytics extends Component {
           ).then(res => {
             console.log(res.data);
             localStorage.setItem("accountId", res.data.accounts[0].name);
-            this.setState({googleIsLoggedIn: true})
+            this.setState({ googleIsLoggedIn: true });
             this.google_report_insight();
           });
         }
@@ -531,17 +537,47 @@ export default class ProfileAnalytics extends Component {
         ).then(resp => {
           console.log(resp.data);
           this.setState({
-            fViews: resp.data.data[2] && resp.data.data[2].values[1]?resp.data.data[2].values[1].value : "-",
-            fWeb: resp.data.data[5] && resp.data.data[5].values[1]? resp.data.data[5].values[1].value : "-",
-            fcalls: resp.data.data[3] && resp.data.data[3].values[1] ?resp.data.data[3].values[1].value : "-",
-            fdirection: resp.data.data[4] && resp.data.data[4].values[1] ? resp.data.data[4].values[1].value : "-",
-            fclicks: resp.data.data[0] && resp.data.data[0].values[1] ? resp.data.data[0].values[1].value : "-",
+            fViews:
+              resp.data.data[2] && resp.data.data[2].values[1]
+                ? resp.data.data[2].values[1].value
+                : "-",
+            fWeb:
+              resp.data.data[5] && resp.data.data[5].values[1]
+                ? resp.data.data[5].values[1].value
+                : "-",
+            fcalls:
+              resp.data.data[3] && resp.data.data[3].values[1]
+                ? resp.data.data[3].values[1].value
+                : "-",
+            fdirection:
+              resp.data.data[4] && resp.data.data[4].values[1]
+                ? resp.data.data[4].values[1].value
+                : "-",
+            fclicks:
+              resp.data.data[0] && resp.data.data[0].values[1]
+                ? resp.data.data[0].values[1].value
+                : "-",
 
-            fViews1: resp.data.data[2] && resp.data.data[2].values[1]?resp.data.data[2].values[1].value : "0",
-            fWeb1: resp.data.data[5] && resp.data.data[5].values[1]? resp.data.data[5].values[1].value : "0",
-            fcalls1: resp.data.data[3] && resp.data.data[3].values[1] ?resp.data.data[3].values[1].value : "0",
-            fdirection1: resp.data.data[4] && resp.data.data[4].values[1] ? resp.data.data[4].values[1].value : "0",
-            fclicks1: resp.data.data[0] && resp.data.data[0].values[1] ? resp.data.data[0].values[1].value : "0",
+            fViews1:
+              resp.data.data[2] && resp.data.data[2].values[1]
+                ? resp.data.data[2].values[1].value
+                : "0",
+            fWeb1:
+              resp.data.data[5] && resp.data.data[5].values[1]
+                ? resp.data.data[5].values[1].value
+                : "0",
+            fcalls1:
+              resp.data.data[3] && resp.data.data[3].values[1]
+                ? resp.data.data[3].values[1].value
+                : "0",
+            fdirection1:
+              resp.data.data[4] && resp.data.data[4].values[1]
+                ? resp.data.data[4].values[1].value
+                : "0",
+            fclicks1:
+              resp.data.data[0] && resp.data.data[0].values[1]
+                ? resp.data.data[0].values[1].value
+                : "0",
 
             fbIsLoggedIn: true
           });
@@ -609,8 +645,14 @@ export default class ProfileAnalytics extends Component {
       GoogleConfig
     )
       .then(res => {
-
-        if(res.data.locationMetrics[0] && res.data.locationMetrics[0].metricValues[0] && res.data.locationMetrics[0].metricValues[1] && res.data.locationMetrics[0].metricValues[5] && res.data.locationMetrics[0].metricValues[6] && res.data.locationMetrics[0].metricValues[7]){
+        if (
+          res.data.locationMetrics[0] &&
+          res.data.locationMetrics[0].metricValues[0] &&
+          res.data.locationMetrics[0].metricValues[1] &&
+          res.data.locationMetrics[0].metricValues[5] &&
+          res.data.locationMetrics[0].metricValues[6] &&
+          res.data.locationMetrics[0].metricValues[7]
+        ) {
           this.setState({
             in: res.data.locationMetrics[0].metricValues,
             profileViews:
@@ -621,7 +663,8 @@ export default class ProfileAnalytics extends Component {
                 res.data.locationMetrics[0].metricValues[1].totalValue.value
               ),
             gWeb: res.data.locationMetrics[0].metricValues[5].totalValue.value,
-            gcalls: res.data.locationMetrics[0].metricValues[6].totalValue.value,
+            gcalls:
+              res.data.locationMetrics[0].metricValues[6].totalValue.value,
             gdirection:
               res.data.locationMetrics[0].metricValues[7].totalValue.value,
             profileViews1:
@@ -632,13 +675,14 @@ export default class ProfileAnalytics extends Component {
                 res.data.locationMetrics[0].metricValues[1].totalValue.value
               ),
             gWeb1: res.data.locationMetrics[0].metricValues[5].totalValue.value,
-            gcalls1: res.data.locationMetrics[0].metricValues[6].totalValue.value,
+            gcalls1:
+              res.data.locationMetrics[0].metricValues[6].totalValue.value,
             gdirection1:
               res.data.locationMetrics[0].metricValues[7].totalValue.value,
             loading: false
           });
         } else {
-          this.setState({loading : false})
+          this.setState({ loading: false });
         }
       })
       .catch(res => {
@@ -789,644 +833,187 @@ export default class ProfileAnalytics extends Component {
         click: parseInt(fclicks)
       }
     ];
-
     return (
-      <div>
-        {/* <div className="content-page"> */}
-
-        {this.state.loader ? (
-          <div className="rightside_title">
-            <Spinner />
+      <>
+        {/* <div className="left-side-menu"></div> */}
+        {/* <div className="content-page" id="overview-10"> */}
+        <div className="container" id="overview-10">
+          <div className="profanalytic">
+            <h3>Profile Analytics</h3>
           </div>
-        ) : (
-          <div className="main_content">
-            <div className="rightside_title">
-              <h1>Profile Analytics</h1>
-            </div>
-            {this.state.fbIsLoggedIn ? (
-              ""
-            ) : (
-              <div className=" mb-30">
-                <div className="analytics-whice analytics">
-                  <div className="analyticsboxdd">
-                    <div className="faceboxbox">
-                      <img
-                        src={require("../images/facebook.png")}
-                        alt="facebook"
-                      />
-                    </div>
-                    <div className="analytics-text">
-                      <h2>
-                        Connect your Facebook profile to get profile analytics
-                        for your Facebook listing
-                      </h2>
-                      <p>
-                        Lorem Ipsum is simply dummy text of the printing and
-                        typesetting industry. Lorem Ipsum{" "}
-                      </p>
-                    </div>
-                    <div className="facebooks">
-                      <FacebookLogin
-                        appId="187396122554776"
-                        // appId="3044182972316291"
-                        autoLoad={false}
-                        fields="name,email,picture"
-                        onClick={this.componentClicked}
-                        callback={this.responseFacebook}
-                      />
-                    </div>
+          <div className="col-12">
+            <div className="row ">
+              <div className="col-md-5 anacard ml-2 ">
+                <div className="row">
+                  <div className="col-md-2">
+                    <img src={fb1} />
+                  </div>
+                  <div className="col-md-5  ana-10 mt-3 ml-3">
+                    <h5>
+                      Connect your Facebook profile to get profile analytics for
+                      your Facebook listing
+                    </h5>
+                  </div>
+                  <div className="col-md-3 mt-4 ml-3 ">
+                    <a href="#" className="btn btn-analy  ">
+                      <h6>Connect</h6>{" "}
+                    </a>
                   </div>
                 </div>
               </div>
-            )}
-
-            {this.state.googleIsLoggedIn ? (
-              ""
-            ) : (
-              <div className=" mb-30">
-                <div className="analytics-whice analytics">
-                  <div className="analyticsboxdd">
-                    <div className="col-md-9">
-                      <div className="faceboxbox">
-                        <img
-                          src={require("../images/google.png")}
-                          alt="google"
-                        />
-                      </div>
-                      <div className="analytics-text">
-                        <h2>
-                          Connect your Google account to get profile analytics
-                          for your Google listing
-                        </h2>
-                        <p>
-                          Lorem Ipsum is simply dummy text of the printing and
-                          typesetting industry. Lorem Ipsum{" "}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="google_btnb col-md-3">
-                      <GoogleLogin
-                        //for localhost
-                        clientId="759599444436-po5k7rhkaqdu55toirpt5c8osaqln6ul.apps.googleusercontent.com"
-                        //for server
-                        // clientId="759599444436-5litbq8gav4ku8sj01o00uh6lsk8ebr0.apps.googleusercontent.com"
-                        buttonText="Login"
-                        scope="https://www.googleapis.com/auth/business.manage"
-                        onSuccess={this.responseGoogle}
-                        onFailure={this.responseErrorGoogle}
-                        cookiePolicy={"single_host_origin"}
-                      />
-                    </div>
+              <div className="col-md-5 anacard ml-2 ">
+                <div className="row">
+                  <div className="col-md-2">
+                    <img src={fb1} />
                   </div>
-                </div>
-              </div>
-            )}
-
-            <div className=" mb-30">
-              <div className="analytics-whice">
-                <div className="box-space ">
-                  <h2 className="analytics_btnx">
-                    Profile States
-                    <div className="camgianbox">
-                      {/* <button className="camaign" onClick={this.printDocument}>
-                      {" "}
-                      Download Report
-                    </button> */}
-                      <PDFDownloadLink
-                        document={this.Quixote(pdf_data)}
-                        fileName="profile_analytics_report.pdf"
-                      >
-                        {({ blob, url, loading, error }) =>
-                          loading ? (
-                            "Loading document..."
-                          ) : (
-                            <button className="camaign">Download Report</button>
-                          )
-                        }
-                      </PDFDownloadLink>
-                      <div className="dropdown">
-                        <a
-                          href="#"
-                          className="last_btn dropdown-toggle"
-                          data-toggle="dropdown"
-                        >
-                          <i className="zmdi zmdi-calendar"></i>
-                          {this.state.range_name}
-                          <span className="zmdi zmdi-caret-down"></span>
-                        </a>
-                        <div className="dropdown-menu">
-                          <ul>
-                            <li
-                              onClick={this.change_states(
-                                last_week,
-                                "Last week"
-                              )}
-                            >
-                              Last week
-                            </li>
-                            <li
-                              onClick={this.change_states(
-                                last_month,
-                                "Last month"
-                              )}
-                            >
-                              Last month
-                            </li>
-                            <li
-                              onClick={this.change_states(
-                                last_3_month,
-                                "Last 3 months"
-                              )}
-                            >
-                              Last 3 months
-                            </li>
-                            <li
-                              onClick={this.change_states(
-                                last_6_month,
-                                "Last 6 months"
-                              )}
-                            >
-                              Last 6 months
-                            </li>
-                            <li
-                              onClick={this.change_states(
-                                last_year,
-                                "Last year"
-                              )}
-                            >
-                              Last year
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </h2>
+                  <div className="col-md-5  ana-10 mt-3 ml-3">
+                    <h5>
+                      Connect your Facebook profile to get profile analytics for
+                      your Facebook listing
+                    </h5>
+                  </div>
+                  <div className="col-md-3 mt-4 ml-3 ">
+                    <a href="#" className="btn btn-analy  ">
+                      <h6>Connect</h6>{" "}
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
-
-            {/* <div
-            id="divToPrint"
-            className="mt4"
-            {...css({
-              backgroundColor: "#f5f5f5",
-              width: "210mm",
-              minHeight: "297mm",
-              marginLeft: "auto",
-              marginRight: "auto"
-            })}
-            style={{
-              height: "297mm",
-              width: "180mm",
-              marginLeft: "auto",
-              marginRight: "auto"
-            }}
-          > */}
-            {this.state.loading ? (
-              <div style={{ textAlign: "center" }}>
-                <Loader2
-                  type="Oval"
-                  color="#00BFFF"
-                  height={25}
-                  width={25}
-                  // timeout={3000} //3 secs
-                />
-              </div>
-            ) : (
-              <div>
-                <div className="total_ant antvd">
-                  <div className="row">
-                    <div className="col-md-2">
-                      <div className="totl-listing">
-                        <div className="icon">
-                          <img src={require("../images/re_an_1.png")} />
-                        </div>
-                        <div className="icon-text">
-                          <h2>
-                            {parseInt(fViews1) + parseInt(profileViews1)}{" "}
-                            <div className="dropdown parsent">
-                              <a
-                                href="#"
-                                className="dropdown-toggle"
-                                data-toggle="dropdown"
-                              >
-                                {parseInt(profileViews1) -
-                                  parseInt(profileViews2) >
-                                0 ? (
-                                  <div style={{ color: "green" }}>
-                                    {"+" +
-                                      (
-                                        ((parseInt(profileViews1) -
-                                          parseInt(profileViews2)) *
-                                          100) /
-                                        (parseInt(fViews1) +
-                                          parseInt(profileViews1))
-                                      )
-                                        .toString()
-                                        .slice(0, 4) +
-                                      " %"}
-                                    <span className="zmdi zmdi-caret-up"></span>
-                                  </div>
-                                ) : parseInt(profileViews1) -
-                                    parseInt(profileViews2) <
-                                  0 ? (
-                                  <div style={{ color: "red" }}>
-                                    {(
-                                      ((parseInt(profileViews1) -
-                                        parseInt(profileViews2)) *
-                                        100) /
-                                      (parseInt(fViews1) +
-                                        parseInt(profileViews1))
-                                    )
-                                      .toString()
-                                      .slice(0, 5) + " %"}
-                                    <span className="zmdi zmdi-caret-down"></span>
-                                  </div>
-                                ) : parseInt(profileViews1) -
-                                    parseInt(profileViews2) ==
-                                  0 ? (
-                                  "0%"
-                                ) : (
-                                  "-"
-                                )}
-                              </a>
-                              {/* <div className="dropdown-menu">
-                                <ul>
-                                  <li>-</li>
-                                  <li>-</li>
-                                </ul>
-                              </div> */}
-                            </div>
-                          </h2>
-                          <h3>Total Profile View</h3>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-2">
-                      <div className="totl-listing">
-                        <div className="icon">
-                          <img src={require("../images/re_an_2.png")} />
-                        </div>
-                        <div className="icon-text">
-                          <h2>
-                            {parseInt(fWeb1) + parseInt(gWeb1)}{" "}
-                            <div className="dropdown parsent">
-                              <a
-                                href="#"
-                                className="dropdown-toggle"
-                                data-toggle="dropdown"
-                              >
-                                {parseInt(gWeb1) - parseInt(gWeb2) > 0 ? (
-                                  <div style={{ color: "green" }}>
-                                    {"+" +
-                                      (
-                                        ((parseInt(gWeb1) - parseInt(gWeb2)) *
-                                          100) /
-                                        (parseInt(fWeb1) + parseInt(gWeb1))
-                                      )
-                                        .toString()
-                                        .slice(0, 4) +
-                                      " %"}
-                                    <span className="zmdi zmdi-caret-up"></span>
-                                  </div>
-                                ) : parseInt(gWeb1) - parseInt(gWeb2) < 0 ? (
-                                  <div style={{ color: "red" }}>
-                                    {(
-                                      ((parseInt(gWeb1) - parseInt(gWeb2)) *
-                                        100) /
-                                      (parseInt(fWeb1) + parseInt(gWeb1))
-                                    )
-                                      .toString()
-                                      .slice(0, 5) + " %"}
-                                    <span className="zmdi zmdi-caret-down"></span>
-                                  </div>
-                                ) : parseInt(gWeb1) - parseInt(gWeb2) == 0 ? (
-                                  "0%"
-                                ) : (
-                                  "-"
-                                )}
-                              </a>
-                              {/* <div className="dropdown-menu">
-                                <ul>
-                                  <li>-</li>
-                                  <li>-</li>
-                                </ul>
-                              </div> */}
-                            </div>
-                          </h2>
-
-                          <h3>Website visits</h3>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-2">
-                      <div className="totl-listing">
-                        <div className="icon">
-                          <img src={require("../images/re_an_3.png")} />
-                        </div>
-                        <div className="icon-text">
-                          <h2>
-                            {parseInt(fcalls1) + parseInt(gcalls1)}{" "}
-                            <div className="dropdown parsent">
-                              <a
-                                href="#"
-                                className="dropdown-toggle"
-                                data-toggle="dropdown"
-                              >
-                                {parseInt(gcalls1) - parseInt(gcalls2) > 0 ? (
-                                  <div style={{ color: "green" }}>
-                                    {"+" +
-                                      (
-                                        ((parseInt(gcalls1) -
-                                          parseInt(gcalls2)) *
-                                          100) /
-                                        (parseInt(fcalls1) + parseInt(gcalls1))
-                                      )
-                                        .toString()
-                                        .slice(0, 4) +
-                                      " %"}
-                                    <span className="zmdi zmdi-caret-up"></span>
-                                  </div>
-                                ) : parseInt(gcalls1) - parseInt(gcalls2) <
-                                  0 ? (
-                                  <div style={{ color: "red" }}>
-                                    {(
-                                      ((parseInt(gcalls1) - parseInt(gcalls2)) *
-                                        100) /
-                                      (parseInt(fcalls1) + parseInt(gcalls1))
-                                    )
-                                      .toString()
-                                      .slice(0, 5) + " %"}
-                                    <span className="zmdi zmdi-caret-down"></span>
-                                  </div>
-                                ) : parseInt(gcalls1) - parseInt(gcalls2) ==
-                                  0 ? (
-                                  "0%"
-                                ) : (
-                                  "-"
-                                )}
-                              </a>
-                              {/* <div className="dropdown-menu">
-                                <ul>
-                                  <li>-</li>
-                                  <li>-</li>
-                                </ul>
-                              </div> */}
-                            </div>
-                          </h2>
-                          <h3>Phone calls</h3>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-2">
-                      <div className="totl-listing">
-                        <div className="icon">
-                          <img src={require("../images/re_an_4.png")} />
-                        </div>
-                        <div className="icon-text">
-                          <h2>
-                            {parseInt(fdirection1) + parseInt(gdirection1)}{" "}
-                            <div className="dropdown parsent">
-                              <a
-                                href="#"
-                                className="dropdown-toggle"
-                                data-toggle="dropdown"
-                              >
-                                {parseInt(gdirection1) - parseInt(gdirection2) >
-                                0 ? (
-                                  <div style={{ color: "green" }}>
-                                    {"+" +
-                                      (
-                                        ((parseInt(gdirection1) -
-                                          parseInt(gdirection2)) *
-                                          100) /
-                                        (parseInt(fdirection1) +
-                                          parseInt(gdirection1))
-                                      )
-                                        .toString()
-                                        .slice(0, 4) +
-                                      " %"}
-                                    <span className="zmdi zmdi-caret-up"></span>
-                                  </div>
-                                ) : parseInt(gdirection1) -
-                                    parseInt(gdirection2) <
-                                  0 ? (
-                                  <div style={{ color: "red" }}>
-                                    {(
-                                      ((parseInt(gdirection1) -
-                                        parseInt(gdirection2)) *
-                                        100) /
-                                      (parseInt(fdirection1) +
-                                        parseInt(gdirection1))
-                                    )
-                                      .toString()
-                                      .slice(0, 5) + " %"}
-                                    <span className="zmdi zmdi-caret-down"></span>
-                                  </div>
-                                ) : parseInt(gdirection1) -
-                                    parseInt(gdirection2) ==
-                                  0 ? (
-                                  "0%"
-                                ) : (
-                                  "-"
-                                )}
-                              </a>
-                              {/* <div className="dropdown-menu">
-                                <ul>
-                                  <li>-</li>
-                                  <li>-</li>
-                                </ul>
-                              </div> */}
-                            </div>
-                          </h2>
-                          <h3>Direction Request</h3>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-2">
-                      <div className="totl-listing">
-                        <div className="icon">
-                          <img src={require("../images/re_an_5.png")} />
-                        </div>
-                        <div className="icon-text">
-                          <h2>
-                            {parseInt(gcalls1) +
-                              parseInt(gdirection1) +
-                              parseInt(gWeb1) +
-                              parseInt(fclicks1)}
-                            <div className="dropdown parsent">
-                              <a
-                                href="#"
-                                className="dropdown-toggle"
-                                data-toggle="dropdown"
-                              >
-                                {parseInt(gdirection1) +
-                                  parseInt(gcalls1) +
-                                  parseInt(gWeb1) -
-                                  parseInt(gdirection2) -
-                                  parseInt(gcalls2) -
-                                  parseInt(gWeb2) >
-                                0 ? (
-                                  <div style={{ color: "green" }}>
-                                    {"+" +
-                                      (
-                                        ((parseInt(gdirection1) +
-                                          parseInt(gcalls1) +
-                                          parseInt(gWeb1) -
-                                          parseInt(gdirection2) -
-                                          parseInt(gcalls2) -
-                                          parseInt(gWeb2)) *
-                                          100) /
-                                        (parseInt(gcalls1) +
-                                          parseInt(gdirection1) +
-                                          parseInt(gWeb1) +
-                                          parseInt(fclicks1))
-                                      )
-                                        .toString()
-                                        .slice(0, 4) +
-                                      " %"}
-                                    <span className="zmdi zmdi-caret-up"></span>
-                                  </div>
-                                ) : parseInt(gdirection1) +
-                                    parseInt(gcalls1) +
-                                    parseInt(gWeb1) -
-                                    parseInt(gdirection2) -
-                                    parseInt(gcalls2) -
-                                    parseInt(gWeb2) <
-                                  0 ? (
-                                  <div style={{ color: "red" }}>
-                                    {(
-                                      ((parseInt(gdirection1) +
-                                        parseInt(gcalls1) +
-                                        parseInt(gWeb1) -
-                                        parseInt(gdirection2) -
-                                        parseInt(gcalls2) -
-                                        parseInt(gWeb2)) *
-                                        100) /
-                                      (parseInt(gcalls1) +
-                                        parseInt(gdirection1) +
-                                        parseInt(gWeb1) +
-                                        parseInt(fclicks1))
-                                    )
-                                      .toString()
-                                      .slice(0, 5) + " %"}
-                                    <span className="zmdi zmdi-caret-down"></span>
-                                  </div>
-                                ) : parseInt(gdirection1) +
-                                    parseInt(gcalls1) +
-                                    parseInt(gWeb1) -
-                                    parseInt(gdirection2) -
-                                    parseInt(gcalls2) -
-                                    parseInt(gWeb2) ==
-                                  0 ? (
-                                  "0%"
-                                ) : (
-                                  "-"
-                                )}
-                              </a>
-                              {/* <div className="dropdown-menu">
-                                <ul>
-                                  <li>-</li>
-                                  <li>-</li>
-                                </ul>
-                              </div> */}
-                            </div>
-                          </h2>
-                          <h3>Button clicks</h3>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className=" mt-30">
-                  <div className="analytics-whice">
-                    <div className="box-space2">
-                      <table
-                        id="example"
-                        className="analytics-whice"
-                        cellSpacing="0"
-                        width="100%"
-                      >
-                        <thead>
-                          <tr>
-                            <th>Profile (2)</th>
-                            <th>Profile View</th>
-                            <th>Website Visits</th>
-                            <th>Phone Calls</th>
-                            <th>Direction Request</th>
-                            <th>Button Clicks</th>
-                          </tr>
-                        </thead>
-
-                        <tbody>
-                          <tr>
-                            <td>Consolidated</td>
-                            <td>
-                              {parseInt(this.state.fViews1) +
-                                parseInt(this.state.profileViews1)}
-                            </td>
-                            <td>
-                              {parseInt(this.state.fWeb1) +
-                                parseInt(this.state.gWeb1)}
-                            </td>
-                            <td>
-                              {parseInt(this.state.fcalls1) +
-                                parseInt(this.state.gcalls1)}
-                            </td>
-                            <td>
-                              {parseInt(this.state.gdirection1) +
-                                parseInt(this.state.fdirection1)}
-                            </td>
-                            <td>
-                              {parseInt(this.state.gcalls1) +
-                                parseInt(this.state.gdirection1) +
-                                parseInt(this.state.gWeb1) +
-                                parseInt(this.state.fclicks1)}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td>Google</td>
-                            <td>{this.state.profileViews}</td>
-                            <td>{this.state.gWeb}</td>
-                            <td>{this.state.gcalls} </td>
-                            <td>{this.state.gdirection}</td>
-                            <td>
-                              {this.state.gcalls == "-"
-                                ? "-"
-                                : parseInt(this.state.gcalls) +
-                                  parseInt(this.state.gdirection) +
-                                  parseInt(this.state.gWeb)}
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td>Facebook</td>
-                            <td>{this.state.fViews}</td>
-                            <td>{this.state.fWeb}</td>
-                            <td>{this.state.fcalls} </td>
-                            <td>{this.state.fdirection}</td>
-                            <td>{this.state.fclicks}</td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
-        )}
 
-        {/* </div> */}
 
+        <div className="container analytic-11">
+          <div className="col-md-12">
+            <div className="row">
+              <div className="col-md-4 analytic-14  ">
+                <div className="row mb-4  mt-3">
+                  <div className="col-md-6">
+                    <a href="#">
+                      <p>This Week</p>{" "}
+                    </a>
+                  </div>
+                  <div className="col-md-6">
+                    <a href="#" className="btn btn-analytic-13">
+                      <h6>Download Report</h6>{" "}
+                    </a>
+                  </div>
+                </div>
+                <div className="row">
+                  <div className="col-md-3 ">
+                    <img src={fb2} />
+                  </div>
+                  <div className="col-md-6 mt-2" style={{ lineHeight: 0 }}>
+                    <p className="analytic-16"> 2623</p>
+                    <p className="analytic-17">Total profile view</p>
+                  </div>
+                  <div className="col-md-3  ">+01.03%</div>
+                  <div className="col-md-3 ">
+                    <img src={fb2} />
+                  </div>
+                  <div className="col-md-6 mt-2" style={{ lineHeight: 0 }}>
+                    <p className="analytic-16"> 2623</p>
+                    <p className="analytic-17">Total profile view</p>
+                  </div>
+                  <div className="col-md-3  ">+01.03%</div>
+                  <div className="col-md-3 ">
+                    <img src={fb2} />
+                  </div>
+                  <div className="col-md-6 mt-2" style={{ lineHeight: 0 }}>
+                    <p className="analytic-16"> 2623</p>
+                    <p className="analytic-17">Total profile view</p>
+                  </div>
+                  <div className="col-md-3  ">+01.03%</div>
+                  <div className="col-md-3 ">
+                    <img src={fb2} />
+                  </div>
+                  <div className="col-md-6 mt-2" style={{ lineHeight: 0 }}>
+                    <p className="analytic-16"> 2623</p>
+                    <p className="analytic-17">Total profile view</p>
+                  </div>
+                  <div className="col-md-3  ">+01.03%</div>
+                  <div className="col-md-3 ">
+                    <img src={fb2} />
+                  </div>
+                  <div className="col-md-6 mt-2" style={{ lineHeight: 0 }}>
+                    <p className="analytic-16"> 2623</p>
+                    <p className="analytic-17">Total profile view</p>
+                  </div>
+                  <div className="col-md-3  ">+01.03%</div>
+                </div>
+              </div>
+              <div className="col-md-7 ml-3 analytic-14">
+                <table class="table table-hover">
+                  <thead className="head_font">
+                    <tr>
+                      <th scope="col">Profiles 02</th>
+                      <th scope="col">Profiles views</th>
+                      <th scope="col">Website views</th>
+                      <th scope="col">Phone calls</th>
+                      <th scope="col">Direction Request</th>
+                      <th scope="col">Button clicks</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row" className="analytics-17">
+                        Consolidated
+                      </th>
+                      <td>2636</td>
+                      <td>10876</td>
+                      <td>213</td>
+                      <td>543</td>
+                      <td>1123</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" className="analytics-17">
+                        Google
+                      </th>
+                      <td>65</td>
+                      <td>65</td>
+                      <td>112</td>
+                      <td>453</td>
+                      <td>54</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" className="analytics-17">
+                        Bing
+                      </th>
+                      <td>785</td>
+                      <td>345</td>
+                      <td>432</td>
+                      <td>76</td>
+                      <td>89</td>
+                    </tr>
+                    <tr>
+                      <th scope="row" className="analytics-17">
+                        Bing
+                      </th>
+                      <td> - </td>
+                      <td> - </td>
+                      <td> - </td>
+                      <td> - </td>
+                      <td> - </td>
+                    </tr>
+                    <tr>
+                      <th scope="row" className="analytics-17">
+                        Google
+                      </th>
+                      <td>65</td>
+                      <td>60</td>
+                      <td>112</td>
+                      <td>453</td>
+                      <td>54</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
         {/* </div> */}
-      </div>
+      </>
     );
   }
 }

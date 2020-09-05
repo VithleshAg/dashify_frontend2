@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import Axios from "axios";
 import { all_connection_of_one_location } from "./apis/social_platforms";
 import { NavLink } from "react-router-dom";
-import Loader from "react-loader-spinner";
 
 const DjangoConfig = {
   headers: {
@@ -36,8 +35,7 @@ export default class ReviewGenerationCampaign extends Component {
     email_replyto_error: "",
     email_content_error: "",
     sms_content_error: "",
-    wrong: "",
-    loading: false
+    wrong: ""
   };
 
   componentDidMount = () => {
@@ -129,39 +127,34 @@ export default class ReviewGenerationCampaign extends Component {
 
     if (!campaign_name) {
       this.setState({
-        campaign_name_error: "Enter your Campaign name",
-        wrong: "Above fields are empty or invalid"
+        campaign_name_error: "Enter your Campaign name"
       });
       isError = true;
     }
 
     if (!emailReg.test(email_from) || email_from == "") {
       this.setState({
-        email_from_error: "Enter valid email",
-        wrong: "Above fields are empty or invalid"
+        email_from_error: "Enter valid email"
       });
       isError = true;
     }
 
     if (!emailReg.test(email_replyto) || email_replyto == "") {
       this.setState({
-        email_replyto_error: "Enter valid email",
-        wrong: "Above fields are empty or invalid"
+        email_replyto_error: "Enter valid email"
       });
       isError = true;
     }
 
     if (!email_content) {
       this.setState({
-        email_content_error: "Email content can not be empty",
-        wrong: "Above fields are empty or invalid"
+        email_content_error: "Email content can not be empty"
       });
       isError = true;
     }
     if (!sms_content) {
       this.setState({
-        sms_content_error: "SMS content can not be empty",
-        wrong: "Above fields are empty or invalid"
+        sms_content_error: "SMS content can not be empty"
       });
       isError = true;
     }
@@ -169,8 +162,6 @@ export default class ReviewGenerationCampaign extends Component {
     if (!isError) {
       var additional_link_image1 = "",
         additional_link_image2 = "";
-
-      this.setState({ loading: true });
 
       Object.values(all_site_url).map((value, i) => {
         if (i == 0) {
@@ -247,18 +238,17 @@ export default class ReviewGenerationCampaign extends Component {
         .then(resp => {
           console.log("Campaign added", resp.data);
           if (resp.data.message == "Campaign create successfully.") {
-            this.setState({ loading: false });
             this.props.history.push({
               pathname: `campaignpart2/${resp.data.campain_id}`
             });
           } else {
             console.log("Campaign adding error", resp);
-            this.setState({ wrong: "Something went wrong", loading: false });
+            this.setState({ wrong: "Something went wrong" });
           }
         })
         .catch(resp => {
           console.log("Campaign adding error", resp);
-          this.setState({ wrong: "Server error", loading: false });
+          this.setState({ wrong: "Server error" });
         });
     }
   };
@@ -415,8 +405,7 @@ export default class ReviewGenerationCampaign extends Component {
       email_replyto_error,
       email_content_error,
       sms_content_error,
-      wrong,
-      loading
+      wrong
     } = this.state;
 
     return (
@@ -430,22 +419,61 @@ export default class ReviewGenerationCampaign extends Component {
             noValidate
           >
             <div className="rightside_title">
-              <h1>Enter Campaign Details </h1>
+              <h1>Create Review Generation Campaign</h1>
             </div>
+            <div className="tablediv mb-30">
+              <div className="row">
+                <div className="col-md-9">
+                  <div className="review-generation">
+                    <div className="icon">
+                      <img src={require("../images/review-campaign.png")} />
+                    </div>
+
+                    <div className="campaign-text">
+                      <h3>
+                        Do you want to pre-screen your customers via an Internal
+                        Rating questtion, before requesting them to write public
+                        reviews?
+                      </h3>
+                      <p>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                        sed do eiusmod tempor incididunt ut labore.{" "}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-3">
+                  <div id="switch">
+                    <label className="toggle-label">
+                      <input type="checkbox" />
+                      <span className="back">
+                        <span className="toggle"></span>
+                        <span className="label on">ON</span>
+                        <span className="label off">OFF</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="row">
               <div className="col-md-8">
                 <div className="step2">
                   <ul>
                     <li>
-                      <div className="step-sms">
-                        <a href="#">Step 01</a>
-                        <span>Ratings Email And SMS</span>
-                      </div>
-                      <div className="closebox">
-                        <i className="zmdi zmdi-close"></i> Close section
-                      </div>
+                      <a href="#">Step 01</a>
                     </li>
                   </ul>
+                  <div className="ratingemail">
+                    <h2>
+                      Ratings Email And SMS
+                      <a className="close-section">
+                        <i className="zmdi zmdi-close"></i>Close Section
+                      </a>
+                    </h2>
+                  </div>
+
                   <div className="formbox">
                     <div className="row">
                       <div className="col-md-12">
@@ -526,7 +554,7 @@ export default class ReviewGenerationCampaign extends Component {
                         </div>
                       </div>
                       <div className="col-md-12">
-                        <div className="">
+                        <div className="form-group">
                           <label>Email Content</label>
                           <textarea
                             className="form-control"
@@ -543,17 +571,13 @@ export default class ReviewGenerationCampaign extends Component {
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className=" mt-30">
-                  <div className="light-blue">
-                    <div className="row">
                       <div className="col-md-12">
                         <div className="text-style">
                           <h3>Choose Review Sites</h3>
-                          <p>the vocabulary, and the questions</p>
+                          {/* <p>
+                            You can only select maximum of 2 review sites in the
+                            review email
+                          </p> */}
 
                           <div className="googlebox">
                             {google_placeid ? (
@@ -593,6 +617,7 @@ export default class ReviewGenerationCampaign extends Component {
                             ) : (
                               ""
                             )}
+
                             <div className="col-md-2">
                               <a className="add_btn add_bt">
                                 <i
@@ -602,83 +627,60 @@ export default class ReviewGenerationCampaign extends Component {
                               </a>
                             </div>
                           </div>
-
-                          <div className="" style={{ marginTop: 20 }}>
-                            <div className="col-md-6">
-                              <div className="form-group">
-                                {this.add_customWebsiteName()}
-                              </div>
-                            </div>
-                            <div className="col-md-6">
-                              <div className="form-group">
-                                {this.add_customWebsiteUrl()}
-                              </div>
-                            </div>
+                        </div>
+                      </div>
+                      <div className="col-md-12" style={{ marginTop: 20 }}>
+                        <div className="col-md-6">
+                          <div className="form-group">
+                            {this.add_customWebsiteName()}
                           </div>
+                        </div>
+                        <div className="col-md-6">
+                          <div className="form-group">
+                            {this.add_customWebsiteUrl()}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="form-group">
+                          <label>SMS Content</label>
+                          <textarea
+                            className="form-control"
+                            rows="4"
+                            cols="50"
+                            // placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley"
+                            name="sms_content"
+                            onChange={this.changeHandler}
+                            value={sms_content}
+                            required
+                          ></textarea>
+                          <div style={{ color: "red" }}>
+                            {sms_content_error}
+                          </div>
+                          <div style={{ color: "red" }}>{wrong}</div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="mt-30 step2">
-                  <div className="customer-phone">
-                    <h3>SMS Content</h3>
-                    <textarea
-                      className="form-control"
-                      rows="4"
-                      cols="50"
-                      // placeholder="Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley"
-                      name="sms_content"
-                      onChange={this.changeHandler}
-                      value={sms_content}
-                      required
-                    ></textarea>
-                    <div style={{ color: "red" }}>{sms_content_error}</div>
-                  </div>
-                </div>
-                <div className="btnbox_button mt-30">
-                  {loading ? (
-                    <Loader
-                      type="Oval"
-                      color="#00BFFF"
-                      height={25}
-                      width={25}
-                      // timeout={3000} //3 secs
-                    />
-                  ) : (
-                    <div style={{ color: "red" }}>{wrong}</div>
-                  )}
-
-                  <button type="submit" className="continue">
-                    Continue
-                  </button>
-                </div>
               </div>
 
               <div className="col-md-4">
                 <div className="step2">
-                  {/*<div className="ratingemail">
+                  <div className="ratingemail">
                     <h2>Rating Email And SMS Template</h2>
-                  </div>*/}
+                  </div>
 
                   <div className="formbox">
-                    <div className="text-center newclass">
-                      <div className="help-icon">
-                        <span>
-                          <i className="fa fa-info"></i>
-                        </span>
-                      </div>
-
-                      <p>
-                        <h3>Hi (name)</h3>
-                        <b>{email_heading}</b>
-                      </p>
+                    <div className="sms_template">
+                      <h3>Hi (name)</h3>
+                      <b>{email_heading}</b>
                     </div>
-                    <div className="sms-newtext">
+                    <div className="sms_template">
                       <p>{email_content}</p>
                       {review_by_google ? (
-                        <div className="apibox">
+                        <div>
+                          <br />
                           <img
                             src={require("../images/googlemap.png")}
                             alt="Google Map"
@@ -686,14 +688,15 @@ export default class ReviewGenerationCampaign extends Component {
                             width={100}
                           />
                           <p>Google</p>
-
+                          <br />
                           <button>Review</button>
                         </div>
                       ) : (
                         ""
                       )}
                       {review_by_apple ? (
-                        <div className="apibox">
+                        <div>
+                          <br />
                           <img
                             src={require("../images/apple.png")}
                             alt="Apple"
@@ -701,14 +704,15 @@ export default class ReviewGenerationCampaign extends Component {
                             width={100}
                           />
                           <p>Apple</p>
-
+                          <br />
                           <button>Review</button>
                         </div>
                       ) : (
                         ""
                       )}
                       {all_site_name[0] && all_site_url[0] ? (
-                        <div className="apibox">
+                        <div>
+                          <br />
                           <img
                             src={require("../images/t-logo.jpg")}
                             alt="Review"
@@ -716,14 +720,15 @@ export default class ReviewGenerationCampaign extends Component {
                             width={100}
                           />
                           <p>{all_site_name[0]}</p>
-
+                          <br />
                           <button>Review</button>
                         </div>
                       ) : (
                         ""
                       )}
                       {all_site_name[1] && all_site_url[1] ? (
-                        <div className="apibox">
+                        <div>
+                          <br />
                           <img
                             src={require("../images/t-logo.jpg")}
                             alt="Review"
@@ -731,123 +736,56 @@ export default class ReviewGenerationCampaign extends Component {
                             width={100}
                           />
                           <p>{all_site_name[1]}</p>
-
+                          <br />
                           <button>Review</button>
                         </div>
                       ) : (
                         ""
                       )}
                     </div>
-                    <div className="toggle-switch">
-                      <label className="switch">
-                        <input type="checkbox" className="switch-input" />
-                        <span
-                          className="switch-label"
-                          data-on="On"
-                          data-off="Off"
-                        ></span>
-                        <span className="switch-handle"></span>
-                      </label>
-                    </div>
                   </div>
                 </div>
 
                 <div className="step2 mt-30">
                   <div className="formbox">
-                    <div className="raitingemail">
-                      <h3>Raiting Email And SMS templete</h3>
-                      <div className="raitingcolor">
-                        <p>
-                          Hi (name) <br />
-                          {email_heading}
-                        </p>
-                      </div>
-
-                      <div className="raitingcolor">
-                        <p>{email_content}</p>
-                        {review_by_google ? (
-                          <div>
-                            <br />
-                            <img
-                              src={require("../images/googlemap.png")}
-                              alt="Google Map"
-                              height={100}
-                              width={100}
-                            />
-                            <p>Google</p>
-                            <br />
-                            <button>Review</button>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                        {review_by_apple ? (
-                          <div>
-                            <br />
-                            <img
-                              src={require("../images/apple.png")}
-                              alt="Apple"
-                              height={100}
-                              width={100}
-                            />
-                            <p>Apple</p>
-                            <br />
-                            <button>Review</button>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                        {all_site_name[0] && all_site_url[0] ? (
-                          <div>
-                            <br />
-                            <img
-                              src={require("../images/t-logo.jpg")}
-                              alt="Review"
-                              height={100}
-                              width={100}
-                            />
-                            <p>{all_site_name[0]}</p>
-                            <br />
-                            <button>Review</button>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                        {all_site_name[1] && all_site_url[1] ? (
-                          <div>
-                            <br />
-                            <img
-                              src={require("../images/t-logo.jpg")}
-                              alt="Review"
-                              height={100}
-                              width={100}
-                            />
-                            <p>{all_site_name[1]}</p>
-                            <br />
-                            <button>Review</button>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
+                    <div className="sms_template blue">
+                      <h3>Hi (Customer Name) </h3>
+                      <p>{sms_content}</p>
                     </div>
-                  </div>
-                </div>
-
-                <div className="step2 mt-30">
-                  <div className="formbox">
-                    <div className="raitingemail">
-                      <div className="raitingcolor">
-                        Hi (Customer Name) <br />
-                        <p>{sms_content}</p>
-                      </div>
-                    </div>
+                    <p className="text-right sent">Sent as text message</p>
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* For email and phone no */}
+            <div className="btnbox_button mt-30">
+              {/* <NavLink
+                to={{
+                  pathname: "campaignpart2",
+                  state: {
+                    promotional_data: {
+                      email_from,
+                      all_site_name,
+                      all_site_url,
+                      email_replyto,
+                      email_subject,
+                      email_heading,
+                      email_content,
+                      sms_content,
+                      review_by_google,
+                      review_by_apple,
+                      google_placeid,
+                      appleId
+                    }
+                  }
+                }}
+                className="continue"
+              >
+                Continue
+              </NavLink> */}
+              <button type="submit" className="continue">
+                Continue
+              </button>
+            </div>
           </form>
         </div>
 

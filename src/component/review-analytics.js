@@ -162,9 +162,8 @@ export default class ReviewAnalytics extends Component {
           "https://graph.facebook.com/me/accounts?fields=access_token,id,name,overall_star_rating,category,category_list,tasks&access_token=" +
             fbtoken
         ).then(resp => {
-          this.setState({ fbAccounts: resp.data.data ? resp.data.data : [] });
-          if(resp.data.data){
-            var fbPageAccessToken, index;
+          this.setState({ fbAccounts: resp.data.data });
+          var fbPageAccessToken, index;
           for (let i = 0; i < resp.data.data.length; i++) {
             if (resp.data.data[i].id == fbPageId) {
               fbPageAccessToken = resp.data.data[i].access_token;
@@ -204,7 +203,6 @@ export default class ReviewAnalytics extends Component {
               ]
             });
           });
-          }
         });
       }
 
@@ -218,17 +216,15 @@ export default class ReviewAnalytics extends Component {
           Yelpconfig
         ).then(resp => {
           console.log("yelp reviews", resp.data);
-          this.setState({ yelpReviews: resp.data.reviews ? resp.data.reviews : [] });
+          this.setState({ yelpReviews: resp.data.reviews });
 
           let yelp_new_reviews = 0;
-          if(resp.data.reviews){
-            for (let j = 0; j < resp.data.reviews.length; j++) {
-              let create_time1 = resp.data.reviews[j].time_created;
-              if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
-                if (parseInt(create_time1.slice(5, 7)) == today.getMonth() + 1) {
-                  if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
-                    yelp_new_reviews++;
-                  }
+          for (let j = 0; j < resp.data.reviews.length; j++) {
+            let create_time1 = resp.data.reviews[j].time_created;
+            if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
+              if (parseInt(create_time1.slice(5, 7)) == today.getMonth() + 1) {
+                if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
+                  yelp_new_reviews++;
                 }
               }
             }
@@ -247,6 +243,7 @@ export default class ReviewAnalytics extends Component {
             yelpUrl.slice(25),
           Yelpconfig
         ).then(resp => {
+          console.log("hii");
           console.log("yelp details", resp.data);
           this.setState({ yelpDetails: resp.data });
         });
@@ -264,7 +261,7 @@ export default class ReviewAnalytics extends Component {
           GoogleConfig
         ).then(res => {
           console.log(res.data);
-          // localStorage.setItem("accountId", res.data.accounts[0].name);
+          localStorage.setItem("accountId", res.data.accounts[0].name);
 
           // Axios.get(
           //   "https://mybusiness.googleapis.com/v4/" +
@@ -327,13 +324,11 @@ export default class ReviewAnalytics extends Component {
             "?client_id=TEUSFAUY42IR0HGTPSWO1GFLC5WHX3PIBKVICAQRZQA0MTD1&client_secret=CYBQFK0YRBPFE54NARAEJCG2NLBARIU2OOIJNE0AZOHWZTXU&v=20180323"
         ).then(res => {
           console.log("foursquare data", res.data.response.venue);
-          if(res.data.response.venue){
-            this.setState({
-              foursquareReviews: res.data.response.venue.tips.groups[0] ? res.data.response.venue.tips.groups[0].items :[],
-              foursquareDetails: res.data.response.venue,
-              foursquareReviewCount: res.data.response.venue.tips.count
-            });
-          }
+          this.setState({
+            foursquareReviews: res.data.response.venue.tips.groups[0] ? res.data.response.venue.tips.groups[0].items :[],
+            foursquareDetails: res.data.response.venue,
+            foursquareReviewCount: res.data.response.venue.tips.count
+          });
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -354,18 +349,16 @@ export default class ReviewAnalytics extends Component {
           let appleRating = 0;
           let appleReviews = res.data.feed.entry;
 
-          if(appleReviews){
-            for (let i = 0; i < appleReviews.length; i++) {
-              appleRating += parseInt(appleReviews[i]["im:rating"].label);
-            }
-            appleRating = parseInt(
-              (appleRating / appleReviews.length).toString().slice(0, 3)
-            );
-            this.setState({
-              appleRating,
-              appleReviewCount: res.data.feed.entry ? res.data.feed.entry.length : "-"
-            });
+          for (let i = 0; i < appleReviews.length; i++) {
+            appleRating += parseInt(appleReviews[i]["im:rating"].label);
           }
+          appleRating = parseInt(
+            (appleRating / appleReviews.length).toString().slice(0, 3)
+          );
+          this.setState({
+            appleRating,
+            appleReviewCount: res.data.feed.entry.length
+          });
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -391,17 +384,15 @@ export default class ReviewAnalytics extends Component {
           var citysearchNewReviews = 0;
           for (let i = 0; i < citysearchReviews.length; i++) {
             citysearchRating +=
-            citysearchReviews[i].children[5] ? (parseInt(citysearchReviews[i].children[5].value) / 2): 0;
+              parseInt(citysearchReviews[i].children[5].value) / 2;
 
-            if(citysearchReviews[i].children[6]){
-              let create_time1 = citysearchReviews[i].children[6].value;
+            let create_time1 = citysearchReviews[i].children[6].value;
             if (parseInt(create_time1.slice(0, 4)) == today.getFullYear()) {
               if (parseInt(create_time1.slice(5, 7)) == today.getMonth() + 1) {
                 if (parseInt(create_time1.slice(8, 10)) == today.getDate()) {
                   citysearchNewReviews++;
                 }
               }
-            }
             }
           }
           citysearchRating = parseInt(
@@ -427,8 +418,7 @@ export default class ReviewAnalytics extends Component {
         Axios.get(hereUrl).then(res => {
           console.log("Here data", res.data);
 
-          if(res.data.media){
-            let hereRating =
+          let hereRating =
             res.data.media.ratings.items.length >= 1
               ? res.data.media.ratings.items[0].average
               : "-";
@@ -438,20 +428,14 @@ export default class ReviewAnalytics extends Component {
               : "-";
           this.setState({
             hereRating,
-            hereReviews: hereReviews,
-            all_connections: [
-              ...this.state.all_connections,
-              { name: "Here" }
-            ]
+            hereReviews: hereReviews
           });
-          } else{
           this.setState({
             all_connections: [
               ...this.state.all_connections,
               { name: "Here" }
             ]
           });
-        }
         });
       }
 
@@ -465,18 +449,16 @@ export default class ReviewAnalytics extends Component {
         ).then(res => {
           console.log("zillow data", res.data);
 
-          if(res.data.response){
-            let zillowRating = res.data.response.results.proInfo.avgRating
+          let zillowRating = res.data.response.results.proInfo.avgRating
             ? parseFloat(res.data.response.results.proInfo.avgRating)
-            : "-";
-          let zillowReviews = res.data.response.results.proInfo.reviewCount ? parseInt(
+            : 0;
+          let zillowReviews = parseInt(
             res.data.response.results.proInfo.reviewCount
-          ) : "-";
+          );
           this.setState({
             zillowRating,
             zillowReviews
           });
-          }
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -488,17 +470,23 @@ export default class ReviewAnalytics extends Component {
 
       // tomtom
 
-        if (tomtomUrl && tomtomUrl != "-") {
+      if (tomtomUrl) {
+        if (tomtomUrl == "-") {
+          this.setState({
+            tomtomRating: 0,
+            tomtomReviews: 0,
+            tomtomNewReviews: 0
+          });
+        } else {
           Axios.get(
             "https://api.tomtom.com/search/2/poiDetails.json?key=BVtLuLXu3StRT6YXupe4H9cbtugU3i10&id=" +
               tomtomUrl
           ).then(res => {
             console.log("tomtom data", res.data);
 
-            if(res.data.result && res.data.result &&  res.data.result.reviews){
-              let tomtomRating = res.data.result.rating
-              ? (parseFloat(res.data.result.rating.value) / 2)
-              : "-";
+            let tomtomRating = res.data.result.rating
+              ? parseFloat(res.data.result.rating.value) / 2
+              : 0;
 
             let tomtomReviews = parseInt(res.data.result.rating.totalRatings);
 
@@ -521,7 +509,6 @@ export default class ReviewAnalytics extends Component {
               tomtomReviews,
               tomtomNewReviews
             });
-            }
             this.setState({
               all_connections: [
                 ...this.state.all_connections,
@@ -530,6 +517,7 @@ export default class ReviewAnalytics extends Component {
             });
           });
         }
+      }
 
       // avvo
 
@@ -546,14 +534,12 @@ export default class ReviewAnalytics extends Component {
         ).then(res => {
           console.log("avvo lawyer data in json", res.data);
 
-          if(res.data.lawyers[0]){
-            let avvoRating = parseFloat(res.data.lawyers[0].client_review_score);
+          let avvoRating = parseFloat(res.data.lawyers[0].client_review_score);
           let avvoReviews = parseInt(res.data.lawyers[0].client_review_count);
           this.setState({
             avvoRating,
             avvoReviews
           });
-          }
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -573,16 +559,14 @@ export default class ReviewAnalytics extends Component {
         ).then(res => {
           console.log("zomato data", res.data);
 
-          if(res.data.user_rating && res.data.all_reviews_count){
-            let zomatoRating = res.data.user_rating.aggregate_rating
+          let zomatoRating = res.data.user_rating.aggregate_rating
             ? parseFloat(res.data.user_rating.aggregate_rating)
-            : "-";
+            : 0;
           let zomatoReviews = parseInt(res.data.all_reviews_count);
           this.setState({
             zomatoRating,
             zomatoReviews
           });
-          }
           this.setState({
             all_connections: [
               ...this.state.all_connections,
@@ -814,11 +798,11 @@ export default class ReviewAnalytics extends Component {
         {all_connections.length != 0 ?
         <div>
         <div className=" mb-30">
-          <div className="analytics-whice">
+          <div className="antbox">
             <div className="box-space ">
               <h2 className="analytics_btnx">
                 Analytics
-                {/* <div className="dropdown">
+               <div className="dropdown">
                   <a
                     href="#"
                     className="last_btn dropdown-toggle"
@@ -834,7 +818,7 @@ export default class ReviewAnalytics extends Component {
                       <li>Last nine month</li>
                     </ul>
                   </div>
-                </div> */}
+                </div> 
               </h2>
             </div>
 
@@ -842,8 +826,11 @@ export default class ReviewAnalytics extends Component {
               <div className="row">
                 <div className="col-md-3">
                   <div className="totl-listing">
+                  <h3>Total Review</h3>
                     <div className="icon">
-                      <img src={require("../images/re_an_1.png")} />
+                      <div className="icon-comment">
+                    <i className="zmdi zmdi-comment-outline"></i>
+                    </div>
                     </div>
                     <div className="icon-text">
                       <h2>
@@ -865,17 +852,21 @@ export default class ReviewAnalytics extends Component {
                           </div> */}
                         </div>
                       </h2>
-                      <h3>Total Review</h3>
+                      
                     </div>
                   </div>
                 </div>
 
                 <div className="col-md-3">
                   <div className="totl-listing">
+                  <h3>New Review</h3>
                     <div className="icon">
-                      <img src={require("../images/re_an_2.png")} />
+                    <div className="icon-comment">
+                    <i className="zmdi zmdi-comments"></i>
+                    </div>
                     </div>
                     <div className="icon-text">
+
                       <h2>
                         {total_new_reviews == 0 ? "-" : total_new_reviews}
                         <div className="dropdown parsent">
@@ -895,15 +886,18 @@ export default class ReviewAnalytics extends Component {
                           </div> */}
                         </div>
                       </h2>
-                      <h3>New Review</h3>
+                     
                     </div>
                   </div>
                 </div>
 
                 <div className="col-md-3">
                   <div className="totl-listing">
+                  <h3>Average Rating</h3>
                     <div className="icon">
-                      <img src={require("../images/re_an_3.png")} />
+                    <div className="icon-comment">
+                    <i className="zmdi zmdi-trending-up"></i>
+                    </div>
                     </div>
                     <div className="icon-text">
                       <h2>
@@ -927,15 +921,18 @@ export default class ReviewAnalytics extends Component {
                           </div> */}
                         </div>
                       </h2>
-                      <h3>Average Rating</h3>
+                     
                     </div>
                   </div>
                 </div>
 
                 <div className="col-md-3">
                   <div className="totl-listing">
+                  <h3>Review Response rate</h3>
                     <div className="icon">
-                      <img src={require("../images/re_an_4.png")} />
+                    <div className="icon-comment">
+                    <i className="zmdi zmdi-share"></i>
+                    </div>
                     </div>
                     <div className="icon-text">
                       <h2>
@@ -957,7 +954,7 @@ export default class ReviewAnalytics extends Component {
                           </div> */}
                         </div>
                       </h2>
-                      <h3>Review Response rate</h3>
+                      
                     </div>
                   </div>
                 </div>
@@ -976,7 +973,7 @@ export default class ReviewAnalytics extends Component {
                 width="100%"
               >
                 <thead>
-                  <tr>
+                  <tr className="thead-color">
                     <th>Review Sites (5)</th>
                     <th>Avg.Rating</th>
                     <th>Total Review</th>
@@ -987,7 +984,7 @@ export default class ReviewAnalytics extends Component {
                   </tr>
                 </thead>
 
-                <tbody>
+                <tbody className="cons">
                   <tr>
                     <td>Consolidated</td>
                     <td>
@@ -999,9 +996,9 @@ export default class ReviewAnalytics extends Component {
                           href="#"
                           className="dropdown-toggle"
                           data-toggle="dropdown"
-                        >
+                        >{/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1018,9 +1015,9 @@ export default class ReviewAnalytics extends Component {
                           href="#"
                           className="dropdown-toggle"
                           data-toggle="dropdown"
-                        >
+                        > {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1038,8 +1035,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1054,7 +1052,7 @@ export default class ReviewAnalytics extends Component {
                     <td>{/* 160 */}-</td>
                   </tr>
                   <tr>
-                    <td>Google</td>
+                    <td >Google</td>
                     <td>
                       {this.state.googleReviews.averageRating
                         ? this.state.googleReviews.averageRating
@@ -1065,8 +1063,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1086,8 +1085,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1105,8 +1105,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1132,8 +1133,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1151,8 +1153,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1170,8 +1173,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1197,8 +1201,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1218,8 +1223,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1236,9 +1242,9 @@ export default class ReviewAnalytics extends Component {
                           href="#"
                           className="dropdown-toggle"
                           data-toggle="dropdown"
-                        >
+                        >{/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1264,8 +1270,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1285,8 +1292,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1304,8 +1312,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1330,9 +1339,9 @@ export default class ReviewAnalytics extends Component {
                           href="#"
                           className="dropdown-toggle"
                           data-toggle="dropdown"
-                        >
+                        > {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1349,9 +1358,9 @@ export default class ReviewAnalytics extends Component {
                           href="#"
                           className="dropdown-toggle"
                           data-toggle="dropdown"
-                        >
+                        >{/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1369,8 +1378,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1396,8 +1406,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1415,8 +1426,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1434,8 +1446,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1460,9 +1473,9 @@ export default class ReviewAnalytics extends Component {
                           href="#"
                           className="dropdown-toggle"
                           data-toggle="dropdown"
-                        >
+                        >{/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1480,8 +1493,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1499,8 +1513,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1525,9 +1540,9 @@ export default class ReviewAnalytics extends Component {
                           href="#"
                           className="dropdown-toggle"
                           data-toggle="dropdown"
-                        >
+                        >{/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1545,8 +1560,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1564,8 +1580,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1591,8 +1608,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1610,8 +1628,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1629,8 +1648,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1656,8 +1676,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1675,8 +1696,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1694,8 +1716,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1721,8 +1744,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1740,8 +1764,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
+                           {/* 160% */}-
                           <span className="zmdi zmdi-caret-down"></span>{" "}
-                          {/* 160% */}-
+                         
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1759,8 +1784,9 @@ export default class ReviewAnalytics extends Component {
                           className="dropdown-toggle"
                           data-toggle="dropdown"
                         >
-                          <span className="zmdi zmdi-caret-down"></span>{" "}
                           {/* 160% */}-
+                          <span className="zmdi zmdi-caret-down"></span>{" "}
+                          
                         </a>
                         {/* <div className="dropdown-menu">
                             <ul>
@@ -1787,33 +1813,10 @@ export default class ReviewAnalytics extends Component {
           <div className="row">
             <div className="col-md-6">
               
-                {/* <img src={require('../images/pie.jpg')}/> */}
-
-                {(overAllReviewCount != 0) && (all_connections.length != 0) ? 
-                <div className="whitechart">
-                  <h2 className="analytics_btnx">Sitewise Distribution Reviews</h2>
-                  <Chart
-                  width={"500px"}
-                  height={"500px"}
-                  chartType="PieChart"
-                  loader={<div>Loading Chart</div>}
-                  data={pieData}
-                  options={{
-                    title: "",
-                    pieSliceText: "label",
-                    legend: "none",
-                    pieHole: 0.4
-                  }}
-                  rootProps={{ "data-testid": "1" }}
-                /> 
-                </div>: ""}
-              
-            </div>
-            <div className="col-md-6">            
                 {/* <img src={require('../images/pie-1.jpg')}/> */}
-                { (overAllRating != "-") && (all_connections.length != 0) ?
+
+                {all_connections.length != 0 ?
                 <div className="whitechart">
-                  <h2 className="analytics_btnx">Sitewise Distribution Of Ratings</h2>
                    <Chart
                   width={"500px"}
                   height={"300px"}
@@ -1821,7 +1824,7 @@ export default class ReviewAnalytics extends Component {
                   loader={<div>Loading Chart</div>}
                   data={columnData}
                   options={{
-                    title: "",
+                    title: "Sitewise Distribution Of Ratings",
                     width: 580,
                     height: 500,
                     bar: { groupWidth: "25%" },
@@ -1835,6 +1838,30 @@ export default class ReviewAnalytics extends Component {
                 /> </div> : ""}
               
             </div>
+            <div className="col-md-6">
+              
+                {/* <img src={require('../images/pie.jpg')}/> */}
+
+                {all_connections.length != 0 ? 
+                <div className="whitechart">
+                  <Chart
+                  width={"500px"}
+                  height={"500px"}
+                  chartType="PieChart"
+                  loader={<div>Loading Chart</div>}
+                  data={pieData}
+                  options={{
+                    title: "Sitewise Distribution Reviews",
+                    pieSliceText: "label",
+                    legend: "none",
+                    pieHole: 0.4
+                  }}
+                  rootProps={{ "data-testid": "1" }}
+                /> 
+                </div>: ""}
+              
+            </div>
+            
           </div>
         </div>
       </div>

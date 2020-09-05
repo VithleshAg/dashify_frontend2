@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html itemscope itemtype="http://schema.org/Article" lang="en">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
@@ -9,6 +9,33 @@
       name="description"
       content="Web site created using create-react-app"
     />
+
+    <!-- google offline access -->
+    <!-- BEGIN Pre-requisites -->
+    <!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script
+      src="https://apis.google.com/js/client:platform.js?onload=start"
+      async
+      defer
+    ></script> -->
+    <!-- END Pre-requisites -->
+
+    <!-- Continuing the <head> section -->
+    <!-- <script>
+      function start() {
+        gapi.load("auth2", function() {
+          auth2 = gapi.auth2.init({
+            client_id:
+              "759599444436-po5k7rhkaqdu55toirpt5c8osaqln6ul.apps.googleusercontent.com",
+            // Scopes to request in addition to 'profile' and 'email'
+            scope: "https://www.googleapis.com/auth/business.manage",
+            immediate: true
+          });
+        });
+      }
+    </script> -->
+
+    <!-- google offline access -->
 
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <link

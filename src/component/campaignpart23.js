@@ -12,9 +12,8 @@ export default class CampaignPart2 extends Component {
   state = {
     email_sendto_error: {},
     contact_sendto_error: {},
-    fname_sendto_error: {},
-    sendto_fname: { 0: "" },
-    sendto_lname: { 0: "" },
+    name_sendto_error: {},
+    sendto_name: { 0: "" },
     sendto_email: { 0: "" },
     sendto_contact: { 0: "" },
     add_customer: 1,
@@ -32,9 +31,8 @@ export default class CampaignPart2 extends Component {
     var {
       email_sendto_error,
       contact_sendto_error,
-      fname_sendto_error,
-      sendto_fname,
-      sendto_lname,
+      name_sendto_error,
+      sendto_name,
       sendto_email,
       sendto_contact
     } = this.state;
@@ -70,21 +68,20 @@ export default class CampaignPart2 extends Component {
           isError = true;
         }
       });
-      Object.values(sendto_fname).map((value, i) => {
+      Object.values(sendto_name).map((value, i) => {
         if (value) {
-          names = { ...names, [i]: value + " " + sendto_lname[i] };
+          names = { ...names, [i]: value };
           send_limit = i + 1;
         } else {
           this.setState(prevState => ({
-            fname_sendto_error: {
-              ...prevState.fname_sendto_error,
-              [i]: "First name can not be empty"
+            name_sendto_error: {
+              ...prevState.name_sendto_error,
+              [i]: "Name can not be empty"
             }
           }));
           isError = true;
         }
       });
-
       Object.values(sendto_contact).map((value, i) => {
         if (value) {
           contact = { ...contact, [i]: value };
@@ -203,12 +200,12 @@ export default class CampaignPart2 extends Component {
               className="form-control"
               placeholder="Enter Name"
               name={i}
-              onChange={this.customer_fname_function}
-              value={this.state.sendto_fname[i]}
+              onChange={this.customer_name_function}
+              value={this.state.sendto_name[i]}
               required
             />
             <div style={{ color: "red" }}>
-              {this.state.fname_sendto_error[i]}
+              {this.state.name_sendto_error[i]}
             </div>
           </div>
           {/* <div className="col-md-2">
@@ -223,36 +220,24 @@ export default class CampaignPart2 extends Component {
     return fname;
   };
 
-  add_lname = () => {
-    var lname = [];
-    for (let i = 0; i < this.state.add_customer; i++) {
-      lname.push(
-        <div>
-          <div className="col-md-12 mb-30">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Enter last name"
-              name={i}
-              onChange={this.customer_lname_function}
-              value={this.state.sendto_lname[i]}
-              required
-            />
-            {/* <div style={{ color: "red" }}>
-              {this.state.lname_sendto_error[i]}
-            </div> */}
-          </div>
-          {/* <div className="col-md-2">
-            <button onClick="" className="btn">
-              Cancel
-            </button>
-          </div> */}
-        </div>
-      );
-    }
-    console.log(lname);
-    return lname;
-  };
+  // add_lname = () => {
+  //   var lname = [];
+  //   for (let i = 0; i < this.state.add_customer; i++) {
+  //     lname.push(
+  //       <input
+  //           type="text"
+  //           className="form-control mt-30"
+  //           placeholder="Enter last name"
+  //           name={i}
+  //           onChange={this.customer_phone_function}
+  //           value={this.state.sendto_contact[i]}
+  //           required
+  //         />
+  //     );
+  //   }
+  //   console.log(lname);
+  //   return lname;
+  // };
 
   add_phone = () => {
     var phone = [];
@@ -263,7 +248,7 @@ export default class CampaignPart2 extends Component {
             <input
               type="number"
               className="form-control"
-              placeholder="Enter mobile no."
+              placeholder="8102232456"
               name={i}
               onChange={this.customer_contact_function}
               value={this.state.sendto_contact[i]}
@@ -377,38 +362,19 @@ export default class CampaignPart2 extends Component {
     console.log("state", this.state);
   };
 
-  customer_fname_function = event => {
+  customer_name_function = event => {
     event.persist();
 
     this.setState(prevState => ({
-      fname_sendto_error: {
-        ...prevState.fname_sendto_error,
+      name_sendto_error: {
+        ...prevState.name_sendto_error,
         [event.target.name]: ""
       }
     }));
 
     this.setState(prevState => ({
-      sendto_fname: {
-        ...prevState.sendto_fname,
-        [event.target.name]: event.target.value
-      }
-    }));
-    console.log("state", this.state);
-  };
-
-  customer_lname_function = event => {
-    event.persist();
-
-    // this.setState(prevState => ({
-    //   lname_sendto_error: {
-    //     ...prevState.lname_sendto_error,
-    //     [event.target.name]: ""
-    //   }
-    // }));
-
-    this.setState(prevState => ({
-      sendto_lname: {
-        ...prevState.sendto_lname,
+      sendto_name: {
+        ...prevState.sendto_name,
         [event.target.name]: event.target.value
       }
     }));
@@ -420,14 +386,8 @@ export default class CampaignPart2 extends Component {
     console.log("add customer button clicked");
 
     this.setState(prevState => ({
-      sendto_fname: {
-        ...prevState.sendto_fname,
-        [this.state.add_customer]: ""
-      }
-    }));
-    this.setState(prevState => ({
-      sendto_lname: {
-        ...prevState.sendto_lname,
+      sendto_name: {
+        ...prevState.sendto_name,
         [this.state.add_customer]: ""
       }
     }));
@@ -452,9 +412,8 @@ export default class CampaignPart2 extends Component {
       campaign_name,
       email_sendto_error,
       contact_sendto_error,
-      fname_sendto_error,
-      sendto_fname,
-      sendto_lname,
+      name_sendto_error,
+      sendto_name,
       sendto_email,
       add_customer,
       wrong,
@@ -477,15 +436,17 @@ export default class CampaignPart2 extends Component {
                 <div className="step2">
                   <ul>
                     <li>
-                      <div className="step-sms">
-                        <a href="#">Step 02</a>
-                        <span>Ralting Email And SMS template</span>
-                      </div>
-                      <div className="closebox">
-                        <i className="zmdi zmdi-close"></i> Close section
-                      </div>
+                      <a href="#">Step 02</a>
                     </li>
                   </ul>
+                  <div className="ratingemail">
+                    <h2>
+                      Ratings Email And SMS
+                      <a className="close-section">
+                        <i className="zmdi zmdi-close"></i>Close Section
+                      </a>
+                    </h2>
+                  </div>
 
                   <div className="formbox">
                     <div className="row">
@@ -495,55 +456,47 @@ export default class CampaignPart2 extends Component {
                           <input
                             type="email"
                             className="form-control"
-                            value="mohit.chack@digimonk.in"
+                            placeholder="mohit.chack@digimonk.in"
                             readonly
                           />
                         </div>
                       </div>
 
                       <div className="col-md-12">
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label>Customer first name</label>
-                            {this.add_fname()}
-                          </div>
-                        </div>
-
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label>Customer last name</label>
-                            {this.add_lname()}
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* <div className="col-md-12">
                         <div className="form-group">
-                          <label>Customer Email/Phone number</label> */}
-
-                      <div className="col-md-12">
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label>Customer Email</label>
-                            {this.add_email()}
-                          </div>
-                        </div>
-                        <div className="col-md-6">
-                          <div className="form-group">
-                            <label>Customer Phone number</label>
-                            {this.add_phone()}
-                          </div>
+                          <label>Customer Name</label>
+                          {this.add_fname()}
                         </div>
                       </div>
-                      {/* </div>
+
+                      {/* <div className="col-md-6">
+                        <div className="form-group">
+                          <label>Customer last name</label>
+                          {this.add_lname()}
+                        </div>
                       </div> */}
+
                       <div className="col-md-12">
-                        <div className="form-group text-right">
+                        <div className="form-group">
+                          <label>Customer Email</label>
+                          {this.add_email()}
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="form-group">
+                          <label>Customer Phone number</label>
+                          {this.add_phone()}
+                        </div>
+                      </div>
+
+                      <div className="col-md-12">
+                        <div className="form-group">
                           <button
                             onClick={this.add_customer_function}
-                            className="add_button"
+                            className="add_btn"
                           >
-                            Add another Customer
+                            <img src={require("../images/plus.png")} /> Add
+                            another Customer
                           </button>
                         </div>
                       </div>
@@ -551,46 +504,18 @@ export default class CampaignPart2 extends Component {
                   </div>
                 </div>
 
-                <div className="mt-30">
-                  <div className="">
-                    <div className="row">
-                      <div className="col-md-5 col-md-offset-1">
-                        <button className="gen_btn">
-                          Create a new review generation
-                        </button>
-                      </div>
-                      <div className="col-md-5" style={{ textAlign: "center" }}>
-                        {loading ? (
-                          <Loader
-                            type="Oval"
-                            color="#00BFFF"
-                            height={25}
-                            width={25}
-                            // timeout={3000} //3 secs
-                          />
-                        ) : (
-                          <div style={{ color: "red" }}>{wrong}</div>
-                        )}
-                        <button type="submit" className="lunch_btn">
-                          Launch Campaign
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-4">
                 <div className="step2 topspace">
                   <div className="formbox">
-                    <div className="design-ui">
-                      <h3>
-                        Upload Your CSV containing Customer Email / Phone
-                        Numbers
-                      </h3>
+                    <div className="d-flex">
                       <div className="csv">
                         <img src={require("../images/csv.png")} alt="csv" />
                       </div>
                       <div className="csv-text">
+                        <h3>
+                          Uploading Your CSV containing Customer Email/ Phone
+                          Numbers
+                        </h3>
+
                         <button className="download_btn">
                           Download Simple
                         </button>
@@ -598,6 +523,38 @@ export default class CampaignPart2 extends Component {
                           <button className="upload_btn">Upload CSV</button>
                           <input type="file" />
                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="step2 mt-30">
+                  <div className="formbox">
+                    <div className="row">
+                      {loading ? (
+                        <div style={{ textAlign: "center" }}>
+                          <Loader
+                            type="Oval"
+                            color="#00BFFF"
+                            height={25}
+                            width={25}
+                            // timeout={3000} //3 secs
+                          />
+                        </div>
+                      ) : (
+                        <div style={{ color: "red", textAlign: "center" }}>
+                          {wrong}
+                        </div>
+                      )}
+                      <div className="col-md-6">
+                        <button className="gen_btn">
+                          Create a new review generation
+                        </button>
+                      </div>
+                      <div className="col-md-6">
+                        <button type="submit" className="lunch_btn">
+                          Launch Campaign
+                        </button>
                       </div>
                     </div>
                   </div>

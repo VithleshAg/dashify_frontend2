@@ -4,8 +4,16 @@ import FacebookLogin from "react-facebook-login";
 // import InstagramLogin from "react-instagram-login";
 import GoogleLogin from "react-google-login";
 import Axios from "axios";
-import { all_connection_of_one_location,add_social_account,remove_social_account } from "./apis/social_platforms";
-import { location_by_id,business_categories,business_states } from "./apis/location";
+import {
+  all_connection_of_one_location,
+  add_social_account,
+  remove_social_account
+} from "./apis/social_platforms";
+import {
+  location_by_id,
+  business_categories,
+  business_states
+} from "./apis/location";
 // import qs from "querystring";
 import qs from "qs";
 import Spinner from "./common/Spinner";
@@ -138,6 +146,9 @@ export default class ViewListing extends Component {
     zomatoId: "",
     avvoId: "",
     otherImage: [],
+    redirect_to_connectedaccounts: false,
+    redirect_to_google_connectedaccounts: false,
+    google_redirect_data: "",
     loader: true,
     all_connections: [],
     pdf_data: [],
@@ -148,7 +159,7 @@ export default class ViewListing extends Component {
   };
 
   async componentDidMount() {
-    if(this.props.match.params.locationId != "null"){
+    if (this.props.match.params.locationId != "null") {
       const data = {
         location_id: this.props.match.params.locationId
       };
@@ -159,9 +170,9 @@ export default class ViewListing extends Component {
         fbData,
         googleData,
         linkedinData;
-  
+
       let { pdf_data } = this.state;
-  
+
       var today = new Date();
       today =
         today.getDate() +
@@ -175,10 +186,11 @@ export default class ViewListing extends Component {
       //   data,
       //   DjangoConfig
       // )
-      all_connection_of_one_location(data,DjangoConfig).then(resp => {
+      all_connection_of_one_location(data, DjangoConfig)
+        .then(resp => {
           console.log("get all connections", resp);
           this.setState({ allListings: resp.data.data });
-  
+
           if (this.state.allListings) {
             this.state.allListings.map(l => {
               if (l.Social_Platform.Platform == "Facebook") {
@@ -186,17 +198,17 @@ export default class ViewListing extends Component {
                 fbPageId = l.Social_Platform.Other_info;
                 fbData = l;
               }
-  
+
               if (l.Social_Platform.Platform == "Google") {
                 googleToken = l.Social_Platform.Token;
                 googleData = l;
               }
-  
+
               if (l.Social_Platform.Platform == "Linkedin") {
                 linkedinToken = l.Social_Platform.Token;
                 linkedinData = l;
               }
-  
+
               if (l.Social_Platform.Platform == "Foursquare") {
                 console.log("yes four");
                 this.setState({
@@ -220,7 +232,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Dnb") {
                 console.log("yes DNB");
                 this.setState({
@@ -244,7 +256,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Instagram") {
                 console.log("yes Instagram");
                 this.setState({
@@ -271,7 +283,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Yelp") {
                 console.log("yes yelp");
                 this.setState({
@@ -295,7 +307,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Apple") {
                 console.log("yes Apple");
                 this.setState({
@@ -319,7 +331,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Citysearch") {
                 console.log("Citysearch data", l);
                 this.setState({
@@ -343,7 +355,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Zillow") {
                 console.log("Zillow data", l);
                 this.setState({
@@ -367,7 +379,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Tomtom") {
                 console.log("Tomtom data", l);
                 this.setState({
@@ -391,7 +403,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Zomato") {
                 console.log("Zomato data", l);
                 this.setState({
@@ -415,7 +427,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Avvo") {
                 console.log("Avvo data", l);
                 this.setState({
@@ -439,7 +451,7 @@ export default class ViewListing extends Component {
                   ]
                 });
               }
-  
+
               if (l.Social_Platform.Platform == "Here") {
                 console.log("yes here");
                 this.setState({
@@ -464,15 +476,16 @@ export default class ViewListing extends Component {
                 });
               }
             });
-  
+
             const GoogleConfig = {
               headers: { Authorization: "Bearer " + googleToken }
             };
-  
+
             // for facebook
             if (fbtoken) {
               Axios.get(
-                "https://graph.facebook.com/me/accounts/?access_token=" + fbtoken
+                "https://graph.facebook.com/me/accounts/?access_token=" +
+                  fbtoken
               ).then(res => {
                 var fbPageAccessToken;
                 for (let i = 0; i < res.data.data.length; i++) {
@@ -510,7 +523,7 @@ export default class ViewListing extends Component {
                 });
               });
             }
-  
+
             // Google
             if (googleToken) {
               Axios.get(
@@ -540,7 +553,7 @@ export default class ViewListing extends Component {
                 });
               });
             }
-  
+
             // Linkedin
             if (linkedinToken) {
               this.setState({
@@ -568,13 +581,15 @@ export default class ViewListing extends Component {
         .catch(resp => {
           console.log(resp);
         });
-  
+
+
       // Axios.post(
       //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
       //   data,
       //   DjangoConfig
       // )
-      location_by_id(data,DjangoConfig).then(resp => {
+      location_by_id(data, DjangoConfig)
+        .then(resp => {
           this.setState({ state: "Loading....", category: "Loading...." });
           // Axios.get(
           //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/states",
@@ -587,7 +602,7 @@ export default class ViewListing extends Component {
                 : ""
             );
           });
-  
+
           // Axios.get(
           //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/dropdown-values/business-categoryes",
           //   DjangoConfig
@@ -599,24 +614,24 @@ export default class ViewListing extends Component {
                 : ""
             );
           });
-  
+
           console.log(resp.data);
           this.setState({
             location: resp.data.location,
             name: resp.data.location.Location_name,
-  
+
             address: resp.data.location.Address_1,
-  
+
             phone: resp.data.location.Phone_no,
-  
+
             about: resp.data.location.About_Business,
-  
+
             city: resp.data.location.City,
             postalCode: resp.data.location.Zipcode,
             logo: resp.data.location.Business_Logo,
             cover: resp.data.location.Business_Cover_Image,
             otherImage: resp.data.location.Df_location_image,
-  
+
             loader: false
           });
         })
@@ -645,24 +660,20 @@ export default class ViewListing extends Component {
 
     // Axios.get("https://graph.facebook.com/oauth/access_token?grant_type=fb_exchange_token&client_id=187396122554776&client_secret=bad0dbb6029a3530ca46048415abe95e&fb_exchange_token="+response.accessToken).then(async res => {
     //   console.log("google refresh token response",res)
-      
+
     //   await localStorage.setItem("fb_token", res.data.access_token);
     //   await localStorage.setItem("fb_data", JSON.stringify(fb_data));
-  
+
     //   // this.setState({ redirect_to_connectedaccounts: true });
     // }).catch(res => {
     //   console.log("google refresh token error",res)
     //   alert("something went wrong")
     // })
 
-
     await localStorage.setItem("fb_token", response.accessToken);
     await localStorage.setItem("fb_data", JSON.stringify(fb_data));
 
-    this.props.history.push({
-      pathname: `/connectedaccounts/view-listing`,
-    })
-    
+    this.setState({ redirect_to_connectedaccounts: true });
   };
 
   responseErrorGoogle = response => {
@@ -680,11 +691,10 @@ export default class ViewListing extends Component {
       location_id: this.props.match.params.locationId,
       redirect_to: "/view-listing"
     };
-    
-    this.props.history.push({
-      pathname: `/google-connectedaccounts/${encodeURIComponent(JSON.stringify(state))}`,
-    })
-
+    this.setState({
+      redirect_to_google_connectedaccounts: true,
+      google_redirect_data: state
+    });
   };
 
   linkedin_handleSuccess = data => {
@@ -729,7 +739,8 @@ export default class ViewListing extends Component {
         //   data,
         //   DjangoConfig
         // )
-        add_social_account(data,DjangoConfig).then(resp => {
+        add_social_account(data, DjangoConfig)
+          .then(resp => {
             console.log("linkedin location response", resp.data);
 
             const data2 = {
@@ -740,7 +751,7 @@ export default class ViewListing extends Component {
             //   data2,
             //   DjangoConfig
             // )
-            all_connection_of_one_location(data2,DjangoConfig).then(resp => {
+            all_connection_of_one_location(data2, DjangoConfig).then(resp => {
               console.log("get all connections", resp);
               this.setState({ allListings: resp.data.data });
 
@@ -801,7 +812,8 @@ export default class ViewListing extends Component {
     //   data,
     //   DjangoConfig
     // )
-    remove_social_account(data,DjangoConfig).then(resp => {
+    remove_social_account(data, DjangoConfig)
+      .then(resp => {
         console.log(resp);
 
         this.setState({ [name]: false });
@@ -874,327 +886,599 @@ export default class ViewListing extends Component {
 
     const { linkedin_code, linkedin_errorMessage } = this.state;
 
+    if (this.state.redirect_to_connectedaccounts) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/connectedaccounts",
+            state: { redirect_to: "/view-listing" }
+          }}
+        />
+      );
+    }
+
+    if (this.state.redirect_to_google_connectedaccounts) {
+      return (
+        <Redirect
+          to={{
+            pathname: "/google-connectedaccounts",
+            state: this.state.google_redirect_data
+          }}
+        />
+      );
+    }
+
     return (
       <div className="main_content">
-      {this.state.loader ? <div className="rightside_title">
+        {this.state.loader ? (
+          <div className="rightside_title">
             <Spinner />
-          </div> : <div>
-      {/* <div className="content-page"> */}
-
-      
-        <div className="rightside_title">
-          <h1>Listing</h1>
-        </div>
-        {this.props.match.params.locationId != "null" ? <div>
-        <div className="tablediv">
-          <div className="row">
-            <div className="col-md-6">
-              <div className="listingdetails">
-                <div className="d-flex">
-                  <div className="viewimg">
-                    <img
-                      src={
-                        this.state.logo
-                          ? this.state.logo
-                          : require("../images/Logo2.png")
-                      }
-                      height="150"
-                      width="150"
-                    />
-                  </div>
-
-                  <div className="viewlisting-text">
-                    <h2>{this.state.name}</h2>
-                    <p>{this.state.category}</p>
-                    <h3>ADDRESS AND CONTACT</h3>
-                    <p>
-                      {this.state.address}, {this.state.state} ,
-                      {this.state.postalCode}
-                    </p>
-                    <p>P:{this.state.phone}</p>
-                    <div className="edit-icon">
-                      <span>
-                        <i className="zmdi  zmdi-edit"></i>
-                      </span>
-
-                      <a
-                        href={
-                          "/dashboard#/locations/" +
-                          localStorage.getItem("locationId") +
-                          "/view-location"
-                        }
-                        className="showmore"
-                      >
-                        Show More informations
-                      </a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-md-6">
-              <div className="business-box">
-                <ul>
-                  {this.state.otherImage.map((img, i) => (
-                    <li>
-                      <img src={img.Image} height="100" width="100" />
-                    </li>
-                  ))}
-                </ul>
-                <div className="viewlisting-text">
-                  <h3>BUSINESS DESCRIPTION</h3>
-                  <p>{this.state.about}</p>
-                </div>
-              </div>
-            </div>
           </div>
-        </div>
-        <div className=" mt-30">
-          <div className="row">
-            <div className="col-md-4">
-              <div className="totl-listing">
-                <div className="icon">
-                  <img src={require("../images/group-2.png")} />
-                </div>
-                <div className="icon-text">
-                  <h2>13</h2>
-                  <h3>Total listing</h3>
-                  <p>Review all business listings</p>
-                </div>
-              </div>
-            </div>
-            <div className="col-md-4">
-              <div className="totl-listing">
-                <div className="icon">
-                  <img src={require("../images/group-3.png")} />
-                </div>
-                <div className="icon-text">
-                  <h2>{all_connections ? all_connections.length : "-"}</h2>
-                  <h3>Sync listing</h3>
-                  <p>Review Sync business listings</p>
-                </div>
-              </div>
-            </div>
+        ) : (
+          <div>
+            {/* <div className="content-page"> */}
 
-            <div className="col-md-4">
-              <div className="totl-listing">
-                <div className="icon">
-                  <img src={require("../images/group-4.png")} />
-                </div>
-                <div className="icon-text">
-                  <h2>
-                    {" "}
-                    {all_connections ? 13 - all_connections.length : "-"}
-                  </h2>
-                  <h3>Requiring Action</h3>
-                  <p>Review All business listings</p>
-                </div>
-              </div>
+            <div className="rightside_title">
+              <h1>Listing Overview</h1>
             </div>
-          </div>
-        </div>
-        <div className="update-account mt-30">
-          <div className="box-space">
-            <div className="row d-flex">
-              <div className="col-md-8">
-                <h2>Last update yesterday at 10:10 PM</h2>
-              </div>
-
-              <div className="col-md-4 text-right">
-                <PDFDownloadLink
-                  document={this.Quixote(pdf_data)}
-                  fileName="connected_listing_report.pdf"
-                >
-                  {({ blob, url, loading, error }) =>
-                    this.state.loader || this.state.category == "Loading...." ? (
-                      "Loading document..."
-                    ) : (
-                      <a className="report_btn">Download Report</a>
-                    )
-                  }
-                </PDFDownloadLink>
-              </div>
-            </div>
-          </div>
-
-          <div className="box-space">
-            <div className="row d-flex">
-              <div className="col-md-12">
-                <h2>Accounts</h2>
-              </div>
-            </div>
-          </div>
-          <div className=" connect-box">
-            {/* yelp */}
-
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img src={require("../images/yelp.png")} alt="yelp" />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.yelpIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.yelpName} </h4>
+            {this.props.match.params.locationId != "null" ? (
+              <div>
+                <div className="row">
+                  <div className="col-md-8">
+                    <div className="listing-dolce">
+                      <div className="dolce-title">
+                        <h2>
+                          {this.state.name}
+                          <br />
+                          <span>{this.state.address}</span>
+                        </h2>
+                        <button
+                          onClick={() =>
+                            this.props.history.push({
+                              pathname: `/locations/${localStorage.getItem(
+                                "locationId"
+                              )}/view-location`
+                            })
+                          }
+                          className="pay_last_btn"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                      <div className="dolcebox">
+                        <div className="dolce-profile">
+                          <img src={require("../images/dolce.png")} alt="" />
                         </div>
-                      ) : (
-                        ""
-                      )}
+                        <div className="dolce-text">
+                          <h4>ADDRESS AND CONTACT</h4>
+                          <p>
+                            {this.state.address}
+                            <br />
+                            {this.state.state},{this.state.postalCode} <br />Р{" "}
+                            {this.state.phone}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="dolce-profile-user">
+                        <ul>
+                          {this.state.otherImage.map((img, i) => (
+                            <li>
+                              <img src={img.Image} height="125" width="125" />
+                            </li>
+                          ))}
+                          {/* <li>
+                            <img
+                              src={require("../images/dolce-1.png")}
+                              alt=""
+                            />
+                          </li> */}
+                        </ul>
+
+                        <h3>BUSSINES DISCRIPTION</h3>
+                        <p>{this.state.about}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="col-md-4">
+                    <div className="dolce-list">
+                      <div className="lightblue-list">
+                        <div className="dolce-icon">
+                          <i className="zmdi zmdi-play-circle-outline"></i>
+                        </div>
+                        <div className="dolce-textbox">
+                          <h4>14</h4>
+                          <strong>Total Listing</strong>
+                          <p>Keyword that have moved up in the rank</p>
+                        </div>
+                      </div>
+
+                      <div className="lightblue-list">
+                        <div className="dolce-icon">
+                          <i className="zmdi zmdi-refresh-alt"></i>
+                        </div>
+                        <div className="dolce-textbox">
+                          <h4>
+                            {all_connections ? all_connections.length : "-"}
+                          </h4>
+                          <strong>Sync Listing</strong>
+                          <p>Keyword that have moved up in the rank</p>
+                        </div>
+                      </div>
+
+                      <div className="lightblue-list">
+                        <div className="dolce-icon">
+                          <i className="zmdi zmdi-sign-in"></i>
+                        </div>
+                        <div className="dolce-textbox">
+                          <h4>
+                            {all_connections
+                              ? 14 - all_connections.length
+                              : "-"}
+                          </h4>
+                          <strong>Requiring Action</strong>
+                          <p>Keyword that have moved up in the rank</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
+                <div className="mt-30">
+                  <div className="row">
+                    <div className="col-md-4">
+                      <div className="bing-box">
+                        <div className="google-top">
+                          <img
+                            src={require("../images/google-new.png")}
+                            alt=""
+                          />
 
-                <div className="col-md-3">
-                  {this.state.yelpIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.yelpId}
-                      name="yelpIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/yelplogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
+                          <div className="progress" data-percentage="100">
+                            <span className="progress-left">
+                              <span className="progress-bar"></span>
+                            </span>
+                            <span className="progress-right">
+                              <span className="progress-bar"></span>
+                            </span>
+                            <div className="progress-value">
+                              <div>
+                                100%
+                                <br />
+                                <span>score</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bing-detils">
+                          <ul>
+                            <li>
+                              <span>Link:</span>
+                              <div className="bing-detail-text">
+                                <input
+                                  type="checkbox"
+                                  id="html"
+                                  defaultChecked
+                                />
+                                <label htmlFor="html"></label>
+                              </div>
+                            </li>
+
+                            <li>
+                              <span>Name:</span>
+                              <div className="bing-detail-text">
+                                Kandl Water Condition Inc.
+                              </div>
+                            </li>
+                            <li>
+                              <span>Address:</span>
+                              <div className="bing-detail-text">
+                                264 Manitoba St. Spicar, 56288, USA
+                              </div>
+                            </li>
+                            <li>
+                              <span>Phone:</span>
+                              <div className="bing-detail-text">
+                                (320)706-50-20
+                              </div>
+                            </li>
+                            <h3>Detailed breakdown</h3>
+                            <ul className="breack-bing">
+                              <li>
+                                <span>Categories</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Website URL Present</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Hours of operation</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Photos present</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Reviews</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                            </ul>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    {/*bing start*/}
+                    <div className="col-md-4">
+                      <div className="bing-box">
+                        <div className="google-top">
+                          <img src={require("../images/bing-new.png")} alt="" />
+
+                          <div className="progress" data-percentage="98">
+                            <span className="progress-left">
+                              <span className="progress-bar"></span>
+                            </span>
+                            <span className="progress-right">
+                              <span className="progress-bar"></span>
+                            </span>
+                            <div className="progress-value">
+                              <div>
+                                98%
+                                <br />
+                                <span>score</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bing-detils">
+                          <ul>
+                            <li>
+                              <span>Link:</span>
+                              <div className="bing-detail-text">
+                                <input
+                                  type="checkbox"
+                                  id="html1"
+                                  defaultChecked
+                                />
+                                <label htmlFor="html1"></label>
+                              </div>
+                            </li>
+
+                            <li>
+                              <span>Name:</span>
+                              <div className="bing-detail-text">
+                                Kandl Water Condition Inc.
+                              </div>
+                            </li>
+                            <li>
+                              <span>Address:</span>
+                              <div className="bing-detail-text">
+                                264 Manitoba St. Spicar, 56288, USA
+                              </div>
+                            </li>
+                            <li>
+                              <span>Phone:</span>
+                              <div className="bing-detail-text">
+                                (320)706-50-20
+                              </div>
+                            </li>
+                            <h3>Detailed breakdown</h3>
+                            <ul className="breack-bing">
+                              <li>
+                                <span>Categories</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Website URL Present</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Hours of operation</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Photos present</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Reviews</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                            </ul>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    {/*bing end*/}
+
+                    {/*yelp start*/}
+                    <div className="col-md-4">
+                      <div className="bing-box">
+                        <div className="google-top">
+                          <img src={require("../images/yelp-new.png")} alt="" />
+
+                          <div className="progress" data-percentage="80">
+                            <span className="progress-left">
+                              <span className="progress-bar"></span>
+                            </span>
+                            <span className="progress-right">
+                              <span className="progress-bar"></span>
+                            </span>
+                            <div className="progress-value">
+                              <div>
+                                80%
+                                <br />
+                                <span>score</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="bing-detils">
+                          <ul>
+                            <li>
+                              <span>Link:</span>
+                              <div className="bing-detail-text">
+                                <input
+                                  type="checkbox"
+                                  id="html2"
+                                  defaultChecked
+                                />
+                                <label htmlFor="html2"></label>
+                              </div>
+                            </li>
+
+                            <li>
+                              <span>Name:</span>
+                              <div className="bing-detail-text">
+                                Kandl Water Condition Inc.
+                              </div>
+                            </li>
+                            <li>
+                              <span>Address:</span>
+                              <div className="bing-detail-text">
+                                264 Manitoba St. Spicar, 56288, USA
+                              </div>
+                            </li>
+                            <li>
+                              <span>Phone:</span>
+                              <div className="bing-detail-text">
+                                (320)706-50-20
+                              </div>
+                            </li>
+                            <h3>Detailed breakdown</h3>
+                            <ul className="breack-bing">
+                              <li>
+                                <span>Categories</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Website URL Present</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Hours of operation</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Photos present</span>
+                                <div className="bing-cat">
+                                  <a className="bing-yes">Yes</a>
+                                </div>
+                              </li>
+                              <li>
+                                <span>Reviews</span>
+                                <div className="bing-cat">
+                                  <a className="bing-no">No</a>
+                                </div>
+                              </li>
+                            </ul>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    {/*yelp end*/}
+                  </div>
                 </div>
 
-                <div className="col-md-5">
+                <div className="mt-30">
+                  <h2 className="account-listing">Account</h2>
+
+
+                  {/* yelp */}
+                  <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/yelp.png")}
+                              alt="Yelp"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.yelpIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.yelpName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.yelpIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.yelpId}
+                            name="yelpIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/yelplogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
+
+
+
+                      <div className="col-md-6">
                   {this.state.yelpIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* instagram */}
 
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/instagram.png")}
-                        alt="instagram"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.instaIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.instaName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.instaIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.instaId}
-                      name="instaIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/instagramlogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
 
-                <div className="col-md-5">
+
+
+
+
+
+
+                  
+                  {/* instagram */}
+
+                  <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/instagram.png")}
+                              alt="Instagram"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.instaIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.instaName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.instaIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.instaId}
+                            name="instaIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/instagramlogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
+
+
+
+                      <div className="col-md-6">
                   {this.state.instaIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* instagram */}
 
-            {/* facebook */}
 
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/facebook.png")}
-                        alt="facebook"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.fbIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.fbName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {/* <a href="#" className="disconnect_btn">Disconnect a account</a> */}
-                  {this.state.fbIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.fbId}
-                      name="fbIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <FacebookLogin
+                {/* fb */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/facebook.png")}
+                              alt="Facebook"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.fbIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.fbName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.fbIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.fbId}
+                            name="fbIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <FacebookLogin
                       appId="187396122554776"
                       // appId="3044182972316291"
                       autoLoad={false}
@@ -1203,75 +1487,71 @@ export default class ViewListing extends Component {
                       onClick={this.componentClicked}
                       callback={this.responseFacebook}
                     />
-                  )}
-                </div>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.fbIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* linkedin */}
 
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/linkedin.png")}
-                        alt="linkedin"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.linkedinIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.linkedinName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.linkedinIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.linkedinId}
-                      name="linkedinIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <div>
+                {/* linkedin */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/linkedin.png")}
+                              alt="Linkedin"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.linkedinIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.linkedinName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.linkedinIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.linkedinId}
+                            name="linkedinIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <div>
                       <LinkedIn
                         clientId="861qygnjkytfwe"
                         onFailure={this.linkedin_handleFailure}
                         onSuccess={this.linkedin_handleSuccess}
                         scope="r_liteprofile r_emailaddress w_member_social"
+                        // scope="r_organization_social w_organization_social rw_organization_admin rw_ads r_ads_reporting r_liteprofile"
                         redirectUri="http://localhost:3000/linkedin"
                         redirectPath="/linkedin"
                       ></LinkedIn>
@@ -1282,337 +1562,252 @@ export default class ViewListing extends Component {
                         <div>{linkedin_errorMessage}</div>
                       )} */}
                     </div>
-                  )}
-                </div>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.linkedinIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* Avvo */}
 
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img src={require("../images/avvo.png")} alt="Avvo" />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.avvoIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.avvoName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {/* <a href="#" className="disconnect_btn">Disconnect a account</a> */}
-                  {this.state.avvoIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.avvoId}
-                      name="avvoIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a
+                {/* avvo */}
+
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/avvo.png")}
+                              alt="Avvo"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.avvoIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.avvoName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.avvoIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.avvoId}
+                            name="avvoIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a
                       href="http://www.avvo.com/oauth2/sessions/new?client_id=72g8jaazozj3eqov89rtdecpd&client_secret=mamtd9k5o7tdvavbu24tsr18&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Favvologin&response_type=code_and_token"
                       className="connect_btn"
                     >
                       Connect a account
                     </a>
-                  )}
-                </div>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.avvoIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* Instagram */}
 
-            {/* <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/instagram.png")}
-                        alt="instagram"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.instaIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.instaName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
                     </div>
                   </div>
-                </div> */}
 
-            {/* <div className="col-md-3"> */}
-            {/* <a href="#" className="disconnect_btn">Disconnect a account</a> */}
-            {/*  {this.state.instaIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.instaId}
-                      name="instaIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <InstagramLogin
-                      clientId="187396122554776"
-                      buttonText="Login"
-                      onSuccess={this.componentClicked}
-                      onFailure={this.responseInstagram}
-                    />
-                  )}
-                </div>
-
-                <div className="col-md-5">
-                  {this.state.instaIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div> */}
-
-            {/* foursqaure */}
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/foursquare.png")}
-                        alt="foursquare"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.foursquareIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.foursquareName} </h4>
+                {/* foursquare */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/foursquare.png")}
+                              alt="Foursquare"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.foursquareIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.foursquareName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
                         </div>
-                      ) : (
-                        ""
-                      )}
-                    </div>
-                  </div>
-                </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.foursquareIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.foursquareId}
+                            name="foursquareIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/foursquarelogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-3">
-                  {this.state.foursquareIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.foursquareId}
-                      name="foursquareIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/foursquarelogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
 
-                <div className="col-md-5">
+
+                      <div className="col-md-6">
                   {this.state.foursquareIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* DNB */}
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/dnb.jpg")}
-                        alt="DandB"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.dnbIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.dnbName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.dnbIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.dnbId}
-                      name="dnbIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/dnblogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
+                {/* DNB */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/dnb.jpg")}
+                              alt="DandB"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.dnbIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.dnbName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.dnbIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.dnbId}
+                            name="dnbIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/dnblogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.dnbIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* google */}
 
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/google.png")}
-                        alt="google"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.googleIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.googleName}</h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.googleIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.googleId}
-                      name="googleIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <div className="google_btnb">
+                {/* google */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/google.png")}
+                              alt="Google"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.googleIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.googleName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.googleIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.googleId}
+                            name="googleIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <div className="google_btnb">
                       <GoogleLogin
                         //for localhost
                         clientId="759599444436-po5k7rhkaqdu55toirpt5c8osaqln6ul.apps.googleusercontent.com"
@@ -1623,435 +1818,433 @@ export default class ViewListing extends Component {
                         onSuccess={this.responseGoogle}
                         onFailure={this.responseErrorGoogle}
                         cookiePolicy={"single_host_origin"}
+
+                        //for refresh token
+                        // accessType="offline"
+                        // responseType="code"
+                        // pompt="consent"
                       />
                     </div>
-                  )}
-                </div>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.googleIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* apple */}
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img src={require("../images/apple.png")} alt="apple" />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.appleIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.appleName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.appleIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.appleId}
-                      name="appleIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/applelogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
+                {/* apple */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/apple.png")}
+                              alt="Apple"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.appleIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.appleName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.appleIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.appleId}
+                            name="appleIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/applelogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.appleIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-            {/* apple */}
 
-            {/* citysearch */}
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/citysearch.jpg")}
-                        alt="citysearch"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.citysearchIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.citysearchName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.citysearchIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.citysearchId}
-                      name="citysearchIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/citysearchlogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
+                {/* citysearch */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/citysearch.png")}
+                              alt="Citysearch"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.citysearchIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.citysearchName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.citysearchIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.citysearchId}
+                            name="citysearchIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/citysearchlogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.citysearchIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-            {/* citysearch */}
 
-            {/* zillow */}
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/zillow.png")}
-                        alt="Zillow"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.zillowIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.zillowName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.zillowIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.zillowId}
-                      name="zillowIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/zillowlogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
+                {/* zillow */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/zillow.png")}
+                              alt="Zillow"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.zillowIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.zillowName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.zillowIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.yelpId}
+                            name="zillowIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/zillowlogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.zillowIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-            {/* zillow */}
 
-            {/* Tomtom */}
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/tomtom.png")}
-                        alt="Tomtom"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.tomtomIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.tomtomName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
+
                     </div>
                   </div>
-                </div>
+                
+                {/* tomtom */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/tomtom.png")}
+                              alt="Tomtom"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.tomtomIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.tomtomName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.tomtomIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.tomtomId}
+                            name="tomtomIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/tomtomlogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-3">
-                  {this.state.tomtomIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.tomtomId}
-                      name="tomtomIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/tomtomlogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
 
-                <div className="col-md-5">
+
+                      <div className="col-md-6">
                   {this.state.tomtomIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-            {/* Tomtom */}
 
-            {/* Zomato */}
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img
-                        src={require("../images/zomato.png")}
-                        alt="Zomato"
-                      />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.zomatoIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.zomatoName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.zomatoIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.zomatoId}
-                      name="zomatoIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/zomatologin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
+                {/* zomato */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/zomato.png")}
+                              alt="Zomato"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.zomatoIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.zomatoName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.zomatoIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.zomatoId}
+                            name="zomatoIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/zomatologin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.zomatoIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
-            {/* Zomato */}
 
-            {/* here */}
 
-            <div className="conntend">
-              <div className="row d-flex ">
-                <div className="col-md-4">
-                  <div className="f-connect">
-                    <div className="yelp-icon">
-                      <img src={require("../images/here.png")} alt="Here" />
-                    </div>
-                    <div className="yelp-text">
-                      {this.state.hereIsLoggedIn ? (
-                        <div>
-                          <p>Connected</p>
-                          <h4>{this.state.hereName} </h4>
-                        </div>
-                      ) : (
-                        ""
-                      )}
+
                     </div>
                   </div>
-                </div>
 
-                <div className="col-md-3">
-                  {this.state.hereIsLoggedIn ? (
-                    <button
-                      className="disconnect_btn"
-                      id={this.state.hereId}
-                      name="hereIsLoggedIn"
-                      onClick={this.disconnectAccount}
-                    >
-                      Disconnect a account
-                    </button>
-                  ) : (
-                    <a href="/herelogin" className="connect_btn">
-                      Connect a account
-                    </a>
-                  )}
-                </div>
+                {/* here */}
+                <div className="account-api">
+                    <div className="row d-flex">
+                      <div className="col-md-3">
+                        <div className="f-connect">
+                          <div className="yelp-icon">
+                            <img
+                              src={require("../images/here.png")}
+                              alt="Here"
+                            />
+                          </div>
+                          <div className="yelp-text">
+                            {this.state.hereIsLoggedIn ? (
+                              <div>
+                                <p>Connected</p>
+                                <h4>{this.state.hereName} </h4>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-3">
+                        {this.state.hereIsLoggedIn ? (
+                          <a
+                            className="disconnect_btn"
+                            id={this.state.hereId}
+                            name="hereIsLoggedIn"
+                            onClick={this.disconnectAccount}
+                          >
+                            Disconnect
+                          </a>
+                        ) : (
+                          <a href="/herelogin" className="connect_btn">
+                            Connect a account
+                          </a>
+                        )}
+                      </div>
 
-                <div className="col-md-5">
+
+
+                      <div className="col-md-6">
                   {this.state.hereIsLoggedIn ? (
                     <div className="refres_box enble_refresh">
-                      <i>
-                        <img src={require("../images/sync-refresh.svg")} />
-                      </i>
-
+                      <i className="fa fa-link"></i>
                       <span>Syncing</span>
                     </div>
                   ) : (
                     <div className="refres_box disble_refresh">
-                      <i>
-                        <img
-                          src={require("../images/sync_disabled-24px.svg")}
-                        />
-                      </i>
-
-                      <span>Connect your account to sync the listings</span>
+                     <i className="zmdi zmdi-close"></i>
+                          <span>Connect your account to sync the listing</span>
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {/* here */}
+
+
+                    </div>
+                  </div>
+
+
+
+                  <div className="listing-lastupdate">
+                    <p>Last Update Yesterday at 13:10 PM</p>
+                    <PDFDownloadLink
+                      document={this.Quixote(pdf_data)}
+                      fileName="connected_listing_report.pdf"
+                    >
+                      {({ blob, url, loading, error }) =>
+                        this.state.loader ||
+                        this.state.category == "Loading...." ? (
+                          "Loading document..."
+                        ) : (
+                          <a className="download-report">Download Report</a>
+                        )
+                      }
+                    </PDFDownloadLink>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="analytics-whice">
+                <div className="box-space2">
+                  <h4>Connect Location first</h4>
+                </div>
+              </div>
+            )}
           </div>
-          {/* </div> */}
-        </div>
-        </div> : <div className="analytics-whice">
-            <div className="box-space2"><h4>Connect Location first</h4></div></div>}
-        
+        )}
       </div>
-    }
-    </div>
     );
   }
 }

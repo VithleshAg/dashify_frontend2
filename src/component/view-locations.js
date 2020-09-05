@@ -133,7 +133,7 @@ export default class LocationManager extends Component {
     //   data,
     //   DjangoConfig
     // )
-    location_by_id(data,DjangoConfig).then(resp => {
+    location_by_id(data, DjangoConfig).then(resp => {
       console.log(resp.data);
       this.setState({
         location: resp.data.location,
@@ -214,7 +214,8 @@ export default class LocationManager extends Component {
     //   data,
     //   DjangoConfig
     // )
-    edit_location_by_id(data,DjangoConfig).then(resp => {
+    edit_location_by_id(data, DjangoConfig)
+      .then(resp => {
         console.log(resp);
 
         this.setState({ detailEdit: false, businessDetailsLoading: false });
@@ -270,7 +271,8 @@ export default class LocationManager extends Component {
     //   data,
     //   DjangoConfig
     // )
-    edit_location_payment_by_id(data,DjangoConfig).then(resp => {
+    edit_location_payment_by_id(data, DjangoConfig)
+      .then(resp => {
         console.log(resp);
         this.setState({ paymentEdit: false });
         const data1 = {
@@ -281,7 +283,8 @@ export default class LocationManager extends Component {
         //   data1,
         //   DjangoConfig
         // )
-        location_by_id(data1,DjangoConfig).then(resp1 => {
+        location_by_id(data1, DjangoConfig)
+          .then(resp1 => {
             this.setState({
               payment: resp1.data.location.Df_location_payments,
               paymentLoading: false
@@ -310,7 +313,7 @@ export default class LocationManager extends Component {
     const data = {
       Location_id: locationId,
       open_houre: {
-        "0": {
+        0: {
           date: "",
           Day: "Monday",
           Type: "Regular",
@@ -320,7 +323,7 @@ export default class LocationManager extends Component {
           start_time_2: this.state.mondayStart2,
           end_time_2: this.state.mondayEnd2
         },
-        "1": {
+        1: {
           date: "",
           Day: "Tuesday",
           Type: "Regular",
@@ -330,7 +333,7 @@ export default class LocationManager extends Component {
           start_time_2: this.state.tuesdayStart2,
           end_time_2: this.state.tuesdayEnd2
         },
-        "2": {
+        2: {
           date: "",
           Day: "Wednesday",
           Type: "Regular",
@@ -340,7 +343,7 @@ export default class LocationManager extends Component {
           start_time_2: this.state.wednesdayStart2,
           end_time_2: this.state.wednesdayEnd2
         },
-        "3": {
+        3: {
           date: "",
           Day: "Thursday",
           Type: "Regular",
@@ -350,7 +353,7 @@ export default class LocationManager extends Component {
           start_time_2: this.state.thursdayStart2,
           end_time_2: this.state.thursdayEnd2
         },
-        "4": {
+        4: {
           date: "",
           Day: "Friday",
           Type: "Regular",
@@ -360,7 +363,7 @@ export default class LocationManager extends Component {
           start_time_2: this.state.fridayStart2,
           end_time_2: this.state.fridayEnd2
         },
-        "5": {
+        5: {
           date: "",
           Day: "Saturday",
           Type: "Regular",
@@ -370,7 +373,7 @@ export default class LocationManager extends Component {
           start_time_2: this.state.saturdayStart2,
           end_time_2: this.state.saturdayEnd2
         },
-        "6": {
+        6: {
           date: "",
           Day: "Sunday",
           Type: "Regular",
@@ -388,7 +391,8 @@ export default class LocationManager extends Component {
     //   data,
     //   DjangoConfig
     // )
-    edit_location_operations_hours_by_id(data,DjangoConfig).then(resp => {
+    edit_location_operations_hours_by_id(data, DjangoConfig)
+      .then(resp => {
         console.log(resp);
         this.setState({ hourEdit: false });
         // window.location.reload(false);
@@ -401,7 +405,8 @@ export default class LocationManager extends Component {
         //   data1,
         //   DjangoConfig
         // )
-        location_by_id(data1,DjangoConfig).then(resp1 => {
+        location_by_id(data1, DjangoConfig)
+          .then(resp1 => {
             this.setState({
               hours: resp1.data.location.Df_location_poen_hour,
               operatingHoursLoading: false
@@ -488,7 +493,8 @@ export default class LocationManager extends Component {
     //   data,
     //   DjangoConfig
     // )
-    edit_location_operations_hours_by_id(data,DjangoConfig).then(resp => {
+    edit_location_operations_hours_by_id(data, DjangoConfig)
+      .then(resp => {
         console.log(resp);
         this.setState({ add_special_hour: false });
 
@@ -500,7 +506,8 @@ export default class LocationManager extends Component {
         //   data1,
         //   DjangoConfig
         // )
-        location_by_id(data1,DjangoConfig).then(resp1 => {
+        location_by_id(data1, DjangoConfig)
+          .then(resp1 => {
             this.setState({
               hours: resp1.data.location.Df_location_poen_hour,
               specialTimeLoading: false
@@ -555,7 +562,8 @@ export default class LocationManager extends Component {
       //   data,
       //   DjangoConfig
       // )
-      update_images_by_location_id(data,DjangoConfig).then(resp => {
+      update_images_by_location_id(data, DjangoConfig)
+        .then(resp => {
           const data1 = {
             location_id: locationId
           };
@@ -564,7 +572,8 @@ export default class LocationManager extends Component {
           //   data1,
           //   DjangoConfig
           // )
-          location_by_id(data1,DjangoConfig).then(resp1 => {
+          location_by_id(data1, DjangoConfig)
+            .then(resp1 => {
               this.setState({
                 LocationDetails: resp1.data.location,
                 logoLoading: false,
@@ -605,7 +614,8 @@ export default class LocationManager extends Component {
       //   data,
       //   DjangoConfig
       // )
-      add_other_images_by_location_id(data,DjangoConfig).then(resp => {
+      add_other_images_by_location_id(data, DjangoConfig)
+        .then(resp => {
           const data1 = {
             location_id: locationId
           };
@@ -614,7 +624,8 @@ export default class LocationManager extends Component {
           //   data1,
           //   DjangoConfig
           // )
-          location_by_id(data1,DjangoConfig).then(resp1 => {
+          location_by_id(data1, DjangoConfig)
+            .then(resp1 => {
               this.setState({
                 otherImages: resp1.data.location.Df_location_image,
                 otherImagesLoading: false
@@ -719,43 +730,31 @@ export default class LocationManager extends Component {
 
     paymentAccepted = this.state.payment.map(p => (
       <li key={p.id}>
-        <ul>
-          {p.Payment_Method == "Visa" ? (
-            <li>
-              <img src={require("../images/visa.jpg")} alt="visa" />
-            </li>
-          ) : (
-            ""
-          )}
-          {p.Payment_Method == "Maestro" ? (
-            <li style={{ marginLeft: 0 }}>
-              <img src={require("../images/master-1.jpg")} alt="master" />
-            </li>
-          ) : (
-            ""
-          )}
-          {p.Payment_Method == "DiscoverNetwork" ? (
-            <li style={{ marginLeft: 0 }}>
-              <img src={require("../images/descover.jpg")} alt="discover" />
-            </li>
-          ) : (
-            ""
-          )}
-          {p.Payment_Method == "Cirrus" ? (
-            <li style={{ marginLeft: 0 }}>
-              <img src={require("../images/cirrus.jpg")} alt="cirrus" />
-            </li>
-          ) : (
-            ""
-          )}
-          {p.Payment_Method == "AmericanExpress" ? (
-            <li style={{ marginLeft: 0 }}>
-              <img src={require("../images/am.jpg")} alt="amex" />
-            </li>
-          ) : (
-            ""
-          )}
-        </ul>
+        {p.Payment_Method == "Visa" ? (
+          <img src={require("../images/visa.jpg")} alt="visa" />
+        ) : (
+          ""
+        )}
+        {p.Payment_Method == "Maestro" ? (
+          <img src={require("../images/master-1.jpg")} alt="master" />
+        ) : (
+          ""
+        )}
+        {p.Payment_Method == "DiscoverNetwork" ? (
+          <img src={require("../images/descover.jpg")} alt="discover" />
+        ) : (
+          ""
+        )}
+        {p.Payment_Method == "Cirrus" ? (
+          <img src={require("../images/cirrus.jpg")} alt="cirrus" />
+        ) : (
+          ""
+        )}
+        {p.Payment_Method == "AmericanExpress" ? (
+          <img src={require("../images/am.jpg")} alt="amex" />
+        ) : (
+          ""
+        )}
       </li>
     ));
 
@@ -768,21 +767,188 @@ export default class LocationManager extends Component {
       <div>
         {/* <div className="content-page"> */}
 
-        {this.state.loader ? 
-        <div className="rightside_title">
-         <Spinner />
-         </div> :
-        <div className="main_content">
+        {this.state.loader ? (
           <div className="rightside_title">
-            <h1>Business Information</h1>
+            <Spinner />
           </div>
+        ) : (
+          <div className="main_content">
+            <div className="rightside_title">
+              <h1>Business Information</h1>
+            </div>
 
-          <div className="mt-30">
-            <div className="white_bg_location">
-              <div className="row">
-                <div className="col-md-3">
-                  <div className="uploadlogo">
-                    {this.state.logoLoading ? (
+            <div className="mt-30">
+              <div className="">
+                <div className="row">
+                  <div className="col-md-4">
+                    <div className="white-shadow">
+                      <div className="logo-business">
+                        <h2 className="analytics_btnx">
+                          {this.state.name}
+                          <button className="last_btn">Edit</button>
+                        </h2>
+                        {this.state.logoLoading ? (
+                          <div style={{ textAlign: "center" }}>
+                            <Loader
+                              type="Oval"
+                              color="#00BFFF"
+                              height={30}
+                              width={30}
+                              // timeout={3000} //3 secs
+                            />
+                          </div>
+                        ) : LocationDetails.Business_Logo ? (
+                          <div className="uploadphoto pt-15">
+                            <img
+                              src={LocationDetails.Business_Logo}
+                              alt="Logo"
+                            />
+                          </div>
+                        ) : (
+                          <div className="uploadphoto pt-15">
+                            <div>
+                              <i className="zmdi zmdi-cloud-upload"></i>
+                              <h3>Upload logo</h3>
+                              <input
+                                type="file"
+                                name="Business_Logo"
+                                onChange={this.onUploadLogo("Business_Logo")}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="detailbox">
+                          <div className="uploadauthor">
+                            <div className="author_namebox">Store Code :</div>
+                            <div className="storetext">
+                              {this.state.storeCode}
+                            </div>
+                          </div>
+
+                          <div className="uploadauthor">
+                            <div className="author_namebox">Category :</div>
+                            <div className="storetext">
+                              {this.state.category}
+                            </div>
+                          </div>
+
+                          <div className="uploadauthor">
+                            <div className="author_namebox">Address :</div>
+                            <div className="storetext">
+                              {" "}
+                              {this.state.city}, {this.state.state}{" "}
+                              {this.state.postalCode}
+                            </div>
+                          </div>
+                          <div className="uploadauthor">
+                            <div className="author_namebox">Phone :</div>
+                            <div className="storetext">{this.state.phone}</div>
+                          </div>
+
+                          <div className="uploadauthor">
+                            <div className="author_namebox">Website :</div>
+                            <div className="storetext">
+                              {this.state.website}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    <div className="upload_text white-shadow">
+                      <h2 className="analytics_btnx">
+                        {this.state.name}
+                        <button className="last_btn">Edit</button>
+                      </h2>
+                      <div className="pt-15">
+                        <h3>About the business</h3>
+                        <p>{this.state.about}</p>
+                        <div className="detailbox">
+                          <div className="uploadauthor">
+                            <div className="author_namebox">
+                              Bussiness owner name :
+                            </div>
+                            <div className="storetext">
+                              {this.state.ownerName}
+                            </div>
+                          </div>
+
+                          <div className="uploadauthor">
+                            <div className="author_namebox">Owner email :</div>
+                            <div className="storetext">
+                              {this.state.ownerEmail}
+                            </div>
+                          </div>
+
+                          <div className="uploadauthor">
+                            <div className="author_namebox">
+                              Bussiness tagline :
+                            </div>
+                            <div className="storetext">
+                              {" "}
+                              {this.state.city}, {this.state.businessTagline}{" "}
+                              {this.state.postalCode}
+                            </div>
+                          </div>
+                          <div className="uploadauthor">
+                            <div className="author_namebox">
+                              Year of incorporation :
+                            </div>
+                            <div className="storetext">
+                              {this.state.yearOfIncorp}
+                            </div>
+                          </div>
+
+                          <div className="uploadauthor">
+                            <div className="author_namebox">Website :</div>
+                            <div className="storetext">
+                              {this.state.website}
+                            </div>
+                          </div>
+                        </div>
+                        <ul className="socialicon-new">
+                          {/* <li>
+                            <a href="#">
+                              <img
+                                src={require("../images/icon-1.png")}
+                                alt=""
+                              />
+                            </a>
+                          </li> */}
+                          <li>
+                            <a href={this.state.facebookProfile}>
+                              <img
+                                src={require("../images/icon-2.png")}
+                                alt="Facebook"
+                              />
+                            </a>
+                          </li>
+                          <li>
+                            <a href={this.state.instagramProfile}>
+                              <img
+                                src={require("../images/icon-3.png")}
+                                alt="Instagram"
+                              />
+                            </a>
+                          </li>
+                          <li>
+                            <a href={this.state.twitterProfile}>
+                              <img
+                                src={require("../images/icon-4.png")}
+                                alt="Twitter"
+                              />
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="col-md-4">
+                    {this.state.operatingHoursLoading ? (
                       <div style={{ textAlign: "center" }}>
                         <Loader
                           type="Oval"
@@ -792,64 +958,749 @@ export default class LocationManager extends Component {
                           // timeout={3000} //3 secs
                         />
                       </div>
-                    ) : LocationDetails.Business_Logo ? (
-                      <img src={LocationDetails.Business_Logo} alt="Logo" />
+                    ) : this.state.hourEdit ? (
+                      <div className="form-group">
+                        <div className="timebox">
+                          <div className="form-day">MONDAY</div>
+                          <select
+                            name="monday"
+                            onChange={this.changeHandler}
+                            className="form-control colorselector"
+                          >
+                            <option>Select hours</option>
+                            <option value="OPEN">OPEN</option>
+                            <option value="SPLIT">SPLIT</option>
+                            <option value="OPEN 24x7">OPEN_24x7</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+
+                          <div className="output">
+                            {this.state.monday == "OPEN" ? (
+                              <div>
+                                <p className="basicExample">
+                                  {console.log("time")}
+
+                                  <input
+                                    name="mondayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="mondayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>{" "}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            {this.state.monday == "SPLIT" ? (
+                              <div>
+                                <p className="basicExample">
+                                  <input
+                                    name="mondayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="mondayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="mondayStart2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="mondayEnd2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="timebox">
+                          <div className="form-day">TUESDAY </div>
+                          <select
+                            name="tuesday"
+                            onChange={this.changeHandler}
+                            className="form-control colorselector"
+                          >
+                            <option>Select hours</option>
+                            <option value="OPEN">OPEN</option>
+                            <option value="SPLIT">SPLIT</option>
+                            <option value="OPEN 24x7">OPEN_24x7</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+
+                          <div className="output">
+                            {this.state.tuesday == "OPEN" ? (
+                              <div>
+                                <p className="basicExample">
+                                  {console.log("time")}
+
+                                  <input
+                                    name="tuesdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="tuesdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>{" "}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            {this.state.tuesday == "SPLIT" ? (
+                              <div>
+                                <p className="basicExample">
+                                  <input
+                                    name="tuesdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="tuesdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="tuesdayStart2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="tuesdayEnd2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="timebox">
+                          <div className="form-day">WEDNESDAY</div>
+                          <select
+                            name="wednesday"
+                            onChange={this.changeHandler}
+                            className="form-control colorselector"
+                          >
+                            <option>Select hours</option>
+                            <option value="OPEN">OPEN</option>
+                            <option value="SPLIT">SPLIT</option>
+                            <option value="OPEN 24x7">OPEN_24x7</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+
+                          <div className="output">
+                            {this.state.wednesday == "OPEN" ? (
+                              <div>
+                                <p className="basicExample">
+                                  {console.log("time")}
+
+                                  <input
+                                    name="wednesdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="wednesdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>{" "}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            {this.state.wednesday == "SPLIT" ? (
+                              <div>
+                                <p className="basicExample">
+                                  <input
+                                    name="wednesdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="wednesdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="wednesdayStart2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="wednesdayEnd2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="timebox">
+                          <div className="form-day"> THURSDAY</div>
+                          <select
+                            name="thursday"
+                            onChange={this.changeHandler}
+                            className="form-control colorselector"
+                          >
+                            <option>Select hours</option>
+                            <option value="OPEN">OPEN</option>
+                            <option value="SPLIT">SPLIT</option>
+                            <option value="OPEN 24x7">OPEN_24x7</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+
+                          <div className="output">
+                            {this.state.thursday == "OPEN" ? (
+                              <div>
+                                <p className="basicExample">
+                                  {console.log("time")}
+
+                                  <input
+                                    name="thursdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="thursdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>{" "}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            {this.state.thursday == "SPLIT" ? (
+                              <div>
+                                <p className="basicExample">
+                                  <input
+                                    name="thursdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="thursdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="thursdayStart2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="thursdayEnd2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="timebox">
+                          <div className="form-day"> FRIDAY</div>
+                          <select
+                            name="friday"
+                            onChange={this.changeHandler}
+                            className="form-control colorselector"
+                          >
+                            <option>Select hours</option>
+                            <option value="OPEN">OPEN</option>
+                            <option value="SPLIT">SPLIT</option>
+                            <option value="OPEN 24x7">OPEN_24x7</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+
+                          <div className="output">
+                            {this.state.friday == "OPEN" ? (
+                              <div>
+                                <p className="basicExample">
+                                  {console.log("time")}
+
+                                  <input
+                                    name="fridayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="fridayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>{" "}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            {this.state.friday == "SPLIT" ? (
+                              <div>
+                                <p className="basicExample">
+                                  <input
+                                    name="fridayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="fridayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="fridayStart2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="fridayEnd2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="timebox">
+                          <div className="form-day">SATURDAY</div>
+                          <select
+                            name="saturday"
+                            onChange={this.changeHandler}
+                            className="form-control colorselector"
+                          >
+                            <option>Select hours</option>
+                            <option value="OPEN">OPEN</option>
+                            <option value="SPLIT">SPLIT</option>
+                            <option value="OPEN 24x7">OPEN_24x7</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+
+                          <div className="output">
+                            {this.state.saturday == "OPEN" ? (
+                              <div>
+                                <p className="basicExample">
+                                  {console.log("time")}
+
+                                  <input
+                                    name="saturdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="saturdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>{" "}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            {this.state.saturday == "SPLIT" ? (
+                              <div>
+                                <p className="basicExample">
+                                  <input
+                                    name="saturdayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="saturdayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="saturdayStart2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="saturdayEnd2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="timebox">
+                          <div className="form-day">SUNDAY</div>
+                          <select
+                            name="sunday"
+                            onChange={this.changeHandler}
+                            className="form-control colorselector"
+                          >
+                            <option>Select hours</option>
+                            <option value="OPEN">OPEN</option>
+                            <option value="SPLIT">SPLIT</option>
+                            <option value="OPEN 24x7">OPEN_24x7</option>
+                            <option value="CLOSED">CLOSED</option>
+                          </select>
+
+                          <div className="output">
+                            {this.state.sunday == "OPEN" ? (
+                              <div>
+                                <p className="basicExample">
+                                  {console.log("time")}
+
+                                  <input
+                                    name="sundayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="sundayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>{" "}
+                              </div>
+                            ) : (
+                              ""
+                            )}
+
+                            {this.state.sunday == "SPLIT" ? (
+                              <div>
+                                <p className="basicExample">
+                                  <input
+                                    name="sundayStart1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="sundayEnd1"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="sundayStart2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+
+                                  <input
+                                    name="sundayEnd2"
+                                    onChange={this.changeHandler}
+                                    type="time"
+                                    className="time end form-control "
+                                    defaultValue="12:00 AM"
+                                  />
+                                </p>
+                              </div>
+                            ) : (
+                              ""
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="business-cover text-center">
+                          <button
+                            type="submit"
+                            className="last_btn"
+                            onClick={this.updateHourButton}
+                          >
+                            Update
+                          </button>
+                        </div>
+                      </div>
                     ) : (
-                      <div className="uploadphoto">
-                        <i className="zmdi zmdi-cloud-upload"></i>
-                        <h3>Upload logo</h3>
-                        <input
-                          type="file"
-                          name="Business_Logo"
-                          onChange={this.onUploadLogo("Business_Logo")}
-                        />
+                      <div className="analytics-whice white-shadow">
+                        <div className="box-space">
+                          <h2 className="analytics_btnx">
+                            Operations Hours
+                            <button
+                              className="last_btn"
+                              onClick={this.editHourButton}
+                            >
+                              Edit
+                            </button>{" "}
+                          </h2>
+                        </div>
+
+                        {RegularHours1}
+
+                        {this.state.specialTimeLoading ? (
+                          <div style={{ textAlign: "center" }}>
+                            <Loader
+                              type="Oval"
+                              color="#00BFFF"
+                              height={30}
+                              width={30}
+                              // timeout={3000} //3 secs
+                            />
+                          </div>
+                        ) : this.state.add_special_hour ? (
+                          <div className="form-group">
+                            <div className="timebox">
+                              {/* <div className="form-day">MONDAY</div> */}
+
+                              <select
+                                name="monday_s"
+                                onChange={this.changeHandler}
+                                className="form-control colorselector"
+                              >
+                                <option>Select hours</option>
+                                <option value="OPEN">OPEN</option>
+                                <option value="SPLIT">SPLIT</option>
+                                <option value="OPEN 24x7">OPEN_24x7</option>
+                                <option value="CLOSED">CLOSED</option>
+                              </select>
+
+                              <div className="output">
+                                {this.state.monday_s == "OPEN" ? (
+                                  <div>
+                                    <p className="basicExample">
+                                      {console.log("time")}
+
+                                      <input
+                                        name="mondayStart1_s"
+                                        onChange={this.changeHandler}
+                                        type="time"
+                                        className="time form-control "
+                                        defaultValue="12:00 AM"
+                                      />
+
+                                      <input
+                                        name="mondayEnd1_s"
+                                        onChange={this.changeHandler}
+                                        type="time"
+                                        className="time end form-control "
+                                        defaultValue="12:00 AM"
+                                      />
+                                    </p>{" "}
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+
+                                {this.state.monday_s == "SPLIT" ? (
+                                  <div>
+                                    <p className="basicExample">
+                                      <input
+                                        name="mondayStart1_s"
+                                        onChange={this.changeHandler}
+                                        type="time"
+                                        className="time form-control "
+                                        defaultValue="12:00 AM"
+                                      />
+
+                                      <input
+                                        name="mondayEnd1_s"
+                                        onChange={this.changeHandler}
+                                        type="time"
+                                        className="time end form-control "
+                                        defaultValue="12:00 AM"
+                                      />
+
+                                      <input
+                                        name="mondayStart2_s"
+                                        onChange={this.changeHandler}
+                                        type="time"
+                                        className="time form-control "
+                                        defaultValue="12:00 AM"
+                                      />
+
+                                      <input
+                                        name="mondayEnd2_s"
+                                        onChange={this.changeHandler}
+                                        type="time"
+                                        className="time end form-control "
+                                        defaultValue="12:00 AM"
+                                      />
+                                    </p>
+                                  </div>
+                                ) : (
+                                  ""
+                                )}
+                                <input
+                                  name="monday_day_s"
+                                  onChange={this.changeHandler}
+                                  type="date"
+                                  className="time end form-control "
+                                  defaultValue=""
+                                />
+                              </div>
+                            </div>
+                            <div className="business-cover text-center">
+                              <button
+                                type="submit"
+                                className="last_btn"
+                                onClick={this.addSpecialHourButton}
+                              >
+                                Update
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <div>
+                            <div className="add-a-spacial box-space">
+                              <a
+                                className="last_btn"
+                                onClick={this.editSpecialHourButton}
+                              >
+                                Add a special Hour
+                              </a>
+                            </div>
+
+                            {RegularHours2}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
                 </div>
-
-                <div className="col-md-6">
-                  <div className="upload_text">
-                    <h4>{this.state.name}</h4>
-
-                    <div className="uploadauthor">
-                      <div className="author_namebox">Store Code :</div>
-                      <div className="storetext">{this.state.storeCode}</div>
-                    </div>
-
-                    <div className="uploadauthor">
-                      <div className="author_namebox">Category :</div>
-                      <div className="storetext">{this.state.category}</div>
-                    </div>
-
-                    <div className="uploadauthor">
-                      <div className="author_namebox">Address :</div>
-                      <div className="storetext">
-                        {" "}
-                        {this.state.city}, {this.state.state}{" "}
-                        {this.state.postalCode}
-                      </div>
-                    </div>
-                    <div className="uploadauthor">
-                      <div className="author_namebox">Phone :</div>
-                      <div className="storetext">{this.state.phone}</div>
-                    </div>
-
-                    <div className="uploadauthor">
-                      <div className="author_namebox">Website :</div>
-                      <div className="storetext">{this.state.website}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="col-md-3 text-right">
-                  <img src={require("../images/map.jpg")} alt="map" />
-                </div>
               </div>
             </div>
-          </div>
 
-          <div className="mt-30">
+            {/*} <div className="mt-30">
             <div className="row">
               <div className="col-md-8">
                 {this.state.businessDetailsLoading ? (
@@ -1014,7 +1865,7 @@ export default class LocationManager extends Component {
 
                     <div className="promotional-box">
                       <ul className="socailicon">
-                        {/* <li><a href="#"><img src={require('../images/yelp.png')}/></a></li> */}
+                       
                         <li>
                           <a href={this.state.facebookProfile}>
                             <img src={require("../images/facebook.png")} />
@@ -1148,8 +1999,26 @@ export default class LocationManager extends Component {
                 </div>
               </div>
 
-              <div className="col-md-4">
-                {this.state.operatingHoursLoading ? (
+              
+              
+            </div>
+          </div>*/}
+
+            <div className="mt-30">
+              <div className="light-blue">
+                <div className="box-space">
+                  <h2 className="analytics_btnx">
+                    Payment Method
+                    <button
+                      className="pay_last_btn"
+                      onClick={this.editPaymentButton}
+                    >
+                      Edit
+                    </button>{" "}
+                  </h2>
+                </div>
+
+                {this.state.paymentLoading ? (
                   <div style={{ textAlign: "center" }}>
                     <Loader
                       type="Oval"
@@ -1159,930 +2028,202 @@ export default class LocationManager extends Component {
                       // timeout={3000} //3 secs
                     />
                   </div>
-                ) : this.state.hourEdit ? (
-                  <div className="form-group">
-                    <div className="timebox">
-                      <div className="form-day">MONDAY</div>
-                      <select
-                        name="monday"
-                        onChange={this.changeHandler}
-                        className="form-control colorselector"
-                      >
-                        <option>Select hours</option>
-                        <option value="OPEN">OPEN</option>
-                        <option value="SPLIT">SPLIT</option>
-                        <option value="OPEN 24x7">OPEN_24x7</option>
-                        <option value="CLOSED">CLOSED</option>
-                      </select>
+                ) : this.state.paymentEdit ? (
+                  <div className="mathedbox">
+                    <form onSubmit={this.editDetailsHandler}>
+                      <div className="paymentbox">
+                        <ul>
+                          <li>
+                            <input
+                              name="visa"
+                              type="checkbox"
+                              onChange={this.checkBoxHandler}
+                              value="true"
+                            />{" "}
+                            <img
+                              src={require("../images/visa.jpg")}
+                              alt="visa"
+                            />
+                          </li>
 
-                      <div className="output">
-                        {this.state.monday == "OPEN" ? (
-                          <div>
-                            <p className="basicExample">
-                              {console.log("time")}
-
-                              <input
-                                name="mondayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="mondayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>{" "}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-
-                        {this.state.monday == "SPLIT" ? (
-                          <div>
-                            <p className="basicExample">
-                              <input
-                                name="mondayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="mondayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="mondayStart2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="mondayEnd2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>
-                          </div>
-                        ) : (
-                          ""
-                        )}
+                          <li>
+                            <input
+                              name="maestro"
+                              onChange={this.checkBoxHandler}
+                              value="true"
+                              type="checkbox"
+                            />{" "}
+                            <img
+                              src={require("../images/master-1.jpg")}
+                              alt="visa"
+                            />
+                          </li>
+                          <li>
+                            <input
+                              name="discover"
+                              onChange={this.checkBoxHandler}
+                              value="true"
+                              type="checkbox"
+                            />{" "}
+                            <img
+                              src={require("../images/descover.jpg")}
+                              alt="visa"
+                            />
+                          </li>
+                          <li>
+                            <input
+                              name="cirrus"
+                              onChange={this.checkBoxHandler}
+                              value="true"
+                              type="checkbox"
+                            />{" "}
+                            <img
+                              src={require("../images/cirrus.jpg")}
+                              alt="visa"
+                            />
+                          </li>
+                          <li>
+                            <input
+                              name="americanExpress"
+                              onChange={this.checkBoxHandler}
+                              value="true"
+                              type="checkbox"
+                            />{" "}
+                            <img src={require("../images/am.jpg")} alt="visa" />
+                          </li>
+                          <li className="plushbtnbox">
+                            <a className="add_btnnew">
+                              <i className="zmdi zmdi-plus"></i>
+                            </a>
+                          </li>
+                        </ul>
                       </div>
-                    </div>
 
-                    <div className="timebox">
-                      <div className="form-day">TUESDAY </div>
-                      <select
-                        name="tuesday"
-                        onChange={this.changeHandler}
-                        className="form-control colorselector"
-                      >
-                        <option>Select hours</option>
-                        <option value="OPEN">OPEN</option>
-                        <option value="SPLIT">SPLIT</option>
-                        <option value="OPEN 24x7">OPEN_24x7</option>
-                        <option value="CLOSED">CLOSED</option>
-                      </select>
-
-                      <div className="output">
-                        {this.state.tuesday == "OPEN" ? (
-                          <div>
-                            <p className="basicExample">
-                              {console.log("time")}
-
-                              <input
-                                name="tuesdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="tuesdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>{" "}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-
-                        {this.state.tuesday == "SPLIT" ? (
-                          <div>
-                            <p className="basicExample">
-                              <input
-                                name="tuesdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="tuesdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="tuesdayStart2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="tuesdayEnd2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="timebox">
-                      <div className="form-day">WEDNESDAY</div>
-                      <select
-                        name="wednesday"
-                        onChange={this.changeHandler}
-                        className="form-control colorselector"
-                      >
-                        <option>Select hours</option>
-                        <option value="OPEN">OPEN</option>
-                        <option value="SPLIT">SPLIT</option>
-                        <option value="OPEN 24x7">OPEN_24x7</option>
-                        <option value="CLOSED">CLOSED</option>
-                      </select>
-
-                      <div className="output">
-                        {this.state.wednesday == "OPEN" ? (
-                          <div>
-                            <p className="basicExample">
-                              {console.log("time")}
-
-                              <input
-                                name="wednesdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="wednesdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>{" "}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-
-                        {this.state.wednesday == "SPLIT" ? (
-                          <div>
-                            <p className="basicExample">
-                              <input
-                                name="wednesdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="wednesdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="wednesdayStart2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="wednesdayEnd2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="timebox">
-                      <div className="form-day"> THURSDAY</div>
-                      <select
-                        name="thursday"
-                        onChange={this.changeHandler}
-                        className="form-control colorselector"
-                      >
-                        <option>Select hours</option>
-                        <option value="OPEN">OPEN</option>
-                        <option value="SPLIT">SPLIT</option>
-                        <option value="OPEN 24x7">OPEN_24x7</option>
-                        <option value="CLOSED">CLOSED</option>
-                      </select>
-
-                      <div className="output">
-                        {this.state.thursday == "OPEN" ? (
-                          <div>
-                            <p className="basicExample">
-                              {console.log("time")}
-
-                              <input
-                                name="thursdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="thursdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>{" "}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-
-                        {this.state.thursday == "SPLIT" ? (
-                          <div>
-                            <p className="basicExample">
-                              <input
-                                name="thursdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="thursdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="thursdayStart2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="thursdayEnd2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="timebox">
-                      <div className="form-day"> FRIDAY</div>
-                      <select
-                        name="friday"
-                        onChange={this.changeHandler}
-                        className="form-control colorselector"
-                      >
-                        <option>Select hours</option>
-                        <option value="OPEN">OPEN</option>
-                        <option value="SPLIT">SPLIT</option>
-                        <option value="OPEN 24x7">OPEN_24x7</option>
-                        <option value="CLOSED">CLOSED</option>
-                      </select>
-
-                      <div className="output">
-                        {this.state.friday == "OPEN" ? (
-                          <div>
-                            <p className="basicExample">
-                              {console.log("time")}
-
-                              <input
-                                name="fridayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="fridayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>{" "}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-
-                        {this.state.friday == "SPLIT" ? (
-                          <div>
-                            <p className="basicExample">
-                              <input
-                                name="fridayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="fridayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="fridayStart2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="fridayEnd2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="timebox">
-                      <div className="form-day">SATURDAY</div>
-                      <select
-                        name="saturday"
-                        onChange={this.changeHandler}
-                        className="form-control colorselector"
-                      >
-                        <option>Select hours</option>
-                        <option value="OPEN">OPEN</option>
-                        <option value="SPLIT">SPLIT</option>
-                        <option value="OPEN 24x7">OPEN_24x7</option>
-                        <option value="CLOSED">CLOSED</option>
-                      </select>
-
-                      <div className="output">
-                        {this.state.saturday == "OPEN" ? (
-                          <div>
-                            <p className="basicExample">
-                              {console.log("time")}
-
-                              <input
-                                name="saturdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="saturdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>{" "}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-
-                        {this.state.saturday == "SPLIT" ? (
-                          <div>
-                            <p className="basicExample">
-                              <input
-                                name="saturdayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="saturdayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="saturdayStart2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="saturdayEnd2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="timebox">
-                      <div className="form-day">SUNDAY</div>
-                      <select
-                        name="sunday"
-                        onChange={this.changeHandler}
-                        className="form-control colorselector"
-                      >
-                        <option>Select hours</option>
-                        <option value="OPEN">OPEN</option>
-                        <option value="SPLIT">SPLIT</option>
-                        <option value="OPEN 24x7">OPEN_24x7</option>
-                        <option value="CLOSED">CLOSED</option>
-                      </select>
-
-                      <div className="output">
-                        {this.state.sunday == "OPEN" ? (
-                          <div>
-                            <p className="basicExample">
-                              {console.log("time")}
-
-                              <input
-                                name="sundayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="sundayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>{" "}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-
-                        {this.state.sunday == "SPLIT" ? (
-                          <div>
-                            <p className="basicExample">
-                              <input
-                                name="sundayStart1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="sundayEnd1"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="sundayStart2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time form-control "
-                                defaultValue="12:00 AM"
-                              />
-
-                              <input
-                                name="sundayEnd2"
-                                onChange={this.changeHandler}
-                                type="time"
-                                className="time end form-control "
-                                defaultValue="12:00 AM"
-                              />
-                            </p>
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="business-cover text-center">
-                      <button
-                        type="submit"
-                        className="last_btn"
-                        onClick={this.updateHourButton}
-                      >
-                        Update
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="analytics-whice">
-                    <div className="box-space">
-                      <h2 className="analytics_btnx">
-                        Operations Hours
-                        <button
-                          className="last_btn"
-                          onClick={this.editHourButton}
-                        >
-                          <i className="zmdi zmdi-edit"></i> Edit
-                        </button>{" "}
-                      </h2>
-                    </div>
-
-                    {RegularHours1}
-                  </div>
-                )}
-
-                {/* Add special hour */}
-
-                <div className="analytics-whice mt-30">
-                  <div className="add-a-spacial">
-                    <a href="#">Add a special Hour</a>
-                  </div>
-
-                  {this.state.specialTimeLoading ? (
-                    <div style={{ textAlign: "center" }}>
-                      <Loader
-                        type="Oval"
-                        color="#00BFFF"
-                        height={30}
-                        width={30}
-                        // timeout={3000} //3 secs
-                      />
-                    </div>
-                  ) : this.state.add_special_hour ? (
-                    <div className="form-group">
-                      <div className="timebox">
-                        {/* <div className="form-day">MONDAY</div> */}
-
-                        <select
-                          name="monday_s"
-                          onChange={this.changeHandler}
-                          className="form-control colorselector"
-                        >
-                          <option>Select hours</option>
-                          <option value="OPEN">OPEN</option>
-                          <option value="SPLIT">SPLIT</option>
-                          <option value="OPEN 24x7">OPEN_24x7</option>
-                          <option value="CLOSED">CLOSED</option>
-                        </select>
-
-                        <div className="output">
-                          {this.state.monday_s == "OPEN" ? (
-                            <div>
-                              <p className="basicExample">
-                                {console.log("time")}
-
-                                <input
-                                  name="mondayStart1_s"
-                                  onChange={this.changeHandler}
-                                  type="time"
-                                  className="time form-control "
-                                  defaultValue="12:00 AM"
-                                />
-
-                                <input
-                                  name="mondayEnd1_s"
-                                  onChange={this.changeHandler}
-                                  type="time"
-                                  className="time end form-control "
-                                  defaultValue="12:00 AM"
-                                />
-                              </p>{" "}
-                            </div>
-                          ) : (
-                            ""
-                          )}
-
-                          {this.state.monday_s == "SPLIT" ? (
-                            <div>
-                              <p className="basicExample">
-                                <input
-                                  name="mondayStart1_s"
-                                  onChange={this.changeHandler}
-                                  type="time"
-                                  className="time form-control "
-                                  defaultValue="12:00 AM"
-                                />
-
-                                <input
-                                  name="mondayEnd1_s"
-                                  onChange={this.changeHandler}
-                                  type="time"
-                                  className="time end form-control "
-                                  defaultValue="12:00 AM"
-                                />
-
-                                <input
-                                  name="mondayStart2_s"
-                                  onChange={this.changeHandler}
-                                  type="time"
-                                  className="time form-control "
-                                  defaultValue="12:00 AM"
-                                />
-
-                                <input
-                                  name="mondayEnd2_s"
-                                  onChange={this.changeHandler}
-                                  type="time"
-                                  className="time end form-control "
-                                  defaultValue="12:00 AM"
-                                />
-                              </p>
-                            </div>
-                          ) : (
-                            ""
-                          )}
-                          <input
-                            name="monday_day_s"
-                            onChange={this.changeHandler}
-                            type="date"
-                            className="time end form-control "
-                            defaultValue=""
-                          />
-                        </div>
-                      </div>
                       <div className="business-cover text-center">
                         <button
                           type="submit"
                           className="last_btn"
-                          onClick={this.addSpecialHourButton}
+                          onClick={this.updatePaymentButton}
                         >
                           Update
                         </button>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="analytics-whice">
-                      <div className="box-space">
-                        <h2 className="analytics_btnx">
-                          Special Time Opening
-                          <button
-                            className="last_btn"
-                            onClick={this.editSpecialHourButton}
-                          >
-                            <i className="zmdi zmdi-edit"></i> Edit
-                          </button>{" "}
-                        </h2>
-                      </div>
-
-                      {RegularHours2}
-                    </div>
-                  )}
-
-                  {/* ending of special hour */}
-                </div>
+                    </form>
+                  </div>
+                ) : (
+                  <div className="paymentbox">
+                    <ul>
+                      {paymentAccepted}
+                      <li className="plushbtnbox">
+                        <a
+                          className="add_btnnew"
+                          onClick={this.editPaymentButton}
+                        >
+                          <i className="zmdi zmdi-plus"></i>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
 
-          <div className="mt-30">
-            <div className="row">
-              <div className="col-md-4">
-                <div className="business-cover">
-                  <h3>Business covers image</h3>
-                  <div className="coverimgupload">
-                    {this.state.coverImageLoading ? (
-                      <div style={{ textAlign: "center" }}>
-                        <Loader
-                          type="Oval"
-                          color="#00BFFF"
-                          height={30}
-                          width={30}
-                          // timeout={3000} //3 secs
-                        />
-                      </div>
-                    ) : LocationDetails.Business_Cover_Image ? (
-                      <img
-                        src={LocationDetails.Business_Cover_Image}
-                        alt="Cover image"
-                      />
-                    ) : (
-                      <div className="coverocn">
-                        <i className="zmdi zmdi-image"></i>
-                        <h4>Attatch a image</h4>
-                        <input
-                          type="file"
-                          name="Business_Cover_Image"
-                          onChange={this.onUploadLogo("Business_Cover_Image")}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="col-md-8">
-                <div className="business-cover">
-                  <h3>Starred Business covers image</h3>
-                  <div className="row">
-                    {this.state.otherImagesLoading ? (
-                      <div style={{ textAlign: "center" }}>
-                        <Loader
-                          type="Oval"
-                          color="#00BFFF"
-                          height={30}
-                          width={30}
-                          // timeout={3000} //3 secs
-                        />
-                      </div>
-                    ) : (
-                      this.state.otherImageLength.map((n, i) =>
-                        // console.log(
-                        //   "image check",
-                        //   this.state.otherImages[0] == undefined
-                        //     ? "undefined"
-                        //     : this.state.otherImages[0]
-                        // )
-                        this.state.otherImages[i] != undefined ? (
-                          <div className="col-md-3">
-                            <div className="imgup">
-                              {this.state.otherImages[i].Image ? <img
-                                height="100"
-                                width="100"
-                                src={this.state.otherImages[i].Image}  
-                              /> : <h5>Starred Business Cover Image</h5> }
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="col-md-3">
-                            <div className="staresd">
-                              <div className="imgup">
-                                <i className="zmdi zmdi-image"></i>
-                                <input
-                                  type="file"
-                                  name="otherImage"
-                                  onChange={this.onUploadOtherImage}
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      )
-                    )}
-
-                    {/* {LocationDetails.Df_location_image ? 
-                    LocationDetails.Df_location_image.map((image, i) => (
-                        <div className="col-md-3">
-                      <div className="staresd"><div className="imgup">
-                          <img
-                            src={image.Image}
-                            alt="Starred Business covers image"
+            <div className="mt-30">
+              <div className="row">
+                <div className="col-md-4">
+                  <div className="business-cover">
+                    <h3>Business covers image</h3>
+                    <div>
+                      {this.state.coverImageLoading ? (
+                        <div style={{ textAlign: "center" }}>
+                          <Loader
+                            type="Oval"
+                            color="#00BFFF"
+                            height={30}
+                            width={30}
+                            // timeout={3000} //3 secs
                           />
-                        </div></div>
-                    </div>
-                    )) : <div className="col-md-3">
-                      <div className="staresd"><div className="imgup">
-                    <i className="zmdi zmdi-image"></i>
-                    <input type="file" />
-                  </div></div>
-                    </div>} */}
-
-                    {/* <div className="col-md-3">
-                      <div className="staresd">
-                        <div className="imgup">
-                          <i className="zmdi zmdi-image"></i>
-                          <input type="file" />
                         </div>
+                      ) : LocationDetails.Business_Cover_Image ? (
+                        <div className="coverimgupload">
+                          <img
+                            src={LocationDetails.Business_Cover_Image}
+                            alt="Cover image"
+                          />
+                        </div>
+                      ) : (
+                        <div className="plush_new">
+                          <span>
+                            <i className="zmdi zmdi-plus"></i>
+                            Attatch a image
+                            <input
+                              type="file"
+                              name="Business_Cover_Image"
+                              onChange={this.onUploadLogo(
+                                "Business_Cover_Image"
+                              )}
+                            />
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-8">
+                  <div className="business-cover">
+                    <h3>Starred Business covers image</h3>
+                    <div className="row">
+                      <div className="col-md-12">
+                        <ul className="shared-business">
+                          {this.state.otherImagesLoading ? (
+                            <div style={{ textAlign: "center" }}>
+                              <Loader
+                                type="Oval"
+                                color="#00BFFF"
+                                height={30}
+                                width={30}
+                                // timeout={3000} //3 secs
+                              />
+                            </div>
+                          ) : (
+                            this.state.otherImageLength.map((n, i) =>
+                              this.state.otherImages[i] != undefined ? (
+                                <li>
+                                  <span>
+                                    <div className="coverimgupload">
+                                      <img
+                                        src={this.state.otherImages[i].Image}
+                                        alt="Starred Business covers image"
+                                      />
+                                    </div>
+                                  </span>
+                                </li>
+                              ) : (
+                                <li>
+                                  <div className="plush_new">
+                                    <span>
+                                      <i className="zmdi zmdi-plus"></i>
+                                      Attatch a image
+                                      <input
+                                        type="file"
+                                        name="otherImage"
+                                        onChange={this.onUploadOtherImage}
+                                      />
+                                    </span>
+                                  </div>
+                                </li>
+                              )
+                            )
+                          )}
+                        </ul>
                       </div>
                     </div>
-
-                    <div className="col-md-3">
-                      <div className="staresd">
-                        <div className="imgup">
-                          <i className="zmdi zmdi-image"></i>
-                          <input type="file" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-3">
-                      <div className="staresd">
-                        <div className="imgup">
-                          <i className="zmdi zmdi-image"></i>
-                          <input type="file" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-3">
-                      <div className="staresd">
-                        <div className="imgup">
-                          <i className="zmdi zmdi-image"></i>
-                          <input type="file" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-3">
-                      <div className="staresd">
-                        <div className="imgup">
-                          <i className="zmdi zmdi-image"></i>
-                          <input type="file" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-3">
-                      <div className="staresd">
-                        <div className="imgup">
-                          <i className="zmdi zmdi-image"></i>
-                          <input type="file" />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-md-3">
-                      <div className="staresd">
-                        <div className="imgup">
-                          <i className="zmdi zmdi-image"></i>
-                          <input type="file" />
-                        </div>
-                      </div>
-                    </div> */}
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-        }
+        )}
 
         {/* </div> */}
       </div>
