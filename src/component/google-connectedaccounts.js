@@ -34,6 +34,8 @@ class GoogleConnectedAccounts extends Component {
       }
     };
 
+    console.log("google token", GoogleConfig);
+
     Axios.get(
       "https://mybusiness.googleapis.com/v4/accounts/",
       GoogleConfig

@@ -795,6 +795,65 @@ export default class ReviewAnalytics extends Component {
         <div className="rightside_title">
           <h1>Review Analytics</h1>
         </div>
+        <div className="mb-30">
+          <div className="row">
+            <div className="col-md-6">
+              
+                {/* <img src={require('../images/pie-1.jpg')}/> */}
+
+                {all_connections.length != 0 ?
+                <div className="whitechart">
+                  <h2 className="analytics_btnx">
+                  Sitewise Distribution Of Ratings</h2>
+                   <Chart
+                  width={"500px"}
+                  height={"300px"}
+                  chartType="ColumnChart"
+                  loader={<div>Loading Chart</div>}
+                  data={columnData}
+                  options={{
+                    // title: "Sitewise Distribution Of Ratings",
+                    width: 580,
+                    height: 500,
+                    bar: { groupWidth: "25%" },
+                    legend: {
+                      position: "none",
+                      textStyle: { color: "black", fontSize: 6 }
+                    }
+                  }}
+                  // For tests
+                  rootProps={{ "data-testid": "6" }}
+                /> </div> : ""}
+              
+            </div>
+            <div className="col-md-6">
+              
+                {/* <img src={require('../images/pie.jpg')}/> */}
+
+                {all_connections.length != 0 ? 
+                <div className="whitechart">
+                  <h2 className="analytics_btnx">
+                  Sitewise Distribution Reviews</h2>
+                  <Chart
+                  width={"500px"}
+                  height={"500px"}
+                  chartType="PieChart"
+                  loader={<div>Loading Chart</div>}
+                  data={pieData}
+                  options={{
+                    // title: "Sitewise Distribution Reviews",
+                    pieSliceText: "label",
+                    legend: "none",
+                    pieHole: 0.4
+                  }}
+                  rootProps={{ "data-testid": "1" }}
+                /> 
+                </div>: ""}
+              
+            </div>
+            
+          </div>
+        </div>
         {all_connections.length != 0 ?
         <div>
         <div className=" mb-30">
@@ -963,7 +1022,7 @@ export default class ReviewAnalytics extends Component {
           </div>
         </div>
 
-        <div className=" mt-30">
+        <div className=" mb-30">
           <div className="analytics-whice">
             <div className="box-space2">
               <table
@@ -1809,61 +1868,7 @@ export default class ReviewAnalytics extends Component {
           <div className="analytics-whice">
             <div className="box-space2"><h4>Connect some listings to see Review Analytics</h4></div></div></div> }
 
-        <div className="mt-30">
-          <div className="row">
-            <div className="col-md-6">
-              
-                {/* <img src={require('../images/pie-1.jpg')}/> */}
-
-                {all_connections.length != 0 ?
-                <div className="whitechart">
-                   <Chart
-                  width={"500px"}
-                  height={"300px"}
-                  chartType="ColumnChart"
-                  loader={<div>Loading Chart</div>}
-                  data={columnData}
-                  options={{
-                    title: "Sitewise Distribution Of Ratings",
-                    width: 580,
-                    height: 500,
-                    bar: { groupWidth: "25%" },
-                    legend: {
-                      position: "none",
-                      textStyle: { color: "black", fontSize: 6 }
-                    }
-                  }}
-                  // For tests
-                  rootProps={{ "data-testid": "6" }}
-                /> </div> : ""}
-              
-            </div>
-            <div className="col-md-6">
-              
-                {/* <img src={require('../images/pie.jpg')}/> */}
-
-                {all_connections.length != 0 ? 
-                <div className="whitechart">
-                  <Chart
-                  width={"500px"}
-                  height={"500px"}
-                  chartType="PieChart"
-                  loader={<div>Loading Chart</div>}
-                  data={pieData}
-                  options={{
-                    title: "Sitewise Distribution Reviews",
-                    pieSliceText: "label",
-                    legend: "none",
-                    pieHole: 0.4
-                  }}
-                  rootProps={{ "data-testid": "1" }}
-                /> 
-                </div>: ""}
-              
-            </div>
-            
-          </div>
-        </div>
+        
       </div>
         )
       }

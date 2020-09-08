@@ -37,6 +37,15 @@ const LinkedinConfig = {
   headers: { "Content-Type": "application/x-www-form-urlencoded" }
 };
 
+const Yelpconfig = {
+  headers: {
+    Authorization:
+      "bearer XkjWF9GSy19xRS_yytCtISMaViqsPuXGmQiTzzAdcRHHNJmISD9bnHisRb8tgF5H7xVuMnbcybxOvEHHM7o91yTFKcGO7KrERhOSMS9NtRiPQNq9tCxMl61oD10pXnYx",
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "http://localhost"
+  }
+};
+
 // Create styles
 
 Font.register({
@@ -146,16 +155,17 @@ export default class ViewListing extends Component {
     zomatoId: "",
     avvoId: "",
     otherImage: [],
-    redirect_to_connectedaccounts: false,
-    redirect_to_google_connectedaccounts: false,
-    google_redirect_data: "",
     loader: true,
     all_connections: [],
     pdf_data: [],
     today: "",
 
     linkedin_code: "",
-    linkedin_errorMessage: ""
+    linkedin_errorMessage: "",
+    googleLocationDetail: "",
+    googleReviewsPresent: false,
+    yelpDetails:"",
+    citysearchDetails:""
   };
 
   async componentDidMount() {
@@ -306,6 +316,16 @@ export default class ViewListing extends Component {
                     { name: "Yelp" }
                   ]
                 });
+                Axios.get(
+                  "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/" +
+                    l.Social_Platform.Other_info.split(",")[0]
+                      .slice(7)
+                      .slice(25),
+                  Yelpconfig
+                ).then(resp => {
+                  console.log("yelpDetails", resp.data);
+                  this.setState({ yelpDetails: resp.data });
+                });
               }
 
               if (l.Social_Platform.Platform == "Apple") {
@@ -354,6 +374,16 @@ export default class ViewListing extends Component {
                     { name: "Citysearch" }
                   ]
                 });
+                let citysearchId = l.Social_Platform.Other_info.split(",")[0]
+                .slice(7)
+                .split("/")[4];
+                Axios.get(
+                  `https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/places/v2/detail?id=${citysearchId}&id_type=cs&client_ip=123.4.56.78&publisher=test&format=json`)
+                  .then(res => {
+                    console.log("citysearchDetails",res.data.locations[0])
+                    if(res.data.locations)
+                    this.setState({citysearchDetails:res.data.locations[0]})
+                  })
               }
 
               if (l.Social_Platform.Platform == "Zillow") {
@@ -532,6 +562,14 @@ export default class ViewListing extends Component {
               ).then(res => {
                 console.log("google data", res.data);
                 console.log("google data", googleData);
+
+                Axios.get(
+                  `https://mybusiness.googleapis.com/v4/${googleData.Social_Platform.Other_info}`,
+                  GoogleConfig
+                ).then(res => {
+                  this.setState({ googleLocationDetail: res.data });
+                  console.log("googleLocationDetail", res.data);
+                });
                 this.setState({
                   googleIsLoggedIn: true,
                   pdf_data: [
@@ -550,6 +588,20 @@ export default class ViewListing extends Component {
                     ...this.state.all_connections,
                     { name: "Google" }
                   ]
+                });
+                Axios.get(
+                  `https://mybusiness.googleapis.com/v4/${googleData.Social_Platform.Other_info}/reviews`,
+                  GoogleConfig
+                ).then(res => {
+                  if (
+                    res.data &&
+                    res.data.reviews &&
+                    res.data.reviews.length != 0
+                  ) {
+                    this.setState({
+                      googleReviewsPresent: true
+                    });
+                  }
                 });
               });
             }
@@ -581,7 +633,6 @@ export default class ViewListing extends Component {
         .catch(resp => {
           console.log(resp);
         });
-
 
       // Axios.post(
       //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
@@ -673,7 +724,9 @@ export default class ViewListing extends Component {
     await localStorage.setItem("fb_token", response.accessToken);
     await localStorage.setItem("fb_data", JSON.stringify(fb_data));
 
-    this.setState({ redirect_to_connectedaccounts: true });
+    this.props.history.push({
+      pathname: `/connectedaccounts/view-listing`
+    });
   };
 
   responseErrorGoogle = response => {
@@ -682,7 +735,7 @@ export default class ViewListing extends Component {
   };
 
   responseGoogle = async response => {
-    console.log("google response", response);
+    console.log("google response", response, response.code);
 
     let state = {
       Token: response.accessToken,
@@ -691,10 +744,28 @@ export default class ViewListing extends Component {
       location_id: this.props.match.params.locationId,
       redirect_to: "/view-listing"
     };
-    this.setState({
-      redirect_to_google_connectedaccounts: true,
-      google_redirect_data: state
+
+    this.props.history.push({
+      pathname: `/google-connectedaccounts/${encodeURIComponent(
+        JSON.stringify(state)
+      )}`
     });
+
+    //refresh token
+
+    // Axios.post('https://www.googleapis.com/oauth2/v4/token',
+    //       { //the headers passed in the request
+    //         'code' : response.code,
+    //         'client_id' : '759599444436-po5k7rhkaqdu55toirpt5c8osaqln6ul.apps.googleusercontent.com',
+    //         'client_secret' : 'zHMBPdDuAx_JMq7bOIo4fqXD',
+    //         'redirect_uri' : 'http://localhost:3000',
+    //         'grant_type' : 'authorization_code',
+    //         'prompt' : "consent"
+    //       }).then(res => {
+    //         console.log("google offline response",res);
+    //       }).catch(res => {
+    //         console.log("google offline error",res);
+    // })
   };
 
   linkedin_handleSuccess = data => {
@@ -823,6 +894,436 @@ export default class ViewListing extends Component {
       });
   };
 
+  googleLocationDetailFunction = googleLocationDetail => {
+    let googleScore = 1;
+    let maxScore = 9;
+    let { googleReviewsPresent } = this.state;
+
+    if (googleLocationDetail.websiteUrl) {
+      googleScore = googleScore + 2;
+    }
+    if (googleLocationDetail.locationName) {
+      googleScore++;
+    }
+    if (googleLocationDetail.address) {
+      googleScore++;
+    }
+    if (googleLocationDetail.primaryPhone) {
+      googleScore++;
+    }
+    if (
+      googleLocationDetail.primaryCategory &&
+      googleLocationDetail.primaryCategory.categoryId
+    ) {
+      googleScore++;
+    }
+    if (
+      googleLocationDetail.regularHours &&
+      googleLocationDetail.regularHours.periods.length != 0
+    ) {
+      googleScore++;
+    }
+    if (googleReviewsPresent) {
+      googleScore++;
+    }
+
+    let scorePercentage = ~~((googleScore / maxScore) * 100);
+    return (
+      <div className="bing-box">
+        <div className="google-top">
+          <img src={require("../images/google-new.png")} alt="" />
+
+          <div className="progress" data-percentage={scorePercentage}>
+            <span className="progress-left">
+              <span className="progress-bar"></span>
+            </span>
+            <span className="progress-right">
+              <span className="progress-bar"></span>
+            </span>
+            <div className="progress-value">
+              <div>
+                {~~((googleScore / maxScore) * 100)}%
+                <br />
+                <span>score</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="bing-detils">
+          <ul>
+            <li>
+              <span>Link:</span>
+              <div className="bing-detail-text">
+                {googleLocationDetail.websiteUrl ? (
+                  <input type="checkbox" id="html" defaultChecked />
+                ) : (
+                  <input type="checkbox" id="html" />
+                )}
+                <label htmlFor="html"></label>
+              </div>
+            </li>
+
+            <li>
+              <span>Name:</span>
+              <div className="bing-detail-text">
+                {googleLocationDetail.locationName
+                  ? googleLocationDetail.locationName
+                  : "-"}
+              </div>
+            </li>
+            <li>
+              <span>Address:</span>
+              <div className="bing-detail-text">
+                {googleLocationDetail.address ? (
+                  <div>
+                    {googleLocationDetail.address.addressLines.map(
+                      data => data
+                    )}
+                    ,{googleLocationDetail.address.locality},
+                    {googleLocationDetail.address.administrativeArea},
+                    {googleLocationDetail.address.postalCode}
+                  </div>
+                ) : (
+                  "-"
+                )}
+              </div>
+            </li>
+            <li>
+              <span>Phone:</span>
+              <div className="bing-detail-text">
+                {googleLocationDetail.primaryPhone
+                  ? googleLocationDetail.primaryPhone
+                  : "-"}
+              </div>
+            </li>
+            <h3>Detailed breakdown</h3>
+            <ul className="breack-bing">
+              <li>
+                <span>Categories</span>
+                <div className="bing-cat">
+                  {googleLocationDetail.primaryCategory &&
+                  googleLocationDetail.primaryCategory.categoryId ? (
+                    <a className="bing-yes">Yes</a>
+                  ) : (
+                    <a className="bing-no">No</a>
+                  )}
+                </div>
+              </li>
+              <li>
+                <span>Website URL Present</span>
+                <div className="bing-cat">
+                  {googleLocationDetail.websiteUrl ? (
+                    <a className="bing-yes">Yes</a>
+                  ) : (
+                    <a className="bing-no">No</a>
+                  )}
+                </div>
+              </li>
+              <li>
+                <span>Hours of operation</span>
+                <div className="bing-cat">
+                  {googleLocationDetail.regularHours &&
+                  googleLocationDetail.regularHours.periods.length != 0 ? (
+                    <a className="bing-yes">Yes</a>
+                  ) : (
+                    <a className="bing-no">No</a>
+                  )}
+                </div>
+              </li>
+              <li>
+                <span>Photos present</span>
+                <div className="bing-cat">
+                  <a className="bing-yes">Yes</a>
+                </div>
+              </li>
+              <li>
+                <span>Reviews</span>
+                <div className="bing-cat">
+                  {googleReviewsPresent ? (
+                    <a className="bing-yes">Yes</a>
+                  ) : (
+                    <a className="bing-no">No</a>
+                  )}
+                </div>
+              </li>
+            </ul>
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+  citysearchDetailsFunction = (data) => {
+
+    let citysearchScore = 0;
+    let maxScore = 9;
+
+    if (data.urls && data.urls.profile_url) {
+      citysearchScore++;
+    }
+    if (data.urls && data.urls.website_url) {
+      citysearchScore++;
+    }
+    if (data.name) {
+      citysearchScore++;
+    }
+    if (data.address && data.address.street) {
+      citysearchScore++;
+    }
+    if (data.contact_info && data.contact_info.display_phone) {
+      citysearchScore++;
+    }
+    if (
+      data.categories && (data.categories.length!=0)
+    ) {
+      citysearchScore++;
+    }
+    if (
+      data.business_hours) {
+      citysearchScore++;
+    }
+    if (data.review_info && (data.review_info.total_user_reviews!=0)) {
+      citysearchScore++;
+    }
+    if(data.images && (data.images.length !=0)) {
+      citysearchScore++
+    }
+
+    let scorePercentage = ~~((citysearchScore / maxScore) * 100);
+
+
+
+    return <div className="bing-box">
+    <div className="google-top">
+      <div className="col-md-6">
+      <img src={require("../images/citysearch-big.png")} alt="citysearch" />
+      </div>
+
+      <div className="progress" data-percentage={scorePercentage}>
+        <span className="progress-left">
+          <span className="progress-bar"></span>
+        </span>
+        <span className="progress-right">
+          <span className="progress-bar"></span>
+        </span>
+        <div className="progress-value">
+          <div>
+  {scorePercentage}%
+            <br />
+            <span>score</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="bing-detils">
+      <ul>
+        <li>
+          <span>Link:</span>
+          <div className="bing-detail-text">
+            {data.urls && data.urls.profile_url ? <input
+              type="checkbox"
+              id="html2"
+              defaultChecked
+            /> : <input
+            type="checkbox"
+            id="html2"
+          />}
+            <label htmlFor="html2"></label>
+          </div>
+        </li>
+
+        <li>
+          <span>Name:</span>
+          <div className="bing-detail-text">
+            {data.name ? data.name : "-"}
+          </div>
+        </li>
+        <li>
+          <span>Address:</span>
+          <div className="bing-detail-text">
+            {data.address && data.address.street ? <div>{data.address.street},{data.address.city},{data.address.state},{data.address.postal_code}</div>: "-"}
+          </div>
+        </li>
+        <li>
+          <span>Phone:</span>
+          <div className="bing-detail-text">
+            {data.contact_info && data.contact_info.display_phone ? data.contact_info.display_phone : "-"}
+          </div>
+        </li>
+        <h3>Detailed breakdown</h3>
+        <ul className="breack-bing">
+          <li>
+            <span>Categories</span>
+            <div className="bing-cat">
+              {data.categories && (data.categories.length!=0) ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Website URL Present</span>
+            <div className="bing-cat">
+              {data.urls && data.urls.website_url ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Hours of operation</span>
+            <div className="bing-cat">
+              {data.business_hours ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Photos present</span>
+            <div className="bing-cat">
+              {data.images && (data.images.length !=0) ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Reviews</span>
+            <div className="bing-cat">
+              {data.review_info && (data.review_info.total_user_reviews!=0) ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+        </ul>
+      </ul>
+    </div>
+  </div>
+  }
+
+  yelpDetailsFunction = (data) => {
+
+    let yelpScore = 0;
+    let maxScore = 9;
+
+    if (data.url) {
+      yelpScore = yelpScore + 2;
+    }
+    if (data.name) {
+      yelpScore++;
+    }
+    if (data.location && data.location.address1) {
+      yelpScore++;
+    }
+    if (data.phone) {
+      yelpScore++;
+    }
+    if (
+      data.categories && (data.categories.length!=0)
+    ) {
+      yelpScore++;
+    }
+    if (
+      data.hours &&
+     ( data.hours.length != 0)
+    ) {
+      yelpScore++;
+    }
+    if (data.review_count!=0) {
+      yelpScore++;
+    }
+    if(data.image_url) {
+      yelpScore++
+    }
+
+    let scorePercentage = ~~((yelpScore / maxScore) * 100);
+
+
+
+    return <div className="bing-box">
+    <div className="google-top">
+      <img src={require("../images/yelp-new.png")} alt="" />
+
+      <div className="progress" data-percentage={scorePercentage}>
+        <span className="progress-left">
+          <span className="progress-bar"></span>
+        </span>
+        <span className="progress-right">
+          <span className="progress-bar"></span>
+        </span>
+        <div className="progress-value">
+          <div>
+  {scorePercentage}%
+            <br />
+            <span>score</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div className="bing-detils">
+      <ul>
+        <li>
+          <span>Link:</span>
+          <div className="bing-detail-text">
+            {data.url ? <input
+              type="checkbox"
+              id="html2"
+              defaultChecked
+            /> : <input
+            type="checkbox"
+            id="html2"
+          />}
+            <label htmlFor="html2"></label>
+          </div>
+        </li>
+
+        <li>
+          <span>Name:</span>
+          <div className="bing-detail-text">
+            {data.name ? data.name : "-"}
+          </div>
+        </li>
+        <li>
+          <span>Address:</span>
+          <div className="bing-detail-text">
+            {data.location && data.location.address1 ? <div>{data.location.address1},{data.location.city},{data.location.country}</div>: "-"}
+          </div>
+        </li>
+        <li>
+          <span>Phone:</span>
+          <div className="bing-detail-text">
+            {data.phone ? data.phone : "-"}
+          </div>
+        </li>
+        <h3>Detailed breakdown</h3>
+        <ul className="breack-bing">
+          <li>
+            <span>Categories</span>
+            <div className="bing-cat">
+              {data.categories && (data.categories.length!=0) ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Website URL Present</span>
+            <div className="bing-cat">
+              {data.url ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Hours of operation</span>
+            <div className="bing-cat">
+              {data.hours &&
+      (data.hours.length != 0) ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Photos present</span>
+            <div className="bing-cat">
+              {data.image_url ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+          <li>
+            <span>Reviews</span>
+            <div className="bing-cat">
+              {data.review_count!=0 ? <a className="bing-yes">Yes</a> : <a className="bing-no">No</a>}
+            </div>
+          </li>
+        </ul>
+      </ul>
+    </div>
+  </div>
+  }
+
   Quixote = pdf_data => (
     <Document>
       {console.log("pdf data", pdf_data)}
@@ -882,31 +1383,11 @@ export default class ViewListing extends Component {
   render() {
     console.log(this.state);
 
-    let { all_connections, pdf_data } = this.state;
+    let { all_connections, pdf_data, googleLocationDetail,citysearchDetails,yelpDetails } = this.state;
 
     const { linkedin_code, linkedin_errorMessage } = this.state;
-
-    if (this.state.redirect_to_connectedaccounts) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/connectedaccounts",
-            state: { redirect_to: "/view-listing" }
-          }}
-        />
-      );
-    }
-
-    if (this.state.redirect_to_google_connectedaccounts) {
-      return (
-        <Redirect
-          to={{
-            pathname: "/google-connectedaccounts",
-            state: this.state.google_redirect_data
-          }}
-        />
-      );
-    }
+    let googleScore = 0;
+    let maxScore = 9;
 
     return (
       <div className="main_content">
@@ -947,7 +1428,16 @@ export default class ViewListing extends Component {
                       </div>
                       <div className="dolcebox">
                         <div className="dolce-profile">
-                          <img src={require("../images/dolce.png")} alt="" />
+                          {/* <img src={require("../images/dolce.png")} alt="" /> */}
+                          <img
+                            src={
+                              this.state.logo
+                                ? this.state.logo
+                                : require("../images/Logo2.png")
+                            }
+                            height="150"
+                            width="150"
+                          />
                         </div>
                         <div className="dolce-text">
                           <h4>ADDRESS AND CONTACT</h4>
@@ -1026,284 +1516,100 @@ export default class ViewListing extends Component {
                 <div className="mt-30">
                   <div className="row">
                     <div className="col-md-4">
-                      <div className="bing-box">
-                        <div className="google-top">
-                          <img
-                            src={require("../images/google-new.png")}
-                            alt=""
-                          />
+                      {googleLocationDetail ? (
+                        this.googleLocationDetailFunction(googleLocationDetail)
+                      ) : (
+                        <div className="bing-box">
+                          <div className="google-top">
+                            <img
+                              src={require("../images/google-new.png")}
+                              alt="google"
+                            />
 
-                          <div className="progress" data-percentage="100">
-                            <span className="progress-left">
-                              <span className="progress-bar"></span>
-                            </span>
-                            <span className="progress-right">
-                              <span className="progress-bar"></span>
-                            </span>
-                            <div className="progress-value">
-                              <div>
-                                100%
-                                <br />
-                                <span>score</span>
+                            <div className="progress" data-percentage="0">
+                              <span className="progress-left">
+                                <span className="progress-bar"></span>
+                              </span>
+                              <span className="progress-right">
+                                <span className="progress-bar"></span>
+                              </span>
+                              <div className="progress-value">
+                                <div>
+                                  0%
+                                  <br />
+                                  <span>score</span>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
 
-                        <div className="bing-detils">
-                          <ul>
-                            <li>
-                              <span>Link:</span>
-                              <div className="bing-detail-text">
-                                <input
-                                  type="checkbox"
-                                  id="html"
-                                  defaultChecked
-                                />
-                                <label htmlFor="html"></label>
-                              </div>
-                            </li>
-
-                            <li>
-                              <span>Name:</span>
-                              <div className="bing-detail-text">
-                                Kandl Water Condition Inc.
-                              </div>
-                            </li>
-                            <li>
-                              <span>Address:</span>
-                              <div className="bing-detail-text">
-                                264 Manitoba St. Spicar, 56288, USA
-                              </div>
-                            </li>
-                            <li>
-                              <span>Phone:</span>
-                              <div className="bing-detail-text">
-                                (320)706-50-20
-                              </div>
-                            </li>
-                            <h3>Detailed breakdown</h3>
-                            <ul className="breack-bing">
-                              <li>
-                                <span>Categories</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Website URL Present</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Hours of operation</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Photos present</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Reviews</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                            </ul>
-                          </ul>
+                          <div className="bing-detils">
+                            <span>Connect google</span>
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </div>
-                    {/*bing start*/}
+                    {/*citysearch start*/}
                     <div className="col-md-4">
+                      {citysearchDetails ? this.citysearchDetailsFunction(citysearchDetails) : 
                       <div className="bing-box">
-                        <div className="google-top">
-                          <img src={require("../images/bing-new.png")} alt="" />
+                      <div className="google-top">
+                        <div className="col-md-6">
+                        <img src={require("../images/citysearch-big.png")} alt="citysearch" />
+                        </div>
 
-                          <div className="progress" data-percentage="98">
-                            <span className="progress-left">
-                              <span className="progress-bar"></span>
-                            </span>
-                            <span className="progress-right">
-                              <span className="progress-bar"></span>
-                            </span>
-                            <div className="progress-value">
-                              <div>
-                                98%
-                                <br />
-                                <span>score</span>
-                              </div>
+                        <div className="progress" data-percentage="0">
+                          <span className="progress-left">
+                            <span className="progress-bar"></span>
+                          </span>
+                          <span className="progress-right">
+                            <span className="progress-bar"></span>
+                          </span>
+                          <div className="progress-value">
+                            <div>
+                              0%
+                              <br />
+                              <span>score</span>
                             </div>
                           </div>
                         </div>
-
-                        <div className="bing-detils">
-                          <ul>
-                            <li>
-                              <span>Link:</span>
-                              <div className="bing-detail-text">
-                                <input
-                                  type="checkbox"
-                                  id="html1"
-                                  defaultChecked
-                                />
-                                <label htmlFor="html1"></label>
-                              </div>
-                            </li>
-
-                            <li>
-                              <span>Name:</span>
-                              <div className="bing-detail-text">
-                                Kandl Water Condition Inc.
-                              </div>
-                            </li>
-                            <li>
-                              <span>Address:</span>
-                              <div className="bing-detail-text">
-                                264 Manitoba St. Spicar, 56288, USA
-                              </div>
-                            </li>
-                            <li>
-                              <span>Phone:</span>
-                              <div className="bing-detail-text">
-                                (320)706-50-20
-                              </div>
-                            </li>
-                            <h3>Detailed breakdown</h3>
-                            <ul className="breack-bing">
-                              <li>
-                                <span>Categories</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Website URL Present</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Hours of operation</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Photos present</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Reviews</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                            </ul>
-                          </ul>
-                        </div>
                       </div>
+
+                      <div className="bing-detils">
+                            <span>Connect citysearch</span>
+                          </div>
+                    </div>}
                     </div>
-                    {/*bing end*/}
+                    {/*citysearch end*/}
 
                     {/*yelp start*/}
                     <div className="col-md-4">
+                      {yelpDetails ? this.yelpDetailsFunction(yelpDetails) : 
                       <div className="bing-box">
-                        <div className="google-top">
-                          <img src={require("../images/yelp-new.png")} alt="" />
+                      <div className="google-top">
+                        <img src={require("../images/yelp-new.png")} alt="yelp" />
 
-                          <div className="progress" data-percentage="80">
-                            <span className="progress-left">
-                              <span className="progress-bar"></span>
-                            </span>
-                            <span className="progress-right">
-                              <span className="progress-bar"></span>
-                            </span>
-                            <div className="progress-value">
-                              <div>
-                                80%
-                                <br />
-                                <span>score</span>
-                              </div>
+                        <div className="progress" data-percentage="0">
+                          <span className="progress-left">
+                            <span className="progress-bar"></span>
+                          </span>
+                          <span className="progress-right">
+                            <span className="progress-bar"></span>
+                          </span>
+                          <div className="progress-value">
+                            <div>
+                              0%
+                              <br />
+                              <span>score</span>
                             </div>
                           </div>
                         </div>
-
-                        <div className="bing-detils">
-                          <ul>
-                            <li>
-                              <span>Link:</span>
-                              <div className="bing-detail-text">
-                                <input
-                                  type="checkbox"
-                                  id="html2"
-                                  defaultChecked
-                                />
-                                <label htmlFor="html2"></label>
-                              </div>
-                            </li>
-
-                            <li>
-                              <span>Name:</span>
-                              <div className="bing-detail-text">
-                                Kandl Water Condition Inc.
-                              </div>
-                            </li>
-                            <li>
-                              <span>Address:</span>
-                              <div className="bing-detail-text">
-                                264 Manitoba St. Spicar, 56288, USA
-                              </div>
-                            </li>
-                            <li>
-                              <span>Phone:</span>
-                              <div className="bing-detail-text">
-                                (320)706-50-20
-                              </div>
-                            </li>
-                            <h3>Detailed breakdown</h3>
-                            <ul className="breack-bing">
-                              <li>
-                                <span>Categories</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Website URL Present</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Hours of operation</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Photos present</span>
-                                <div className="bing-cat">
-                                  <a className="bing-yes">Yes</a>
-                                </div>
-                              </li>
-                              <li>
-                                <span>Reviews</span>
-                                <div className="bing-cat">
-                                  <a className="bing-no">No</a>
-                                </div>
-                              </li>
-                            </ul>
-                          </ul>
-                        </div>
                       </div>
+
+                      <div className="bing-detils">
+                            <span>Connect yelp</span>
+                          </div>
+                    </div>}
                     </div>
                     {/*yelp end*/}
                   </div>
@@ -1311,7 +1617,6 @@ export default class ViewListing extends Component {
 
                 <div className="mt-30">
                   <h2 className="account-listing">Account</h2>
-
 
                   {/* yelp */}
                   <div className="account-api">
@@ -1353,35 +1658,24 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.yelpIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.yelpIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-
-
-
-
-
-
-
-                  
                   {/* instagram */}
 
                   <div className="account-api">
@@ -1423,29 +1717,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.instaIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.instaIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* fb */}
-                <div className="account-api">
+                  {/* fb */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1479,40 +1770,37 @@ export default class ViewListing extends Component {
                           </a>
                         ) : (
                           <FacebookLogin
-                      appId="187396122554776"
-                      // appId="3044182972316291"
-                      autoLoad={false}
-                      fields="name,email,picture"
-                      // fields="name,email,picture,pages_read_engagement,pages_read_user_content,Page Public Metadata Access"
-                      onClick={this.componentClicked}
-                      callback={this.responseFacebook}
-                    />
+                            appId="187396122554776"
+                            // appId="3044182972316291"
+                            autoLoad={false}
+                            fields="name,email,picture"
+                            // fields="name,email,picture,pages_read_engagement,pages_read_user_content,Page Public Metadata Access"
+                            onClick={this.componentClicked}
+                            callback={this.responseFacebook}
+                          />
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.fbIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.fbIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* linkedin */}
-                <div className="account-api">
+                  {/* linkedin */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1546,49 +1834,46 @@ export default class ViewListing extends Component {
                           </a>
                         ) : (
                           <div>
-                      <LinkedIn
-                        clientId="861qygnjkytfwe"
-                        onFailure={this.linkedin_handleFailure}
-                        onSuccess={this.linkedin_handleSuccess}
-                        scope="r_liteprofile r_emailaddress w_member_social"
-                        // scope="r_organization_social w_organization_social rw_organization_admin rw_ads r_ads_reporting r_liteprofile"
-                        redirectUri="http://localhost:3000/linkedin"
-                        redirectPath="/linkedin"
-                      ></LinkedIn>
-                      {/* <a className="connect_btn">Connect a account</a> */}
-                      {/* {!linkedin_code && <div>No code</div>}
+                            <LinkedIn
+                              clientId="861qygnjkytfwe"
+                              onFailure={this.linkedin_handleFailure}
+                              onSuccess={this.linkedin_handleSuccess}
+                              scope="r_liteprofile r_emailaddress w_member_social"
+                              // scope="r_organization_social w_organization_social rw_organization_admin rw_ads r_ads_reporting r_liteprofile"
+                              redirectUri="http://localhost:3000/linkedin"
+                              redirectPath="/linkedin"
+                            ></LinkedIn>
+                            {/* <a className="connect_btn">Connect a account</a> */}
+                            {/* {!linkedin_code && <div>No code</div>}
                       {linkedin_code && <div>Code: {linkedin_code}</div>}
                       {linkedin_errorMessage && (
                         <div>{linkedin_errorMessage}</div>
                       )} */}
-                    </div>
+                          </div>
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.linkedinIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.linkedinIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* avvo */}
+                  {/* avvo */}
 
-                <div className="account-api">
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1622,37 +1907,34 @@ export default class ViewListing extends Component {
                           </a>
                         ) : (
                           <a
-                      href="http://www.avvo.com/oauth2/sessions/new?client_id=72g8jaazozj3eqov89rtdecpd&client_secret=mamtd9k5o7tdvavbu24tsr18&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Favvologin&response_type=code_and_token"
-                      className="connect_btn"
-                    >
-                      Connect a account
-                    </a>
+                            href="http://www.avvo.com/oauth2/sessions/new?client_id=72g8jaazozj3eqov89rtdecpd&client_secret=mamtd9k5o7tdvavbu24tsr18&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Favvologin&response_type=code_and_token"
+                            className="connect_btn"
+                          >
+                            Connect a account
+                          </a>
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.avvoIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.avvoIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* foursquare */}
-                <div className="account-api">
+                  {/* foursquare */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1691,29 +1973,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.foursquareIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.foursquareIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* DNB */}
-                <div className="account-api">
+                  {/* DNB */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1752,29 +2031,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.dnbIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.dnbIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* google */}
-                <div className="account-api">
+                  {/* google */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1808,49 +2084,46 @@ export default class ViewListing extends Component {
                           </a>
                         ) : (
                           <div className="google_btnb">
-                      <GoogleLogin
-                        //for localhost
-                        clientId="759599444436-po5k7rhkaqdu55toirpt5c8osaqln6ul.apps.googleusercontent.com"
-                        //for server
-                        // clientId="759599444436-5litbq8gav4ku8sj01o00uh6lsk8ebr0.apps.googleusercontent.com"
-                        buttonText="Login"
-                        scope="https://www.googleapis.com/auth/business.manage"
-                        onSuccess={this.responseGoogle}
-                        onFailure={this.responseErrorGoogle}
-                        cookiePolicy={"single_host_origin"}
+                            <GoogleLogin
+                              //for localhost
+                              clientId="759599444436-po5k7rhkaqdu55toirpt5c8osaqln6ul.apps.googleusercontent.com"
+                              //for server
+                              // clientId="759599444436-5litbq8gav4ku8sj01o00uh6lsk8ebr0.apps.googleusercontent.com"
+                              buttonText="Login"
+                              scope="https://www.googleapis.com/auth/business.manage"
+                              onSuccess={this.responseGoogle}
+                              onFailure={this.responseErrorGoogle}
+                              cookiePolicy={"single_host_origin"}
 
-                        //for refresh token
-                        // accessType="offline"
-                        // responseType="code"
-                        // pompt="consent"
-                      />
-                    </div>
+                              //for refresh token
+                              // accessType="offline"
+                              // responseType="code"
+                              // pompt="consent"
+                            />
+                          </div>
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.googleIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.googleIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* apple */}
-                <div className="account-api">
+                  {/* apple */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1889,29 +2162,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.appleIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.appleIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* citysearch */}
-                <div className="account-api">
+                  {/* citysearch */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -1950,29 +2220,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.citysearchIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.citysearchIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* zillow */}
-                <div className="account-api">
+                  {/* zillow */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -2011,29 +2278,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.zillowIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.zillowIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                
-                {/* tomtom */}
-                <div className="account-api">
+
+                  {/* tomtom */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -2072,29 +2336,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.tomtomIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.tomtomIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* zomato */}
-                <div className="account-api">
+                  {/* zomato */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -2133,29 +2394,26 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.zomatoIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.zomatoIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                {/* here */}
-                <div className="account-api">
+                  {/* here */}
+                  <div className="account-api">
                     <div className="row d-flex">
                       <div className="col-md-3">
                         <div className="f-connect">
@@ -2194,28 +2452,23 @@ export default class ViewListing extends Component {
                         )}
                       </div>
 
-
-
                       <div className="col-md-6">
-                  {this.state.hereIsLoggedIn ? (
-                    <div className="refres_box enble_refresh">
-                      <i className="fa fa-link"></i>
-                      <span>Syncing</span>
-                    </div>
-                  ) : (
-                    <div className="refres_box disble_refresh">
-                     <i className="zmdi zmdi-close"></i>
-                          <span>Connect your account to sync the listing</span>
-                    </div>
-                  )}
-                </div>
-
-
-
+                        {this.state.hereIsLoggedIn ? (
+                          <div className="refres_box enble_refresh">
+                            <i className="fa fa-link"></i>
+                            <span>Syncing</span>
+                          </div>
+                        ) : (
+                          <div className="refres_box disble_refresh">
+                            <i className="zmdi zmdi-close"></i>
+                            <span>
+                              Connect your account to sync the listing
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-
-
 
                   <div className="listing-lastupdate">
                     <p>Last Update Yesterday at 13:10 PM</p>

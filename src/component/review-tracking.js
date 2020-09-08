@@ -168,7 +168,8 @@ export default class ReviewTracking extends Component {
       zomatoUrl,
       fbtoken,
       fbPageId,
-      googleToken;
+      googleToken,
+      googleData;
 
     let { active_listing } = this.state;
 
@@ -204,6 +205,7 @@ export default class ReviewTracking extends Component {
           if (l.Social_Platform.Platform == "Google") {
             console.log("yes goo");
             googleToken = l.Social_Platform.Token;
+            googleData = l;
             console.log(googleToken);
           }
 
@@ -405,26 +407,24 @@ export default class ReviewTracking extends Component {
             console.log("google account data",res.data);
 
             if(res.data.accounts[0]){
-              Axios.get(
-                "https://mybusiness.googleapis.com/v4/" +
-                res.data.accounts[0].name +
-                  "/locations",
-                GoogleConfig
-              ).then(resp => {
-                console.log("google location data",resp.data);
+          //     Axios.get(
+          //       "https://mybusiness.googleapis.com/v4/" +
+          //       res.data.accounts[0].name +
+          //         "/locations",
+          //       GoogleConfig
+          //     ).then(resp => {
+          //       console.log("google location data",resp.data);
   
-                if(resp.data.locations[0]){
-                  Axios.get(
-                    "https://mybusiness.googleapis.com/v4/" +
-                    resp.data.locations[0].name +
-                      "/reviews",
+          //       if(resp.data.locations[0]){
+                  Axios.get(`https://mybusiness.googleapis.com/v4/${googleData.Social_Platform.Other_info}/reviews`,
                     GoogleConfig
                   ).then(respo => {
                     console.log("google reviews", respo.data);
                     
                     if(respo.data){
                       this.setState({
-                        active_listing: [...this.state.active_listing, "Google"]
+                        active_listing: [...this.state.active_listing, "Google"],
+                        googleReviews: respo.data
                       });
                       if (respo.data.averageRating) {
                         this.setState({
@@ -439,12 +439,8 @@ export default class ReviewTracking extends Component {
                         });
                       }
       
-                      if (
-                        this.state.googleReviews &&
-                        this.state.googleReviews.length != 0
-                      ) {
                         if (
-                          this.state.googleReviews.reviews &&
+                          this.state.googleReviews && this.state.googleReviews.reviews &&
                           this.state.googleReviews.reviews.length != 0
                         ) {
                           this.setState({
@@ -458,17 +454,16 @@ export default class ReviewTracking extends Component {
                             ]
                           });
                         }
-                      }
+               
                       this.google_star_counting(respo.data);
                     } else {
                       this.setState({
-                        googleReviews: respo.data,
                         active_listing: [...this.state.active_listing, "Google"]
                       });
                     }
                   });
-                }
-              });
+          //       }
+          //     });
             }
           });
         }
@@ -843,7 +838,6 @@ export default class ReviewTracking extends Component {
         }
 
         if (citysearchUrl) {
-          console.log("inside citysearchUrl");
           Axios.get(
             "https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/reviews/v2/search/where?listing_id=" +
               citysearchUrl +
@@ -851,9 +845,11 @@ export default class ReviewTracking extends Component {
           ).then(res => {
             console.log("citysearchUrl response", res);
 
-            if(xml.getElementsByTagName("review")){
-              var XMLParser = require("react-xml-parser");
+            var XMLParser = require("react-xml-parser");
             var xml = new XMLParser().parseFromString(res.data); // Assume xmlText contains the example XML
+
+            if(xml.getElementsByTagName("review")){
+              
             this.setState({
               citysearchReviews: xml.getElementsByTagName("review"),
               citysearchDetails: xml,

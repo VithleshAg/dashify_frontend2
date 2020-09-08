@@ -40,20 +40,6 @@ class Signup extends React.Component {
     //   "https://cors-anywhere.herokuapp.com/http://dashify.biz/api/account/get-all-user"
     // )
 
-    //rahul sir project
-    // const data = {
-    //   startDate: "2020-07-16",
-    //   endDate: "2020-07-21"
-    // };
-
-    // Axios.get("http://54.164.209.42/api/users/admin/user-filter-by-date", JSON.parse(data))
-    //   .then(res => {
-    //     console.log("testing api", res.data);
-    //   })
-    //   .catch(res => {
-    //     console.log("error in testing api", res);
-    //   });
-
     get_all_user()
       .then(res => {
         this.setState({

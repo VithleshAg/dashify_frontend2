@@ -57,27 +57,24 @@ class YelpLogin extends Component {
     const DjangoConfig = {
       headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
     };
-    const yelpUrl = this.state.url;
-    // localStorage.setItem('yelpUrl', yelpUrl);
-    const data = {
-      location_id: localStorage.getItem("locationId"),
-      Platform: "Yelp",
-      Token: "",
-      Username: this.state.username,
-      Email: "",
-      Password: this.state.password,
-      Connect_status: "Connect",
-      Other_info: "{'URL':" + this.state.url + ",'data':''}"
-    };
 
     Axios.get(
       "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/" +
-        this.state.url.slice(25) +
-        "/reviews",
+        this.state.url.slice(25),
       Yelpconfig
     )
       .then(resp => {
-        if (resp.data.reviews) {
+        if (resp.data.name) {
+          const data = {
+            location_id: localStorage.getItem("locationId"),
+            Platform: "Yelp",
+            Token: "",
+            Username: resp.data.name,
+            Email: "",
+            Password: this.state.password,
+            Connect_status: "Connect",
+            Other_info: "{'URL':" + this.state.url + ",'data':''}"
+          };
           // Axios.post(
           //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
           //   data,
