@@ -36,6 +36,7 @@ import HereRelatedLocation from "./here-related-location";
 import TomtomRelatedLocation from "./tomtom-related-location";
 import PageNotFound from "./page-not-found";
 
+
 export default class MainApp extends Component {
   render() {
     console.log(localStorage.getItem("locationId"));

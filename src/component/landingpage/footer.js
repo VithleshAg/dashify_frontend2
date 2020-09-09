@@ -1,54 +1,101 @@
-import React from "react";
-import { Link } from 'react-router-dom';
+import React, { Component } from "react";
+import { NavLink, withRouter } from "react-router-dom";
+import { MDBRow, MDBCol, MDBContainer } from "mdbreact";
+import logo from "../assets/footer-logo.png";
 
+class Footer extends Component {
+  render() {
+    return (
+      <div>
+        <div className="footer">
+          <MDBContainer>
+            <MDBRow>
+              <MDBCol md="3">
+                <div className="footer-logo">
+                  <img src={logo} alt="logo" />
+                </div>
+              </MDBCol>
+              <MDBCol md="3">
+                <ul>
+                  <li>
+                    {" "}
+                    <NavLink to="/aboutus">About us</NavLink>
+                  </li>
+                  <li>
+                    {" "}
+                    <NavLink to="/how-we-work">How we work</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/our-team">Our team</NavLink>
+                  </li>
+                  <li>
+                    {" "}
+                    <NavLink to="/our-news">Our news</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/our-customer">Our customers</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/blog">Blog</NavLink>
+                  </li>
+                </ul>
+              </MDBCol>
+              <MDBCol md="3">
+                <ul>
+                  <li>
+                    {" "}
+                    <NavLink to="/our-app">Our App</NavLink>
+                  </li>
 
-
-
-const Footer = () => {
-  return (
-
-    
-
-    <div className=" footer-color">
-
-      <div className="container">
-        <div className="text-center logo-new">
-          <Link to="/"> < img src={require('./img/logo-white.png')} /></Link>
-
+                  <li>
+                    <NavLink to="/listing-management">
+                      Listings Management
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/review-management">Review Management</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/analytics">Analytics</NavLink>
+                  </li>
+                  <li>
+                    {" "}
+                    <NavLink to="/commants-and-review">
+                      Сomments and reviews
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/features">Features</NavLink>
+                  </li>
+                </ul>
+              </MDBCol>
+              <MDBCol md="3">
+                <ul>
+                  <li>
+                    <NavLink to="/pricing">Pricing</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/support">Support</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/chat">Chat</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/login">Log in</NavLink>
+                  </li>
+                  <li>
+                    <NavLink to="/contactus">Contact us</NavLink>
+                  </li>
+                </ul>
+                <div className="bookbox">
+                  <button className="btn_demo">Book A Demo</button>
+                </div>
+              </MDBCol>
+            </MDBRow>
+          </MDBContainer>
         </div>
-        <div className="footer-icon">
-          <ul>
-            < li><Link to="" className="fb-ic " >
-              <i className="fa fa-facebook-f" aria-hidden="true"> </i>
-            </Link>
-            </li>
-            <li>
-              <Link to="" className="tw-ic ">
-                <i className="fa fa-twitter" aria-hidden="true"> </i>
-              </Link></li>
-            <li>
-              <Link to="" className="tw-ic">
-                <i class="fa fa-linkedin" aria-hidden="true"></i>
-              </Link>
-            </li>
-            <li>
-              <Link to="" className="tw-ic">
-                <i className="fa fa-instagram" aria-hidden="true "> </i>
-              </Link>
-            </li>
-
-          </ul>
-        </div>
-
-        <div className="footer-copyright-link">
-          <container fluid>
-            <a href="">copyright  &copy;Dashify, All Rights Reserved</a>
-          </container>
-        </div>
-
       </div>
-    </div>
-  );
+    );
+  }
 }
-
-export default Footer;
+export default withRouter(Footer);

@@ -8,6 +8,9 @@ import InstagramLogin from "./component/instagramlogin";
 import YelpLogin from "./component/yelplogin";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Home from "./component/landingpage/home";
+import Review_management from "./component/landingpage/Review_management";
+import Blog from "./component/landingpage/Blog";
+import How_we_work from "./component/landingpage/How_we_work";
 import Login from "./component/landingpage/login";
 import Signup from "./component/landingpage/signup";
 import Forgot from "./component/landingpage/forgot.js";
@@ -34,7 +37,15 @@ class App extends Component {
 
         <BrowserRouter>
           <Switch>
+
             <Route path="/" exact component={Home} />
+            <Route path="/blog" exact component={Blog} />
+            <Route path="/how-we-work" exact component={How_we_work} />
+            <Route
+              path="/review-management"
+              exacts
+              component={Review_management}
+            />
             <Route path="/Login" exact component={Login} />
 
             <Route
