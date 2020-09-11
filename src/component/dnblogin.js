@@ -6,8 +6,8 @@ import { add_social_account } from "./apis/social_platforms";
 
 const DnbConfig = {
   headers: {
-    "x-dnb-user": "P200000A3A7EC40D0DD41748DA62B835",
-    "x-dnb-pwd": "iit2mumbai"
+    "x-dnb-user": "P200000D5647887A34E4067B86A78E31",
+    "x-dnb-pwd": "digimonk@123"
   }
 };
 

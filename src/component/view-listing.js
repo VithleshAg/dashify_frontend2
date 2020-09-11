@@ -40,7 +40,7 @@ const LinkedinConfig = {
 const Yelpconfig = {
   headers: {
     Authorization:
-      "bearer XkjWF9GSy19xRS_yytCtISMaViqsPuXGmQiTzzAdcRHHNJmISD9bnHisRb8tgF5H7xVuMnbcybxOvEHHM7o91yTFKcGO7KrERhOSMS9NtRiPQNq9tCxMl61oD10pXnYx",
+      "bearer _1cVnrrkqmG_dwNUdtorVxarkzItJM7AWM700rkRxM7aPdDfxJECcdaN00ADjSkrStF1pX4sdGCspYeSjU7VGkpjWYoMsC2_filBf5d5J5GMRTgXws_W6qusNMhYX3Yx",
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "http://localhost"
   }
@@ -161,7 +161,7 @@ export default class ViewListing extends Component {
     today: "",
 
     linkedin_code: "",
-    linkedin_errorMessage: "",
+    // linkedin_errorMessage: "",
     googleLocationDetail: "",
     googleReviewsPresent: false,
     yelpDetails:"",
@@ -380,7 +380,7 @@ export default class ViewListing extends Component {
                 Axios.get(
                   `https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/places/v2/detail?id=${citysearchId}&id_type=cs&client_ip=123.4.56.78&publisher=test&format=json`)
                   .then(res => {
-                    console.log("citysearchDetails",res.data.locations[0])
+                    // console.log("citysearchDetails",res.data.locations[0])
                     if(res.data.locations)
                     this.setState({citysearchDetails:res.data.locations[0]})
                   })
@@ -730,7 +730,7 @@ export default class ViewListing extends Component {
   };
 
   responseErrorGoogle = response => {
-    console.log(response);
+    console.log("facebook error",response);
     alert("try again");
   };
 
@@ -769,9 +769,10 @@ export default class ViewListing extends Component {
   };
 
   linkedin_handleSuccess = data => {
+    console.log("linkedin login data",data)
     this.setState({
       linkedin_code: data.code,
-      linkedin_errorMessage: ""
+      // linkedin_errorMessage: ""
     });
 
     const data1 = {
@@ -792,72 +793,66 @@ export default class ViewListing extends Component {
       }
     })
       .then(resp => {
-        console.log("linkedin token response", resp.data);
+        // console.log("linkedin token response", resp.data);
+        this.props.history.push({
+          pathname: `/linkedin-connectedaccounts/${resp.data.access_token}/view-listing/${this.props.match.params.locationId}`
+        })
 
-        const data = {
-          location_id: this.props.match.params.locationId,
-          Platform: "Linkedin",
-          Token: resp.data.access_token,
-          Username: "Linkedin User",
-          Email: "Linkedin Email",
-          Password: "",
-          Connect_status: "Connect",
-          Other_info: "861qygnjkytfwe"
-        };
+        // const data = {
+        //   location_id: this.props.match.params.locationId,
+        //   Platform: "Linkedin",
+        //   Token: resp.data.access_token,
+        //   Username: "Linkedin User",
+        //   Email: "Linkedin Email",
+        //   Password: "",
+        //   Connect_status: "Connect",
+        //   Other_info: "861qygnjkytfwe"
+        // };
 
-        // Axios.post(
-        //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-        //   data,
-        //   DjangoConfig
-        // )
-        add_social_account(data, DjangoConfig)
-          .then(resp => {
-            console.log("linkedin location response", resp.data);
+        // add_social_account(data, DjangoConfig)
+        //   .then(resp => {
+        //     console.log("linkedin location response", resp.data);
 
-            const data2 = {
-              location_id: this.props.match.params.locationId
-            };
-            // Axios.post(
-            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-all-connection-of-one-location",
-            //   data2,
-            //   DjangoConfig
-            // )
-            all_connection_of_one_location(data2, DjangoConfig).then(resp => {
-              console.log("get all connections", resp);
-              this.setState({ allListings: resp.data.data });
+        //     const data2 = {
+        //       location_id: this.props.match.params.locationId
+        //     };
 
-              if (this.state.allListings) {
-                this.state.allListings.map(l => {
-                  if (l.Social_Platform.Platform == "Linkedin") {
-                    this.setState({ loading: false });
-                    this.setState({
-                      linkedinIsLoggedIn: true,
-                      pdf_data: [
-                        ...this.state.pdf_data,
-                        {
-                          listing: "Linkedin",
-                          image: require("../images/linkedin.png"),
-                          username: l.Social_Platform.Username,
-                          status: true,
-                          date: l.Social_Platform.Update_Date.split("T")[0]
-                        }
-                      ],
-                      linkedinId: l.id,
-                      linkedinName: l.Social_Platform.Username,
-                      all_connections: [
-                        ...this.state.all_connections,
-                        { name: "Linkedin" }
-                      ]
-                    });
-                  }
-                });
-              }
-            });
-          })
-          .catch(resp => {
-            console.log(resp);
-            this.setState({ loading: false });
-          });
+        //     all_connection_of_one_location(data2, DjangoConfig).then(resp => {
+        //       console.log("get all connections", resp);
+        //       this.setState({ allListings: resp.data.data });
+
+        //       if (this.state.allListings) {
+        //         this.state.allListings.map(l => {
+        //           if (l.Social_Platform.Platform == "Linkedin") {
+        //             this.setState({ loading: false });
+        //             this.setState({
+        //               linkedinIsLoggedIn: true,
+        //               pdf_data: [
+        //                 ...this.state.pdf_data,
+        //                 {
+        //                   listing: "Linkedin",
+        //                   image: require("../images/linkedin.png"),
+        //                   username: l.Social_Platform.Username,
+        //                   status: true,
+        //                   date: l.Social_Platform.Update_Date.split("T")[0]
+        //                 }
+        //               ],
+        //               linkedinId: l.id,
+        //               linkedinName: l.Social_Platform.Username,
+        //               all_connections: [
+        //                 ...this.state.all_connections,
+        //                 { name: "Linkedin" }
+        //               ]
+        //             });
+        //           }
+        //         });
+        //       }
+        //     });
+        //   })
+        //   .catch(resp => {
+        //     console.log(resp);
+        //     this.setState({ loading: false });
+        //   });
       })
       .catch(resp => {
         console.log(resp);
@@ -868,8 +863,9 @@ export default class ViewListing extends Component {
   linkedin_handleFailure = error => {
     this.setState({
       linkedin_code: "",
-      linkedin_errorMessage: error.errorMessage
+      // linkedin_errorMessage: error.errorMessage
     });
+    alert("Linkedin : ",error.errorMessage)
   };
 
   disconnectAccount = e => {
@@ -1385,7 +1381,9 @@ export default class ViewListing extends Component {
 
     let { all_connections, pdf_data, googleLocationDetail,citysearchDetails,yelpDetails } = this.state;
 
-    const { linkedin_code, linkedin_errorMessage } = this.state;
+    const { linkedin_code,
+      //  linkedin_errorMessage
+       } = this.state;
     let googleScore = 0;
     let maxScore = 9;
 
@@ -1838,8 +1836,7 @@ export default class ViewListing extends Component {
                               clientId="861qygnjkytfwe"
                               onFailure={this.linkedin_handleFailure}
                               onSuccess={this.linkedin_handleSuccess}
-                              scope="r_liteprofile r_emailaddress w_member_social"
-                              // scope="r_organization_social w_organization_social rw_organization_admin rw_ads r_ads_reporting r_liteprofile"
+                              scope="r_liteprofile r_emailaddress w_member_social r_organization_social w_organization_social rw_organization_admin,rw_ads r_ads_reporting"
                               redirectUri="http://localhost:3000/linkedin"
                               redirectPath="/linkedin"
                             ></LinkedIn>

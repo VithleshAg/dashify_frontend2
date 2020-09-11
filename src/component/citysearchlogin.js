@@ -52,24 +52,27 @@ class CitySearchLogin extends Component {
     const citysearchUrl = this.state.url.split("/")[4];
     localStorage.setItem("citysearchUrl", citysearchUrl);
 
-    const data = {
-      location_id: localStorage.getItem("locationId"),
-      Platform: "Citysearch",
-      Token: "",
-      Username: this.state.username,
-      Email: "",
-      Password: this.state.password,
-      Connect_status: "Connect",
-      Other_info: "{'URL':" + this.state.url + ",'data':''}"
-    };
-
     Axios.get(
-      "https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/reviews/v2/search/where?listing_id=" +
+      "https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/places/v2/detail?id=" +
         this.state.url.split("/")[4] +
-        "&publisher=test"
+        "&id_type=cs&client_ip=123.4.56.78&publisher=test&format=json"
     )
       .then(res => {
         if (res.data) {
+          console.log("citysearch response", res.data);
+          const data = {
+            location_id: localStorage.getItem("locationId"),
+            Platform: "Citysearch",
+            Token: "",
+            Username: res.data.locations
+              ? res.data.locations[0].name
+              : this.state.username,
+            Email: this.state.username,
+            Password: "",
+            Connect_status: "Connect",
+            Other_info: "{'URL':" + this.state.url + ",'data':''}"
+          };
+
           // Axios.post(
           //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
           //   data,
@@ -115,7 +118,7 @@ class CitySearchLogin extends Component {
     return (
       <div>
         <div className="foursquer-logo">
-          <img src={require("../images/citysearch.jpg")} alt="citysearch" />
+          <img src={require("../images/citysearch.png")} alt="citysearch" />
         </div>
         <div className="login_form">
           <form onSubmit={this.onSubmit}>

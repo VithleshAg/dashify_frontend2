@@ -52,24 +52,25 @@ class FourSquareLogin extends Component {
     // const fourUrl = this.state.url.split("/")[5];
     // localStorage.setItem("fourUrl", fourUrl);
 
-    const data = {
-      location_id: localStorage.getItem("locationId"),
-      Platform: "Foursquare",
-      Token: "",
-      Username: this.state.username,
-      Email: "",
-      Password: this.state.password,
-      Connect_status: "Connect",
-      Other_info: "{'URL':" + this.state.url + ",'data':''}"
-    };
-
     Axios.get(
       "https://cors-anywhere.herokuapp.com/https://api.foursquare.com/v2/venues/" +
         this.state.url.split("/")[5] +
-        "?client_id=TEUSFAUY42IR0HGTPSWO1GFLC5WHX3PIBKVICAQRZQA0MTD1&client_secret=CYBQFK0YRBPFE54NARAEJCG2NLBARIU2OOIJNE0AZOHWZTXU&v=20180323"
+        "?client_id=44RU2431YG02H4E00RQTLKEUKIKINQSFO2JBHII2WHH32PXZ&client_secret=FWV2WOL40MQ5M1YZ5E2TKUWIQ4WYZ1QUJXOQ24VGRSXFA3IY&v=20180323"
     )
       .then(res => {
-        if (res.data.response.venue) {
+        // console.log("citysearch resp",res);
+        if (res.data && res.data.response && res.data.response.venue) {
+          const data = {
+            location_id: localStorage.getItem("locationId"),
+            Platform: "Foursquare",
+            Token: "",
+            Username: res.data.response.venue.name,
+            Email: this.state.username,
+            Password: this.state.password,
+            Connect_status: "Connect",
+            Other_info: "{'URL':" + this.state.url + ",'data':''}"
+          };
+
           // Axios.post(
           //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
           //   data,
@@ -89,7 +90,7 @@ class FourSquareLogin extends Component {
               });
             });
         } else {
-          alert("Invalid username or password");
+          alert("Invalid urlp");
           this.setState({ loading: false });
         }
       })

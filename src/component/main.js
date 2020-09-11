@@ -32,10 +32,10 @@ import ReviewGenerationStats from "./review-generation-stats";
 import AddLocation from "./add-location";
 import ConnectedAccounts from "./connectedaccounts";
 import GoogleConnectedAccounts from "./google-connectedaccounts";
+import LinkedinConnectedAccounts from "./linkedin-connectedaccounts";
 import HereRelatedLocation from "./here-related-location";
 import TomtomRelatedLocation from "./tomtom-related-location";
 import PageNotFound from "./page-not-found";
-
 
 export default class MainApp extends Component {
   render() {
@@ -345,6 +345,11 @@ export default class MainApp extends Component {
                   exact
                   path="/google-connectedaccounts/:state"
                   render={props => <GoogleConnectedAccounts {...props} />}
+                />
+                <Route
+                  exact
+                  path="/linkedin-connectedaccounts/:state/:redirect_to/:locationId"
+                  render={props => <LinkedinConnectedAccounts {...props} />}
                 />
                 <Route
                   exact

@@ -54,9 +54,9 @@ class InstagramLogin extends Component {
       location_id: localStorage.getItem("locationId"),
       Platform: "Instagram",
       Token: "",
-      Username: this.state.username,
-      Email: "",
-      Password: this.state.password,
+      Username: this.state.url,
+      Email: this.state.username,
+      Password: "",
       Connect_status: "Connect",
       Other_info: "{'URL':" + this.state.url + ",'data':''}"
     };

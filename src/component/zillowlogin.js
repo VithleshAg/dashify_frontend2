@@ -49,27 +49,36 @@ class ZillowLogin extends Component {
       headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
     };
 
-    const data = {
-      location_id: localStorage.getItem("locationId"),
-      Platform: "Zillow",
-      Token: "",
-      Username: this.state.username,
-      Email: this.state.username,
-      Password: this.state.password,
-      Connect_status: "Connect",
-      Other_info: this.state.url
-    };
-
     if (isError == false) {
       this.setState({ loading: true });
       Axios.get(
-        "https://www.zillow.com/webservice/ProReviews.htm?zws-id=X1-ZWz173vkfofw97_8e096&email=" +
+        "https://www.zillow.com/webservice/ProReviews.htm?zws-id=X1-ZWz170sf100mbv_7lwvq&email=" +
           this.state.url +
           "&count=10&output=json"
       )
         .then(res => {
           console.log("zillow checking data", res.data);
-          if (res.data.message.text == "Request successfully processed") {
+          if (
+            res.data.message &&
+            res.data.message.text == "Request successfully processed"
+          ) {
+            const data = {
+              location_id: localStorage.getItem("locationId"),
+              Platform: "Zillow",
+              Token: "",
+              Username:
+                res.data.response &&
+                res.data.response.results &&
+                res.data.response.results.proInfo &&
+                res.data.response.results.proInfo.businessName
+                  ? res.data.response.results.proInfo.businessName
+                  : this.state.username,
+              Email: this.state.username,
+              Password: this.state.password,
+              Connect_status: "Connect",
+              Other_info: this.state.url
+            };
+
             // Axios.post(
             //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
             //   data,

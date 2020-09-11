@@ -50,18 +50,7 @@ class AppleLogin extends Component {
     };
 
     // const appleId = this.state.id.split("/")[6].slice(2);
-    // localStorage.setItem("appleId", appleId);
-
-    const data = {
-      location_id: localStorage.getItem("locationId"),
-      Platform: "Apple",
-      Token: "",
-      Username: this.state.username,
-      Email: "",
-      Password: this.state.password,
-      Connect_status: "Connect",
-      Other_info: "{'URL':" + this.state.id + ",'data':''}"
-    };
+    // localStorage.setItem("appleId", appleId)
 
     if (this.state.id.split("/")[6]) {
       Axios.get(
@@ -70,12 +59,23 @@ class AppleLogin extends Component {
           "/sortBy=mostRecent/json"
       )
         .then(res => {
-          if (res.data.feed.entry) {
+          if (res.data && res.data.feed && res.data.feed.entry) {
+            const data = {
+              location_id: localStorage.getItem("locationId"),
+              Platform: "Apple",
+              Token: "",
+              Username: this.state.id.split("/")[5],
+              Email: this.state.username,
+              Password: "",
+              Connect_status: "Connect",
+              Other_info: "{'URL':" + this.state.id + ",'data':''}"
+            };
+
+            // console.log("apple esponse", res.data);
             // Axios.post(
             //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
             //   data,
             //   DjangoConfig
-
             // )
             add_social_account(data, DjangoConfig)
               .then(resp => {
@@ -91,7 +91,7 @@ class AppleLogin extends Component {
                 });
               });
           } else {
-            alert("Invalid username or password");
+            alert("Invalid url");
             this.setState({ loading: false });
           }
         })
@@ -144,7 +144,7 @@ class AppleLogin extends Component {
                   type="text"
                   id="id"
                   value={this.state.id}
-                  placeholder="https://apps.apple.com/us/app/tiktok-make-your-day/id835599320"
+                  placeholder="https://apps.apple.com/us/app/ullu/id1435281792"
                   onChange={e => this.setState({ id: e.target.value })}
                 />
                 <div style={{ color: "red" }}>{this.state.id_error}</div>

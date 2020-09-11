@@ -6,8 +6,13 @@ import { add_social_account } from "./apis/social_platforms";
 
 const Zomatoconfig = {
   headers: {
-    "user-key": "5a09665cb72fa8f5a661296e9ed00af4",
+    "user-key": "0850988704eeed5da2f4d38fdfc582c1",
     Accept: "application/json"
+  }
+};
+const DjangoConfig = {
+  headers: {
+    Authorization: "Token " + localStorage.getItem("UserToken")
   }
 };
 
@@ -60,44 +65,40 @@ class ZomatoLogin extends Component {
         Zomatoconfig
       )
         .then(res => {
-          console.log("zomato checking data", res.data);
+          // console.log("zomato checking data", res.data);
+          if (res.data && res.data.name) {
+            const data = {
+              location_id: localStorage.getItem("locationId"),
+              Platform: "Zomato",
+              Token: "",
+              Username: res.data.name,
+              Email: this.state.username,
+              Password: this.state.password,
+              Connect_status: "Connect",
+              Other_info: this.state.url
+            };
 
-          const DjangoConfig = {
-            headers: {
-              Authorization: "Token " + localStorage.getItem("UserToken")
-            }
-          };
-
-          const data = {
-            location_id: localStorage.getItem("locationId"),
-            Platform: "Zomato",
-            Token: "",
-            Username: res.data.name,
-            Email: this.state.username,
-            Password: this.state.password,
-            Connect_status: "Connect",
-            Other_info: this.state.url
-          };
-
-          Axios.post(
-            "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-            data,
-            DjangoConfig
-          );
-
-          add_social_account(data, DjangoConfig)
-            .then(resp => {
-              console.log("zomato resp", resp.data);
-              this.setState({ isUrl: true, loading: false });
-            })
-            .catch(resp => {
-              alert("Invalid Zomato id");
-              console.log("Zomato resp", resp.data);
-              this.setState({
-                // wrong: "Invalid Zillow Email",
-                loading: false
+            // Axios.post(
+            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+            //   data,
+            //   DjangoConfig
+            // );
+            add_social_account(data, DjangoConfig)
+              .then(resp => {
+                console.log("zomato resp", resp.data);
+                this.setState({ isUrl: true, loading: false });
+              })
+              .catch(resp => {
+                alert("Invalid Zomato id");
+                console.log("Zomato resp", resp.data);
+                this.setState({
+                  loading: false
+                });
               });
-            });
+          } else {
+            alert("Invalid Zomato id");
+            this.setState({ loading: false });
+          }
         })
         .catch(res => {
           alert("Invalid Zomato id");

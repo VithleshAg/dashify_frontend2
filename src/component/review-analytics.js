@@ -7,7 +7,7 @@ import Spinner from "./common/Spinner";
 const Yelpconfig = {
   headers: {
     Authorization:
-      "bearer XkjWF9GSy19xRS_yytCtISMaViqsPuXGmQiTzzAdcRHHNJmISD9bnHisRb8tgF5H7xVuMnbcybxOvEHHM7o91yTFKcGO7KrERhOSMS9NtRiPQNq9tCxMl61oD10pXnYx",
+      "bearer _1cVnrrkqmG_dwNUdtorVxarkzItJM7AWM700rkRxM7aPdDfxJECcdaN00ADjSkrStF1pX4sdGCspYeSjU7VGkpjWYoMsC2_filBf5d5J5GMRTgXws_W6qusNMhYX3Yx",
     "Content-Type": "application/json",
     "Access-Control-Allow-Origin": "http://localhost"
   }
@@ -15,7 +15,7 @@ const Yelpconfig = {
 
 const Zomatoconfig = {
   headers: {
-    "user-key": "5a09665cb72fa8f5a661296e9ed00af4",
+    "user-key": "0850988704eeed5da2f4d38fdfc582c1",
     Accept: "application/json"
   }
 };
@@ -321,7 +321,7 @@ export default class ReviewAnalytics extends Component {
         Axios.get(
           "https://api.foursquare.com/v2/venues/" +
             fourUrl +
-            "?client_id=TEUSFAUY42IR0HGTPSWO1GFLC5WHX3PIBKVICAQRZQA0MTD1&client_secret=CYBQFK0YRBPFE54NARAEJCG2NLBARIU2OOIJNE0AZOHWZTXU&v=20180323"
+            "?client_id=44RU2431YG02H4E00RQTLKEUKIKINQSFO2JBHII2WHH32PXZ&client_secret=FWV2WOL40MQ5M1YZ5E2TKUWIQ4WYZ1QUJXOQ24VGRSXFA3IY&v=20180323"
         ).then(res => {
           console.log("foursquare data", res.data.response.venue);
           this.setState({
@@ -443,7 +443,7 @@ export default class ReviewAnalytics extends Component {
 
       if (zillowUrl) {
         Axios.get(
-          "https://www.zillow.com/webservice/ProReviews.htm?zws-id=X1-ZWz173vkfofw97_8e096&email=" +
+          "https://www.zillow.com/webservice/ProReviews.htm?zws-id=X1-ZWz170sf100mbv_7lwvq&email=" +
             zillowUrl +
             "&count=10&output=json"
         ).then(res => {
@@ -479,7 +479,7 @@ export default class ReviewAnalytics extends Component {
           });
         } else {
           Axios.get(
-            "https://api.tomtom.com/search/2/poiDetails.json?key=BVtLuLXu3StRT6YXupe4H9cbtugU3i10&id=" +
+            "https://api.tomtom.com/search/2/poiDetails.json?key=IRUplE1TqUPstrlMA2N51xASusnsDsEd&id=" +
               tomtomUrl
           ).then(res => {
             console.log("tomtom data", res.data);
