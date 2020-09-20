@@ -16,7 +16,7 @@ export default class SideBar extends Component {
                   </NavLink>
                 </li>
                 <li>
-                  <NavLink to="/voice-listing">
+                  <NavLink to="/user-profile">
                     <i className="flaticon-user"></i>{" "}
                     <span className="nonebox">User Profile</span>
                   </NavLink>
@@ -37,6 +37,12 @@ export default class SideBar extends Component {
                   <NavLink to="/support">
                     <i className="flaticon-support"></i>{" "}
                     <span className="nonebox">Support</span>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/notification">
+                    <i className="flaticon-support"></i>{" "}
+                    <span className="nonebox">Notification</span>
                   </NavLink>
                 </li>
                 <li>

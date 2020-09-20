@@ -1,6 +1,4 @@
 import React, { Component } from "react";
-
-import TodoApp from "./pagination";
 import {
   BrowserRouter,
   Route,
@@ -17,6 +15,8 @@ import VoiceListing from "./voice-listing";
 import ReviewAnalytics from "./review-analytics";
 import Topbarmenu from "./topbarmenu";
 
+import User_profile from "./user_profile";
+import Notification from "./notification";
 import SettingMain from "./setting-main";
 import SettingAccounts from "./setting-accounts";
 import SettingBilling from "./setting-billing";
@@ -52,14 +52,6 @@ export default class MainApp extends Component {
                 <div className="col-md-12">
                   <div className="breadcrumb-menu">
                     <ul>
-                      {/* <li>
-                        <NavLink
-                          to={"/pagination"}
-                          className="underline-from-left"
-                        >
-                          Pagination
-                        </NavLink>
-                      </li> */}
                       <li>
                         <NavLink
                           to={
@@ -250,11 +242,6 @@ export default class MainApp extends Component {
             </div>
 
             <div className="content">
-              {/* <Route
-                exact
-                path="/pagination"
-                render={props => <TodoApp {...props} />}
-              /> */}
               <Switch>
                 <Route
                   exact
@@ -326,6 +313,8 @@ export default class MainApp extends Component {
                 />
                 <Route exact path="/add-location" component={AddLocation} />
 
+                <Route exact path="/user-profile" component={User_profile} />
+                <Route exact path="/notification" component={Notification} />
                 <Route exact path="/setting-main" component={SettingMain} />
                 <Route
                   path="/setting-main/setting-accounts"

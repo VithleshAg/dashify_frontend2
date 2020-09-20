@@ -66,7 +66,7 @@ class LinkedinConnectedAccounts extends Component {
       Email: "",
       Password: "",
       Connect_status: "Connect",
-      Other_info: "861qygnjkytfwe"
+      Other_info: this.state.all_pages[index]["organization"]
     };
 
     add_social_account(data, DjangoConfig)

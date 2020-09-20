@@ -33,11 +33,6 @@ class HereRelatedLocation extends Component {
     };
 
     if (data.href) {
-      // Axios.post(
-      //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-      //   data2,
-      //   DjangoConfig
-      // )
       add_social_account(data2, DjangoConfig)
         .then(resp => {
           console.log("Here register response", resp.data);

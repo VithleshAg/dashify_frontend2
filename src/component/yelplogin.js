@@ -29,9 +29,8 @@ class YelpLogin extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    //  this.setState({log:false})
-    // this.props.login(this.state.username, this.state.password);
-    // return <Redirect to="/locationdetails" />
+
+    let isError = false;
 
     this.setState({
       username_error: "",
@@ -44,64 +43,64 @@ class YelpLogin extends Component {
       this.setState({
         username_error: "Enter your Email"
       });
+      isError = true;
     }
     if (this.state.password == "") {
       this.setState({ password_error: "Enter your password" });
+      isError = true;
     }
     if (this.state.url == "") {
       this.setState({ url_error: "Enter Url" });
-      console.log("i am in console");
+      isError = true;
     }
-    this.setState({ loading: true });
 
-    const DjangoConfig = {
-      headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
-    };
+    if (!isError) {
+      this.setState({ loading: true });
 
-    Axios.get(
-      "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/" +
-        this.state.url.slice(25),
-      Yelpconfig
-    )
-      .then(resp => {
-        if (resp.data.name) {
-          const data = {
-            location_id: localStorage.getItem("locationId"),
-            Platform: "Yelp",
-            Token: "",
-            Username: resp.data.name,
-            Email: "",
-            Password: this.state.password,
-            Connect_status: "Connect",
-            Other_info: "{'URL':" + this.state.url + ",'data':''}"
-          };
-          // Axios.post(
-          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-          //   data,
-          //   DjangoConfig
-          // )
-          add_social_account(data, DjangoConfig)
-            .then(resp => {
-              console.log(resp);
-              this.setState({ isUrl: true, loading: false });
-            })
-            .catch(resp => {
-              alert("Invalid username or password");
-              console.log(resp);
-              this.setState({
-                wrong: "Invalid or Not authorised",
-                loading: false
+      const DjangoConfig = {
+        headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
+      };
+
+      Axios.get(
+        "https://cors-anywhere.herokuapp.com/https://api.yelp.com/v3/businesses/" +
+          this.state.url.slice(25),
+        Yelpconfig
+      )
+        .then(resp => {
+          if (resp.data.name) {
+            const data = {
+              location_id: localStorage.getItem("locationId"),
+              Platform: "Yelp",
+              Token: "",
+              Username: resp.data.name,
+              Email: "",
+              Password: this.state.password,
+              Connect_status: "Connect",
+              Other_info: "{'URL':" + this.state.url + ",'data':''}"
+            };
+            add_social_account(data, DjangoConfig)
+              .then(resp => {
+                console.log(resp);
+                this.setState({ isUrl: true, loading: false });
+              })
+              .catch(resp => {
+                alert("Invalid username or password");
+                console.log(resp);
+                this.setState({
+                  wrong: "Invalid or Not authorised",
+                  loading: false
+                });
               });
-            });
-        } else {
+          } else {
+            alert("Invalid Username or password");
+            this.setState({ loading: false });
+          }
+        })
+        .catch(resp => {
           alert("Invalid Username or password");
           this.setState({ loading: false });
-        }
-      })
-      .catch(resp => {
-        alert("Invalid Username or password");
-        this.setState({ loading: false });
-      });
+        });
+    }
   };
 
   render() {

@@ -159,11 +159,11 @@ class Signup extends React.Component {
       any_error = true;
     }
     if (data.Country == "") {
-      this.setState({ city_error: "*Enter your City" });
+      this.setState({ city_error: "*Enter your Country name" });
       any_error = true;
     }
     if (data.Phone == "") {
-      this.setState({ state_error: "*Enter your State" });
+      this.setState({ state_error: "*Enter your Phone No." });
       any_error = true;
     }
     if (data.password == "") {

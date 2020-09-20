@@ -488,11 +488,6 @@ export default class LocationManager extends Component {
 
     this.setState({ specialTimeLoading: true });
 
-    // Axios.post(
-    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/edit-Location-operations-hours-by-id",
-    //   data,
-    //   DjangoConfig
-    // )
     edit_location_operations_hours_by_id(data, DjangoConfig)
       .then(resp => {
         console.log(resp);
@@ -501,11 +496,7 @@ export default class LocationManager extends Component {
         const data1 = {
           location_id: locationId
         };
-        // Axios.post(
-        //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/get-location-by-id",
-        //   data1,
-        //   DjangoConfig
-        // )
+        
         location_by_id(data1, DjangoConfig)
           .then(resp1 => {
             this.setState({

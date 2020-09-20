@@ -16,6 +16,8 @@ const Yelpconfig = {
   }
 };
 
+let total_listings = 14;
+
 const DnbConfig = {
   headers: {
     "x-dnb-user": "P200000D5647887A34E4067B86A78E31",
@@ -102,6 +104,13 @@ export default class Overview extends Component {
     foursquareReviews: [],
     foursquareDetails:"",
     foursquareReviewlength:"-",
+
+    linkedin_clicks:"-",
+    linkedin_likes:"-",
+    linkedin_impressions:"-",
+    linkedin_comments:"-",
+    linkedin_share:"-",
+    linkedin_followers:"-",
 
     dnbFinancialConditionText:"-",
     dnbHistoryRatingText:"-",
@@ -228,6 +237,7 @@ export default class Overview extends Component {
       hereUrl,
       tomtomUrl,
       linkedinUrl,
+      linkedinId,
       avvoToken,
       fbtoken,
       fbPageId,
@@ -308,14 +318,8 @@ export default class Overview extends Component {
             tomtomUrl = l.Social_Platform.Other_info;
           }
           if (l.Social_Platform.Platform == "Linkedin") {
-            this.setState({
-              all_connections: [
-                ...this.state.all_connections,
-                { name: "Linkedin" }
-              ]
-            });
-
             linkedinUrl = l.Social_Platform.Token;
+            linkedinId = l.Social_Platform.Other_info
           }
         });
 
@@ -713,6 +717,46 @@ export default class Overview extends Component {
           });
         }
 
+        // For linkedin
+        if (linkedinUrl && linkedinId) {
+          const LinkedinConfig = {
+            headers: {
+              Authorization: "Bearer " + linkedinUrl
+            }
+          };
+          Axios.get(
+            `https://cors-anywhere.herokuapp.com/https://api.linkedin.com/v2/organizationalEntityShareStatistics?q=organizationalEntity&organizationalEntity=${linkedinId}`,LinkedinConfig
+          ).then(res => {
+            // console.log("linkedin data", res.data);
+            if(res.data && res.data.elements && res.data.elements[0].totalShareStatistics){
+              let lin_data = res.data.elements[0].totalShareStatistics
+              this.setState({
+              linkedin_clicks:lin_data.clickCount,
+              linkedin_likes:lin_data.likeCount,
+              linkedin_impressions:lin_data.impressionCount,
+              linkedin_comments:lin_data.commentCount,
+              linkedin_share:lin_data.shareCount
+              });
+            }
+            this.setState({
+              all_connections: [
+                ...this.state.all_connections,
+                { name: "Linkedin" }
+              ]
+            });
+          });
+          Axios.get(
+            `https://cors-anywhere.herokuapp.com/https://api.linkedin.com/v2/networkSizes/${linkedinId}?edgeType=CompanyFollowedByMember`,LinkedinConfig
+          ).then(res => {
+            // console.log("linkedin data", res.data);
+            if(res.data && res.data.firstDegreeSize){
+              this.setState({
+              linkedin_followers:res.data.firstDegreeSize
+              });
+            }
+          })
+        }
+
         // For Dnb
         if (dnbUrl) {
 
@@ -1032,11 +1076,18 @@ export default class Overview extends Component {
       foursquareReviewlength,
       foursquareDetails,
 
+      linkedin_clicks,
+      linkedin_likes,
+      linkedin_comments,
+      linkedin_impressions,
+      linkedin_followers,
+      linkedin_share,
+
       dnbFinancialConditionText,
-    dnbHistoryRatingText,
-    dnbRiskLevelDescription,
-    dnbRiskScore,
-    dnbStandardRating,
+      dnbHistoryRatingText,
+      dnbRiskLevelDescription,
+      dnbRiskScore,
+      dnbStandardRating,
 
       appleReviews,
       appleRating,
@@ -1139,7 +1190,7 @@ export default class Overview extends Component {
       // { title: "Google", value: 6, color: "#ffb92d" },
       {
         title: "Opted out",
-        value: 13 - all_connections.length,
+        value: total_listings - all_connections.length,
         color: "#0460ea"
       },
       { title: "Live Listing", value: all_connections.length, color: "#04e38a" }
@@ -1635,6 +1686,44 @@ export default class Overview extends Component {
               ])
             : ""}
 
+{data.name == "Linkedin"
+            ? (total_social_overview = [
+                ...total_social_overview,
+                <div className="socailsbox">
+                  <div className="iconbxo">
+                    <img src={require("../images/linkedin.png")} alt="Linkedin" />
+                  </div>
+                  <div className="liks">
+                    <span>Likes</span>
+                    <h4>{linkedin_likes}</h4>
+                    {/* <div className="countbox">+10.3%</div> */}
+                  </div>
+                  <div className="liks">
+                    <span>Followers</span>
+                    <h4>{linkedin_followers}</h4>
+                    {/* <div className="countbox">+10.3%</div> */}
+                  </div>
+                  <div className="liks">
+                    <span>impression</span>
+                    <h4>{linkedin_impressions}</h4>
+                    {/* <div className="countbox">+10.3%</div> */}
+                  </div>
+                  {/* <div className="liks">
+                    <span>Comments</span>
+                    <h4>{linkedin_comments}</h4>
+                  </div>
+                  <div className="liks">
+                    <span>share</span>
+                    <h4>{linkedin_share}</h4>
+                  </div>
+                  <div className="liks">
+                    <span>Clicks</span>
+                    <h4>{linkedin_clicks}</h4>
+                  </div> */}
+                </div>
+              ])
+            : ""}
+
 {data.name == "Avvo"
             ? (total_social_overview = [
                 ...total_social_overview,
@@ -1865,7 +1954,7 @@ export default class Overview extends Component {
         </div> */}
         <div className="liks">
           <span>Rating</span>
-          <h4>{zillowDetails.avgRating}</h4>
+          <h4>{zillowDetails.avgRating ? zillowDetails.avgRating : "-"}</h4>
         </div>
         <div className="liks">
           <span>Reviews</span>
@@ -2280,7 +2369,7 @@ export default class Overview extends Component {
 
                             <h3>
                               {all_connections
-                                ? (((13 - all_connections.length) * 100) / 13)
+                                ? (((total_listings - all_connections.length) * 100) / total_listings)
                                     .toString()
                                     .slice(0, 4) + "%"
                                 : "-"}
@@ -2302,7 +2391,7 @@ export default class Overview extends Component {
                               />
                             </div>
                             <div className="promo-text">
-                              <h2>13</h2>
+                                <h2>{total_listings}</h2>
                               <h3>All Listing</h3>
                             </div>
                           </div>
@@ -2366,7 +2455,7 @@ export default class Overview extends Component {
                             <div className="promo-text">
                               <h2>
                                 {all_connections
-                                  ? 13 - all_connections.length
+                                  ? total_listings - all_connections.length
                                   : "-"}
                               </h2>
                               <h3>Opted-out</h3>

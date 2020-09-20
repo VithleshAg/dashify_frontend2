@@ -20,9 +20,8 @@ class AppleLogin extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    //  this.setState({log:false})
-    // this.props.login(this.state.username, this.state.password);
-    // return <Redirect to="/locationdetails" />
+
+    let isError = false;
 
     this.setState({
       username_error: "",
@@ -35,73 +34,78 @@ class AppleLogin extends Component {
       this.setState({
         username_error: "Enter your Email"
       });
+      isError = true;
     }
     if (this.state.password == "") {
       this.setState({ password_error: "Enter your password" });
+      isError = true;
     }
     if (this.state.id == "") {
       this.setState({ id_error: "Enter Url" });
-      console.log("i am in console");
+      isError = true;
     }
-    this.setState({ loading: true });
 
-    const DjangoConfig = {
-      headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
-    };
+    if (!isError) {
+      this.setState({ loading: true });
 
-    // const appleId = this.state.id.split("/")[6].slice(2);
-    // localStorage.setItem("appleId", appleId)
+      const DjangoConfig = {
+        headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
+      };
 
-    if (this.state.id.split("/")[6]) {
-      Axios.get(
-        "https://itunes.apple.com/in/rss/customerreviews/id=" +
-          this.state.id.split("/")[6].slice(2) +
-          "/sortBy=mostRecent/json"
-      )
-        .then(res => {
-          if (res.data && res.data.feed && res.data.feed.entry) {
-            const data = {
-              location_id: localStorage.getItem("locationId"),
-              Platform: "Apple",
-              Token: "",
-              Username: this.state.id.split("/")[5],
-              Email: this.state.username,
-              Password: "",
-              Connect_status: "Connect",
-              Other_info: "{'URL':" + this.state.id + ",'data':''}"
-            };
+      // const appleId = this.state.id.split("/")[6].slice(2);
+      // localStorage.setItem("appleId", appleId)
 
-            // console.log("apple esponse", res.data);
-            // Axios.post(
-            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-            //   data,
-            //   DjangoConfig
-            // )
-            add_social_account(data, DjangoConfig)
-              .then(resp => {
-                console.log("apple response", resp);
-                this.setState({ isId: true, loading: false });
-              })
-              .catch(resp => {
-                console.log("apple response", resp);
-                alert("Invalid username or password");
-                this.setState({
-                  wrong: "Invalid or Not authorised",
-                  loading: false
+      if (this.state.id.split("/")[6]) {
+        Axios.get(
+          "https://itunes.apple.com/in/rss/customerreviews/id=" +
+            this.state.id.split("/")[6].slice(2) +
+            "/sortBy=mostRecent/json"
+        )
+          .then(res => {
+            if (res.data && res.data.feed && res.data.feed.entry) {
+              const data = {
+                location_id: localStorage.getItem("locationId"),
+                Platform: "Apple",
+                Token: "",
+                Username: this.state.id.split("/")[5],
+                Email: this.state.username,
+                Password: "",
+                Connect_status: "Connect",
+                Other_info: "{'URL':" + this.state.id + ",'data':''}"
+              };
+
+              // console.log("apple esponse", res.data);
+              // Axios.post(
+              //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+              //   data,
+              //   DjangoConfig
+              // )
+              add_social_account(data, DjangoConfig)
+                .then(resp => {
+                  console.log("apple response", resp);
+                  this.setState({ isId: true, loading: false });
+                })
+                .catch(resp => {
+                  console.log("apple response", resp);
+                  alert("Invalid username or password");
+                  this.setState({
+                    wrong: "Invalid or Not authorised",
+                    loading: false
+                  });
                 });
-              });
-          } else {
-            alert("Invalid url");
+            } else {
+              alert("Invalid url");
+              this.setState({ loading: false });
+            }
+          })
+          .catch(resp => {
+            alert("Invalid username or password");
             this.setState({ loading: false });
-          }
-        })
-        .catch(resp => {
-          alert("Invalid username or password");
-          this.setState({ loading: false });
-        });
-    } else {
-      alert("Invalid username or password");
-      this.setState({ loading: false });
+          });
+      } else {
+        alert("Invalid username or password");
+        this.setState({ loading: false });
+      }
     }
   };
 

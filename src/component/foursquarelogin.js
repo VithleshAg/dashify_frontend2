@@ -20,9 +20,8 @@ class FourSquareLogin extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    //  this.setState({log:false})
-    // this.props.login(this.state.username, this.state.password);
-    // return <Redirect to="/locationdetails" />
+
+    let isError = false;
 
     this.setState({
       username_error: "",
@@ -35,69 +34,69 @@ class FourSquareLogin extends Component {
       this.setState({
         username_error: "Enter your Email"
       });
+      isError = true;
     }
     if (this.state.password == "") {
       this.setState({ password_error: "Enter your password" });
+      isError = true;
     }
     if (this.state.url == "") {
       this.setState({ url_error: "Enter Url" });
-      console.log("i am in console");
+      isError = true;
     }
-    this.setState({ loading: true });
 
-    const DjangoConfig = {
-      headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
-    };
+    if (!isError) {
+      this.setState({ loading: true });
 
-    // const fourUrl = this.state.url.split("/")[5];
-    // localStorage.setItem("fourUrl", fourUrl);
+      const DjangoConfig = {
+        headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
+      };
 
-    Axios.get(
-      "https://cors-anywhere.herokuapp.com/https://api.foursquare.com/v2/venues/" +
-        this.state.url.split("/")[5] +
-        "?client_id=44RU2431YG02H4E00RQTLKEUKIKINQSFO2JBHII2WHH32PXZ&client_secret=FWV2WOL40MQ5M1YZ5E2TKUWIQ4WYZ1QUJXOQ24VGRSXFA3IY&v=20180323"
-    )
-      .then(res => {
-        // console.log("citysearch resp",res);
-        if (res.data && res.data.response && res.data.response.venue) {
-          const data = {
-            location_id: localStorage.getItem("locationId"),
-            Platform: "Foursquare",
-            Token: "",
-            Username: res.data.response.venue.name,
-            Email: this.state.username,
-            Password: this.state.password,
-            Connect_status: "Connect",
-            Other_info: "{'URL':" + this.state.url + ",'data':''}"
-          };
+      // const fourUrl = this.state.url.split("/")[5];
+      // localStorage.setItem("fourUrl", fourUrl);
 
-          // Axios.post(
-          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-          //   data,
-          //   DjangoConfig
-          // )
-          add_social_account(data, DjangoConfig)
-            .then(resp => {
-              console.log(resp);
-              this.setState({ isUrl: true, loading: false });
-            })
-            .catch(resp => {
-              alert("Invalid username or password");
-              console.log(resp);
-              this.setState({
-                wrong: "Invalid or Not authorised",
-                loading: false
+      Axios.get(
+        "https://cors-anywhere.herokuapp.com/https://api.foursquare.com/v2/venues/" +
+          this.state.url.split("/")[5] +
+          "?client_id=44RU2431YG02H4E00RQTLKEUKIKINQSFO2JBHII2WHH32PXZ&client_secret=FWV2WOL40MQ5M1YZ5E2TKUWIQ4WYZ1QUJXOQ24VGRSXFA3IY&v=20180323"
+      )
+        .then(res => {
+          // console.log("citysearch resp",res);
+          if (res.data && res.data.response && res.data.response.venue) {
+            const data = {
+              location_id: localStorage.getItem("locationId"),
+              Platform: "Foursquare",
+              Token: "",
+              Username: res.data.response.venue.name,
+              Email: this.state.username,
+              Password: this.state.password,
+              Connect_status: "Connect",
+              Other_info: "{'URL':" + this.state.url + ",'data':''}"
+            };
+
+            add_social_account(data, DjangoConfig)
+              .then(resp => {
+                console.log(resp);
+                this.setState({ isUrl: true, loading: false });
+              })
+              .catch(resp => {
+                alert("Invalid username or password");
+                console.log(resp);
+                this.setState({
+                  wrong: "Invalid or Not authorised",
+                  loading: false
+                });
               });
-            });
-        } else {
-          alert("Invalid urlp");
+          } else {
+            alert("Invalid urlp");
+            this.setState({ loading: false });
+          }
+        })
+        .catch(res => {
+          alert("Invalid username or password");
           this.setState({ loading: false });
-        }
-      })
-      .catch(res => {
-        alert("Invalid username or password");
-        this.setState({ loading: false });
-      });
+        });
+    }
   };
 
   render() {

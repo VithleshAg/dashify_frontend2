@@ -7,7 +7,6 @@ import {
   business_categories,
   business_states
 } from "./apis/location";
-
 import {
   faqs_by_id,
   edit_faq,
@@ -18,19 +17,6 @@ import {
 } from "./apis/voice";
 import GoogleLogin from "react-google-login";
 import Spinner from "./common/Spinner";
-import { MDBRow, MDBCol, MDBBtn, MDBCard, MDBContainer } from "mdbreact";
-import vl_img1 from "./assets/vl_img1.png";
-import vl_img2 from "./assets/vl_img2.png";
-import vl_img3 from "./assets/vl_img3.png";
-import vl_img4 from "./assets/vl_img4.png";
-import vl_img5 from "./assets/vl_img5.png";
-import vl_img6 from "./assets/vl_img6.png";
-import vl_img7 from "./assets/vl_img7.png";
-import vl_img8 from "./assets/vl_img8.png";
-import vl_img9 from "./assets/vl_img9.png";
-import vl_img10 from "./assets/vl_img10.png";
-import vl_img11 from "./assets/vl_img11.png";
-import attachment from "./assets/attachment.png";
 
 const DjangoConfig = {
   headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
@@ -615,9 +601,15 @@ export default class VoiceListing extends Component {
 
   render() {
     if (this.state.otherImage) {
-      var otherIma = this.state.otherImage.map((img, i) => (
-        <img src={img.Image} className="vl_img" />
-      ));
+      var otherIma = (
+        <ul>
+          {this.state.otherImage.map((img, i) => (
+            <li>
+              <img src={img.Image} height="100" width="100" />
+            </li>
+          ))}
+        </ul>
+      );
     }
 
     if (this.state.allFaq.map) {
@@ -625,94 +617,109 @@ export default class VoiceListing extends Component {
         var nameid = r.id;
 
         return (
-          <div>
-            <MDBRow>
-              <MDBCol className="col-sm-7 col-md-offset-1">
-                <div className="vl_c3_subhead"> {r.question}</div>
-                <div className="vl_contant">{r.answer}</div>
-              </MDBCol>
-              {/* <MDBCol className=" col-md-2 col-md-offset-2">
-              <MDBBtn onClick={() => this.deleteFaq(nameid)} className="vl_btn_c3_edit">Delete</MDBBtn>
-            </MDBCol> */}
-              <MDBCol className=" col-md-2 col-md-offset-2">
-                <MDBBtn
-                  onClick={() => this.editFaq(nameid)}
-                  className="vl_btn_c3_edit"
-                >
-                  Edit
-                </MDBBtn>
-              </MDBCol>
-            </MDBRow>
-            <hr className="voice_hr" />
+          <div className="conntend">
+            <div className="row d-flex ">
+              <div className="col-md-10">
+                <div className="faq-title">
+                  <h4>Q : {r.question} ?</h4>
+                </div>
+                <div className="faq-descrition">
+                  <p>A : {r.answer}</p>
+                </div>
+              </div>
+
+              <div className="col-md-2">
+                <a className="delete" onClick={() => this.deleteFaq(nameid)}>
+                  <i className="zmdi zmdi-delete"></i>
+                </a>
+                <a onClick={() => this.editFaq(nameid)} className="edit">
+                  <i className="zmdi zmdi-edit"></i>
+                </a>
+              </div>
+            </div>
           </div>
         );
       });
     }
+
     return (
       <div>
-        <MDBContainer>
-          <div className="setting-10">
-            <h3>Voice Listing</h3>
+        {/* <div className="content-page"> */}
+
+        {this.state.loader ? (
+          <div className="rightside_title">
+            <Spinner />
           </div>
-          <MDBRow className="voice_container">
-            <MDBCol sm="12" md="5" lg="5">
-              <MDBRow>
-                <MDBCol sm="5" md="5" lg="5">
-                  <img
-                    // src={vl_img1}
-                    // alt="vl_img1"
-                    src={
-                      this.state.logo
-                        ? this.state.logo
-                        : require("../images/Logo2.png")
-                    }
-                    className="responsive"
-                    id="vl_img1"
-                  />
-                </MDBCol>
-                <MDBCol sm="7" md="7" lg="7">
-                  <div id="vl_heading">{this.state.name}</div>
-                  <div className="vl_contant">{this.state.category}</div>
-                  <div className="vl_subhead" style={{ marginTop: "10%" }}>
-                    ADDRESS AND CONTACT
+        ) : (
+          <div className="main_content">
+            <div className="rightside_title">
+              <h1>Voice Listing</h1>
+            </div>
+            <div className="tablediv">
+              <div className="row">
+                <div className="col-md-6">
+                  <div className="listingdetails">
+                    <div className="d-flex">
+                      <div className="viewimg">
+                        <img
+                          src={
+                            this.state.logo
+                              ? this.state.logo
+                              : require("../images/Logo2.png")
+                          }
+                          height="150"
+                          width="150"
+                        />
+                      </div>
+                      <div className="viewlisting-text">
+                        <h2>{this.state.name}</h2>
+                        <p>{this.state.category}</p>
+                        <h3>ADDRESS AND CONTACT</h3>
+                        <p>
+                          {this.state.address}, {this.state.state} ,
+                          {this.state.postalCode}
+                        </p>
+                        <p>P:{this.state.phone}</p>
+                        <div className="edit-icon">
+                          <span>
+                            <i className="zmdi  zmdi-edit"></i>
+                          </span>
+
+                          <a
+                            href={`/dashboard#/locations/${localStorage.getItem(
+                              "locationId"
+                            )}/view-location`}
+                            className="showmore"
+                          >
+                            Show More informations
+                          </a>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div className="vl_contant">
-                    {this.state.address}, {this.state.state} ,
-                    {this.state.postalCode}
-                    <br />
-                    {this.state.phone ? `P : ${this.state.phone}` : ""}
+                </div>
+
+                <div className="col-md-6">
+                  <div className="business-box">
+                    {otherIma}
+                    <div className="viewlisting-text">
+                      <h3>BUSINESS DESCRIPTION</h3>
+                      <p>{this.state.about}</p>
+                    </div>
                   </div>
-                  <MDBBtn
-                    id="vl_btn_edit"
-                    href={`/dashboard#/locations/${localStorage.getItem(
-                      "locationId"
-                    )}/view-location`}
-                  >
-                    Edit
-                  </MDBBtn>
-                </MDBCol>
-              </MDBRow>
-            </MDBCol>
-            <MDBCol xs="12" md="7" lg="7">
-              <div className="vl_subhead" id="buss_desc">
-                BUSINESS DESCRIPTION
+                </div>
               </div>
-              <div className="vl_contant">{this.state.about}</div>
-              <MDBRow>{otherIma}</MDBRow>
-            </MDBCol>
-          </MDBRow>
-        </MDBContainer>
-        <MDBContainer className="voice_container">
-          <MDBRow>
-            <div className="col-md-12">
-              <ul className="main-listfive">
-                <li>
-                  <div className="img-iconbox col-md-4 ">
-                    <img src={vl_img7} alt="vl_img" className="vl_c2_icon" />
+            </div>
+
+            <div className=" mt-30">
+              <div className="googleass">
+                <div className="google-asst">
+                  <div className="google-icon">
+                    <img src={require("../images/google-assistant.png")} />
                   </div>
-                  <div className="text-iconbox">
-                    <div className="vl_card_head">Google Assistant</div>
-                    {/* <MDBBtn id="vl_btn_optimize">Optimize</MDBBtn> */}
+                  <div className="google-text">
+                    <h2>Google Assistant</h2>
+
                     {this.state.googleLoggedIn ? (
                       this.state.googleOptimized ? (
                         <a className="progressb">
@@ -736,223 +743,219 @@ export default class VoiceListing extends Component {
                       />
                     )}
                   </div>
-                </li>
+                </div>
 
-                <li>
-                  <div className="img-iconbox col-md-4">
-                    <img src={vl_img8} alt="vl_img" className="vl_c2_icon" />
+                <div className="google-asst">
+                  <div className="google-icon">
+                    <img src={require("../images/alexa.png")} />
                   </div>
-                  <div className="text-iconbox">
-                    <div className="vl_card_head">Amazon Alexa</div>
+                  <div className="google-text">
+                    <h2>Amazon Alexa</h2>
                     {this.state.yelpIsLoggedIn ? (
                       this.state.yelpAlexa ? (
-                        <div className="vl_link">
-                          <img
-                            src={attachment}
-                            alt="attachment_icon"
-                            className="attachment"
-                          />
-                          Optimizacion in progress
-                        </div>
+                        <a className="progressb">
+                          <i className="zmdi zmdi-check-circle"></i>Optimization
+                          in progress
+                        </a>
                       ) : (
                         <p style={{ color: "red" }}>can't optimise</p>
                       )
                     ) : (
-                      <MDBBtn id="vl_btn_optimize" href="/yelplogin">
+                      <a href="/yelplogin" className="optimize">
                         Optimize
-                      </MDBBtn>
+                      </a>
                     )}
                   </div>
-                </li>
+                </div>
 
-                <li>
-                  <div className="img-iconbox col-md-4">
-                    <img src={vl_img9} alt="vl_img" className="vl_c2_icon" />
+                <div className="google-asst">
+                  <div className="google-icon">
+                    <img src={require("../images/siri.png")} />
                   </div>
-                  <div className="text-iconbox">
-                    <div className="vl_card_head">Apple Siri</div>
+                  <div className="google-text">
+                    <h2>Apple Siri</h2>
+
                     {this.state.appleIsLoggedIn ? (
                       this.state.appleOptimized ? (
-                        <div className="vl_link">
-                          <img
-                            src={attachment}
-                            alt="attachment_icon"
-                            className="attachment"
-                          />
-                          Optimizacion in progress
-                        </div>
+                        <a className="progressb">
+                          <i className="zmdi zmdi-check-circle"></i>Optimization
+                          in progress
+                        </a>
                       ) : (
                         <p style={{ color: "red" }}>can't optimise</p>
                       )
                     ) : (
-                      <MDBBtn id="vl_btn_optimize" href="/applelogin">
+                      <a href="/applelogin" className="optimize">
                         Optimize
-                      </MDBBtn>
+                      </a>
                     )}
                   </div>
-                </li>
+                </div>
 
-                <li>
-                  <div className="img-iconbox col-md-4">
-                    <img src={vl_img10} alt="vl_img" className="vl_c2_icon" />
+                <div className="google-asst">
+                  <div className="google-icon">
+                    <img src={require("../images/cortana.png")} />
                   </div>
-                  <div className="text-iconbox">
-                    <div className="vl_card_head">Microsoft Cortana</div>
-                    <MDBBtn id="vl_btn_optimize">Optimize</MDBBtn>
+                  <div className="google-text">
+                    <h2>Microsoft Cortana</h2>
+                    <a className="optimize">Optimize</a>
                   </div>
-                </li>
+                </div>
 
-                <li>
-                  <div className="img-iconbox col-md-4">
-                    <img src={vl_img11} alt="vl_img" className="vl_c2_icon" />
+                <div className="google-asst">
+                  <div className="google-icon">
+                    <img src={require("../images/bixby.png")} />
                   </div>
-                  <div className="text-iconbox">
-                    <div className="vl_card_head">Samsung Bixby</div>
+                  <div className="google-text">
+                    <h2>Samsung bixby</h2>
                     {this.state.foursquareIsLoggedIn ? (
                       this.state.fourBixby ? (
-                        <div className="vl_link">
-                          <img
-                            src={attachment}
-                            alt="attachment_icon"
-                            className="attachment"
-                          />
-                          Optimizacion in progress
-                        </div>
+                        <a className="progressb">
+                          <i className="zmdi zmdi-check-circle"></i>Optimization
+                          in progress
+                        </a>
                       ) : (
                         <p style={{ color: "red" }}>can't optimize</p>
                       )
                     ) : (
-                      <MDBBtn id="vl_btn_optimize" href="/foursquarelogin">
+                      <a href="/foursquarelogin" className="optimize">
                         Optimize
-                      </MDBBtn>
+                      </a>
                     )}
                   </div>
-                </li>
-              </ul>
-            </div>
-          </MDBRow>
-        </MDBContainer>
-
-        <MDBContainer className="voice_container">
-          <MDBRow>
-            <MDBCol className="col-md-7">
-              <div id="vl_c3_head">Voice FAQs</div>
-              <div id="vl_c3_contant">
-                Add FAQs that will help you to customize your location to appear
-                in voice search{" "}
+                </div>
               </div>
-            </MDBCol>
-            <MDBCol className="col-md-5">
-              <MDBBtn onClick={this.addFaq} id="vl_btn_FAQ">
-                + Add FAQs
-              </MDBBtn>
-              <MDBBtn
-                onClick={this.installWedget}
-                data-toggle="modal"
-                data-target="#myModal"
-                id="vl_btn_wedgets"
-              >
-                Install Wedgets
-              </MDBBtn>
-            </MDBCol>
-          </MDBRow>
-          <div id="myModal" className="modal fade" role="dialog">
-            <div className="modal-dialog">
-              <div className="modal-content">
-                <form className="needs-validation" noValidate>
-                  <div className="modal-header">
-                    <button
-                      type="button"
-                      className="close"
-                      data-dismiss="modal"
-                    >
-                      <i className="zmdi zmdi-close"></i>
-                    </button>
-                    <h4 className="modal-title" style={{ textAlign: "center" }}>
-                      Add FAQs to your website
-                    </h4>
+            </div>
+
+            <div className="update-account voices mt-30">
+              <div className="box-space">
+                <div className="row d-flex">
+                  <div className="col-md-8">
+                    <h2>Voice FAQs</h2>
                     <p>
-                      Follow the steps below to optimize your website for voice
-                      search
+                      Add FAQs that will help you to customize your location to
+                      appear in voice search
                     </p>
                   </div>
-                  <div className="modal-body" style={{ paddingTop: "0px" }}>
-                    <div className="form-group enterpost">
-                      <p>Step 01 </p>
-                      <br />
-                      <div>
-                        Copy the generated html below and paste it into any
-                        section of any page on your website. Feel free to modify
-                        the CSS if you wish to.
-                      </div>
-                      <br />
-                      <textarea
-                        className="codearea"
-                        name="htmlcode"
-                        id="htmlcode"
-                        value={this.state.htmlc}
-                        readOnly
-                      ></textarea>
-                      <br />
-
-                      <button onClick={this.htmlcopy}>Copy Code</button>
-
-                      <br />
-                      <br />
-                      <br />
-
-                      <p>Step 02 </p>
-                      <br />
-                      <div>
-                        Copy the Javascript snippet below and paste it into the
-                        head tag of your website.
-                      </div>
-                      <br />
-                      <textarea
-                        className="codearea"
-                        name="javascriptcode"
-                        id="javascriptcode"
-                        value={this.state.javac}
-                        readOnly
-                      ></textarea>
-                      <br />
-
-                      <button onClick={this.javacopy}>Copy Code</button>
-                      <br />
-                      <br />
-                    </div>
+                  <div className="col-md-4 text-right">
+                    <button onClick={this.addFaq} className="add_faq">
+                      + Add FAQs
+                    </button>
+                    <a
+                      href="#"
+                      onClick={this.installWedget}
+                      data-toggle="modal"
+                      data-target="#myModal"
+                      className="wedgets"
+                    >
+                      Install Wedgets
+                    </a>
                   </div>
-                </form>
+                </div>
+              </div>
+
+              <div id="myModal" className="modal fade" role="dialog">
+                <div className="modal-dialog">
+                  <div className="modal-content">
+                    <form className="needs-validation" noValidate>
+                      <div className="modal-header">
+                        <button
+                          type="button"
+                          className="close"
+                          data-dismiss="modal"
+                        >
+                          <i className="zmdi zmdi-close"></i>
+                        </button>
+                        <h4
+                          className="modal-title"
+                          style={{ textAlign: "center" }}
+                        >
+                          Add FAQs to your website
+                        </h4>
+                        <p>
+                          Follow the steps below to optimize your website for
+                          voice search
+                        </p>
+                      </div>
+                      <div className="modal-body" style={{ paddingTop: "0px" }}>
+                        <div className="form-group enterpost">
+                          <p>Step 01 </p>
+                          <br />
+                          <div>
+                            Copy the generated html below and paste it into any
+                            section of any page on your website. Feel free to
+                            modify the CSS if you wish to.
+                          </div>
+                          <br />
+                          <textarea
+                            className="codearea"
+                            name="htmlcode"
+                            id="htmlcode"
+                            value={this.state.htmlc}
+                            readOnly
+                          ></textarea>
+                          <br />
+
+                          <button onClick={this.htmlcopy}>Copy Code</button>
+
+                          <br />
+                          <br />
+                          <br />
+
+                          <p>Step 02 </p>
+                          <br />
+                          <div>
+                            Copy the Javascript snippet below and paste it into
+                            the head tag of your website.
+                          </div>
+                          <br />
+                          <textarea
+                            className="codearea"
+                            name="javascriptcode"
+                            id="javascriptcode"
+                            value={this.state.javac}
+                            readOnly
+                          ></textarea>
+                          <br />
+
+                          <button onClick={this.javacopy}>Copy Code</button>
+                          <br />
+                          <br />
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div className=" connect-box">
+                {this.state.new ? (
+                  <NewFaq submit={this.submitFaq} cancel={this.submitCancel} />
+                ) : (
+                  ""
+                )}
+
+                {this.state.update ? (
+                  <UpdateFaq
+                    update={this.updateFaq}
+                    faqid={this.state.faqid}
+                    cancel={this.updateCancel}
+                    error={{
+                      ans_error: this.state.ans_error,
+                      que_error: this.state.que_error
+                    }}
+                  />
+                ) : (
+                  ""
+                )}
+
+                {AllFaq}
               </div>
             </div>
           </div>
+        )}
 
-          <hr className="voice_hr" />
-
-          <div className="connect-box">
-            {this.state.new ? (
-              <NewFaq submit={this.submitFaq} cancel={this.submitCancel} />
-            ) : (
-              ""
-            )}
-
-            {this.state.update ? (
-              <UpdateFaq
-                update={this.updateFaq}
-                faqid={this.state.faqid}
-                cancel={this.updateCancel}
-                error={{
-                  ans_error: this.state.ans_error,
-                  que_error: this.state.que_error
-                }}
-              />
-            ) : (
-              ""
-            )}
-
-            {AllFaq}
-          </div>
-        </MDBContainer>
+        {/* </div> */}
       </div>
     );
   }

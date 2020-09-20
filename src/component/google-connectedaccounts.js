@@ -74,11 +74,6 @@ class GoogleConnectedAccounts extends Component {
       Other_info: this.state.all_pages[index].name
     };
 
-    // Axios.post(
-    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-    //   data,
-    //   DjangoConfig
-    // )
     add_social_account(data, DjangoConfig)
       .then(resp => {
         console.log("google location response", resp.data);

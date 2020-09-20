@@ -185,13 +185,13 @@ export default class ViewLocations extends Component {
                   <div className="pagination-main">
                     <div className="pagination">
                       <ul>
-                        {/* <li className="prev">
-                      <a href="#">Previous</a>
-                    </li> */}
+                        <li className="prev">
+                          <a href="#">Previous</a>
+                        </li>
                         {renderPageNumbers}
-                        {/* <li className="next">
-                      <a href="#">Next</a>
-                    </li> */}
+                        <li className="next">
+                          <a href="#">Next</a>
+                        </li>
 
                         <li className="itempage dropdown">
                           <a className="dropdown-select" data-toggle="dropdown">

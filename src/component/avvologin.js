@@ -87,11 +87,6 @@ class AvvoLogin extends Component {
               Other_info: this.state.url
             };
 
-            // Axios.post(
-            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-            //   data,
-            //   DjangoConfig
-            // )
             add_social_account(data, DjangoConfig)
               .then(resp => {
                 console.log("Avvo resp", resp.data);

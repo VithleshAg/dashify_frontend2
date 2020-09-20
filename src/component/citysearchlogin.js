@@ -20,9 +20,8 @@ class CitySearchLogin extends Component {
 
   onSubmit = e => {
     e.preventDefault();
-    //  this.setState({log:false})
-    // this.props.login(this.state.username, this.state.password);
-    // return <Redirect to="/locationdetails" />
+
+    let isError = false;
 
     this.setState({
       username_error: "",
@@ -35,71 +34,76 @@ class CitySearchLogin extends Component {
       this.setState({
         username_error: "Enter your Email"
       });
+      isError = true;
     }
     if (this.state.password == "") {
       this.setState({ password_error: "Enter your password" });
+      isError = true;
     }
     if (this.state.url == "") {
       this.setState({ url_error: "Enter Url" });
-      console.log("i am in console");
+      isError = true;
     }
-    this.setState({ loading: true });
 
-    const DjangoConfig = {
-      headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
-    };
+    if (!isError) {
+      this.setState({ loading: true });
 
-    const citysearchUrl = this.state.url.split("/")[4];
-    localStorage.setItem("citysearchUrl", citysearchUrl);
+      const DjangoConfig = {
+        headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
+      };
 
-    Axios.get(
-      "https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/places/v2/detail?id=" +
-        this.state.url.split("/")[4] +
-        "&id_type=cs&client_ip=123.4.56.78&publisher=test&format=json"
-    )
-      .then(res => {
-        if (res.data) {
-          console.log("citysearch response", res.data);
-          const data = {
-            location_id: localStorage.getItem("locationId"),
-            Platform: "Citysearch",
-            Token: "",
-            Username: res.data.locations
-              ? res.data.locations[0].name
-              : this.state.username,
-            Email: this.state.username,
-            Password: "",
-            Connect_status: "Connect",
-            Other_info: "{'URL':" + this.state.url + ",'data':''}"
-          };
+      const citysearchUrl = this.state.url.split("/")[4];
+      localStorage.setItem("citysearchUrl", citysearchUrl);
 
-          // Axios.post(
-          //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
-          //   data,
-          //   DjangoConfig
-          // )
-          add_social_account(data, DjangoConfig)
-            .then(resp => {
-              console.log("citysearch resp", resp);
-              this.setState({ isUrl: true, loading: false });
-            })
-            .catch(resp => {
-              alert("Invalid username or password");
-              console.log("citysearch resp", resp);
-              this.setState({
-                wrong: "Invalid or Not authorised",
-                loading: false
+      Axios.get(
+        "https://cors-anywhere.herokuapp.com/https://api.citygridmedia.com/content/places/v2/detail?id=" +
+          this.state.url.split("/")[4] +
+          "&id_type=cs&client_ip=123.4.56.78&publisher=test&format=json"
+      )
+        .then(res => {
+          if (res.data) {
+            console.log("citysearch response", res.data);
+            const data = {
+              location_id: localStorage.getItem("locationId"),
+              Platform: "Citysearch",
+              Token: "",
+              Username: res.data.locations
+                ? res.data.locations[0].name
+                : this.state.username,
+              Email: this.state.username,
+              Password: "",
+              Connect_status: "Connect",
+              Other_info: "{'URL':" + this.state.url + ",'data':''}"
+            };
+
+            // Axios.post(
+            //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/social-platforms/add-account",
+            //   data,
+            //   DjangoConfig
+            // )
+            add_social_account(data, DjangoConfig)
+              .then(resp => {
+                console.log("citysearch resp", resp);
+                this.setState({ isUrl: true, loading: false });
+              })
+              .catch(resp => {
+                alert("Invalid username or password");
+                console.log("citysearch resp", resp);
+                this.setState({
+                  wrong: "Invalid or Not authorised",
+                  loading: false
+                });
               });
-            });
-        } else {
+          } else {
+            alert("Invalid username or password");
+            this.setState({ loading: false });
+          }
+        })
+        .catch(res => {
           alert("Invalid username or password");
           this.setState({ loading: false });
-        }
-      })
-      .catch(res => {
-        alert("Invalid username or password");
-        this.setState({ loading: false });
-      });
+        });
+    }
   };
 
   render() {

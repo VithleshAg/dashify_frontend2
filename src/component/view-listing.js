@@ -46,6 +46,8 @@ const Yelpconfig = {
   }
 };
 
+let total_listings = 14;
+
 // Create styles
 
 Font.register({
@@ -179,7 +181,8 @@ export default class ViewListing extends Component {
         fbPageId,
         fbData,
         googleData,
-        linkedinData;
+        linkedinData,
+        linkedin_page_id;
 
       let { pdf_data } = this.state;
 
@@ -217,6 +220,7 @@ export default class ViewListing extends Component {
               if (l.Social_Platform.Platform == "Linkedin") {
                 linkedinToken = l.Social_Platform.Token;
                 linkedinData = l;
+                linkedin_page_id = l.Social_Platform.Other_info
               }
 
               if (l.Social_Platform.Platform == "Foursquare") {
@@ -607,7 +611,18 @@ export default class ViewListing extends Component {
             }
 
             // Linkedin
-            if (linkedinToken) {
+            if (linkedinToken && linkedin_page_id) {
+              const LinkedinConfig = {
+                headers: {
+                  Authorization: "Bearer " + linkedinToken
+                }
+              };
+
+              Axios.get(
+            `https://cors-anywhere.herokuapp.com/https://api.linkedin.com/v2/networkSizes/${linkedin_page_id}?edgeType=CompanyFollowedByMember`,LinkedinConfig
+          ).then(res => {
+            // console.log("linkedin data", res.data);
+            if(res.data && res.data.firstDegreeSize){
               this.setState({
                 linkedinIsLoggedIn: true,
                 pdf_data: [
@@ -627,6 +642,9 @@ export default class ViewListing extends Component {
                   { name: "Linkedin" }
                 ]
               });
+            }
+          })
+
             }
           }
         })
@@ -869,16 +887,10 @@ export default class ViewListing extends Component {
   };
 
   disconnectAccount = e => {
-    console.log("hey");
     console.log(e.target.name);
     var name = e.target.name;
     const data = { location_connect_social_id: e.target.id };
 
-    // Axios.post(
-    //   "https://cors-anywhere.herokuapp.com/https://dashify.biz/locations/location-connect-remove-with-social-media",
-    //   data,
-    //   DjangoConfig
-    // )
     remove_social_account(data, DjangoConfig)
       .then(resp => {
         console.log(resp);
@@ -1475,7 +1487,7 @@ export default class ViewListing extends Component {
                           <i className="zmdi zmdi-play-circle-outline"></i>
                         </div>
                         <div className="dolce-textbox">
-                          <h4>14</h4>
+                        <h4>{total_listings}</h4>
                           <strong>Total Listing</strong>
                           <p>Keyword that have moved up in the rank</p>
                         </div>
@@ -1501,7 +1513,7 @@ export default class ViewListing extends Component {
                         <div className="dolce-textbox">
                           <h4>
                             {all_connections
-                              ? 14 - all_connections.length
+                              ? total_listings - all_connections.length
                               : "-"}
                           </h4>
                           <strong>Requiring Action</strong>
@@ -1768,7 +1780,8 @@ export default class ViewListing extends Component {
                           </a>
                         ) : (
                           <FacebookLogin
-                            appId="187396122554776"
+                            appId="3550574924973433"
+                            // appId="187396122554776"
                             // appId="3044182972316291"
                             autoLoad={false}
                             fields="name,email,picture"
@@ -1833,10 +1846,10 @@ export default class ViewListing extends Component {
                         ) : (
                           <div>
                             <LinkedIn
-                              clientId="861qygnjkytfwe"
+                              clientId="788d28i85q45cz"
                               onFailure={this.linkedin_handleFailure}
                               onSuccess={this.linkedin_handleSuccess}
-                              scope="r_liteprofile r_emailaddress w_member_social r_organization_social w_organization_social rw_organization_admin,rw_ads r_ads_reporting"
+                              scope="r_liteprofile r_emailaddress w_member_social r_organization_social w_organization_social rw_organization_admin rw_ads r_ads_reporting"
                               redirectUri="http://localhost:3000/linkedin"
                               redirectPath="/linkedin"
                             ></LinkedIn>
@@ -1904,7 +1917,7 @@ export default class ViewListing extends Component {
                           </a>
                         ) : (
                           <a
-                            href="http://www.avvo.com/oauth2/sessions/new?client_id=72g8jaazozj3eqov89rtdecpd&client_secret=mamtd9k5o7tdvavbu24tsr18&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Favvologin&response_type=code_and_token"
+                            href="http://www.avvo.com/oauth2/sessions/new?client_id=5qnw8y28j4m1ey1s29wprg668&client_secret=8dou5mll9h4z0k2i4ow752e8b&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Favvologin&response_type=code_and_token"
                             className="connect_btn"
                           >
                             Connect a account

@@ -66,6 +66,8 @@ class DnbLogin extends Component {
   onSubmit = e => {
     e.preventDefault();
 
+    let isError = false;
+
     this.setState({
       username_error: "",
       password_error: "",
@@ -77,75 +79,80 @@ class DnbLogin extends Component {
       this.setState({
         username_error: "Enter your Email"
       });
+      isError = true;
     }
     if (this.state.password == "") {
       this.setState({ password_error: "Enter your password" });
+      isError = true;
     }
     if (this.state.url == "") {
       this.setState({ url_error: "Enter Company DUNS Number" });
-      console.log("i am in console");
+      isError = true;
     }
-    this.setState({ loading: true });
 
-    const DjangoConfig = {
-      headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
-    };
+    if (!isError) {
+      this.setState({ loading: true });
 
-    const DnbAuthorization = {
-      headers: { Authorization: this.state.token }
-    };
+      const DjangoConfig = {
+        headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
+      };
 
-    Axios.get(
-      "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V6.0/organizations?match=true&MatchTypeText=Basic&DUNSNumber=" +
-        this.state.url,
-      DnbAuthorization
-    )
-      .then(resp => {
-        console.log("DNB result", resp.data);
+      const DnbAuthorization = {
+        headers: { Authorization: this.state.token }
+      };
 
-        if (
-          resp.data.MatchResponse &&
-          resp.data.MatchResponse.TransactionResult &&
-          resp.data.MatchResponse.TransactionResult.ResultText == "Success"
-        ) {
-          const data = {
-            location_id: localStorage.getItem("locationId"),
-            Platform: "Dnb",
-            Token: this.state.token,
-            Username:
-              resp.data.MatchResponse.MatchResponseDetail.MatchCandidate[0]
-                .OrganizationPrimaryName.OrganizationName.$,
-            Email: this.state.username,
-            Password: this.state.password,
-            Connect_status: "Connect",
-            Other_info: this.state.url
-          };
-          add_social_account(data, DjangoConfig)
-            .then(resp => {
-              console.log("add social account", resp.data);
-              this.setState({ isUrl: true, loading: false });
-            })
-            .catch(resp => {
-              console.log("add social account error", resp);
-              this.setState({
-                wrong: "Something went wrong",
-                loading: false
+      Axios.get(
+        "https://cors-anywhere.herokuapp.com/https://direct.dnb.com/V6.0/organizations?match=true&MatchTypeText=Basic&DUNSNumber=" +
+          this.state.url,
+        DnbAuthorization
+      )
+        .then(resp => {
+          console.log("DNB result", resp.data);
+
+          if (
+            resp.data.MatchResponse &&
+            resp.data.MatchResponse.TransactionResult &&
+            resp.data.MatchResponse.TransactionResult.ResultText == "Success"
+          ) {
+            const data = {
+              location_id: localStorage.getItem("locationId"),
+              Platform: "Dnb",
+              Token: this.state.token,
+              Username:
+                resp.data.MatchResponse.MatchResponseDetail.MatchCandidate[0]
+                  .OrganizationPrimaryName.OrganizationName.$,
+              Email: this.state.username,
+              Password: this.state.password,
+              Connect_status: "Connect",
+              Other_info: this.state.url
+            };
+            add_social_account(data, DjangoConfig)
+              .then(resp => {
+                console.log("add social account", resp.data);
+                this.setState({ isUrl: true, loading: false });
+              })
+              .catch(resp => {
+                console.log("add social account error", resp);
+                this.setState({
+                  wrong: "Something went wrong",
+                  loading: false
+                });
               });
+          } else {
+            this.setState({
+              wrong: "No match found for the requested Duns number.",
+              loading: false
             });
-        } else {
+          }
+        })
+        .catch(resp => {
+          console.log("DNB error", resp);
           this.setState({
             wrong: "No match found for the requested Duns number.",
             loading: false
           });
-        }
-      })
-      .catch(resp => {
-        console.log("DNB error", resp);
-        this.setState({
-          wrong: "No match found for the requested Duns number.",
-          loading: false
         });
-      });
+    }
   };
 
   render() {
