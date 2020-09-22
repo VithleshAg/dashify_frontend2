@@ -11,6 +11,8 @@ import Home from "./component/landingpage/home";
 import Review_management from "./component/landingpage/Review_management";
 import Blog from "./component/landingpage/Blog";
 import Career from "./component/landingpage/career";
+import ContactUs from "./component/landingpage/contactus";
+import Support from "./component/landingpage/support";
 import How_we_work from "./component/landingpage/How_we_work";
 import Login from "./component/landingpage/login";
 import Signup from "./component/landingpage/signup";
@@ -29,7 +31,6 @@ import PageNotFound from "./component/page-not-found";
 
 import EmailConfirmation from "./component/landingpage/email-confirmation";
 import PasswordReset from "./component/landingpage/password-reset";
-import ContactUs from "./component/contactus";
 
 class App extends Component {
   render() {
@@ -42,6 +43,8 @@ class App extends Component {
             <Route exact path="/" component={Home} />
             <Route exact path="/blog" component={Blog} />
             <Route exact path="/career" component={Career} />
+            <Route exact path="/contactus" component={ContactUs} />
+            <Route exact path="/support" component={Support} />
             <Route exact path="/how-we-work" component={How_we_work} />
             <Route
               exact
@@ -66,7 +69,6 @@ class App extends Component {
               component={EmailConfirmation}
             />
             <Route exact path="/forgot" component={Forgot} />
-            <Route exact path="/contactus" component={ContactUs} />
             <Route exact path="/instagramlogin" component={InstagramLogin} />
             <Route exact path="/yelplogin" component={YelpLogin} />
             <Route exact path="/foursquarelogin" component={FourSquareLogin} />
