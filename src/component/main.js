@@ -19,7 +19,10 @@ import User_profile from "./user_profile";
 import Notification from "./notification";
 import SettingMain from "./setting-main";
 import SettingAccounts from "./setting-accounts";
+import SettingPeople from "./setting-people";
 import SettingBilling from "./setting-billing";
+import SettingEmail from "./setting-email";
+import SettingUpdateCard from "./setting-updateCard";
 import SideBar from "./sidebar";
 import PromotionalPost from "./promotional-post";
 import PromotionalPostSorry from "./promotional-post-sorry";
@@ -35,6 +38,7 @@ import GoogleConnectedAccounts from "./google-connectedaccounts";
 import LinkedinConnectedAccounts from "./linkedin-connectedaccounts";
 import HereRelatedLocation from "./here-related-location";
 import TomtomRelatedLocation from "./tomtom-related-location";
+import TestingPage from "./testing-page";
 import PageNotFound from "./page-not-found";
 
 export default class MainApp extends Component {
@@ -97,6 +101,17 @@ export default class MainApp extends Component {
                               }
                             >
                               Review Analytics
+                            </NavLink>
+                          </li>
+                          <li>
+                            <NavLink
+                              to={
+                                "/locations/" +
+                                localStorage.getItem("locationId") +
+                                "/testing-page"
+                              }
+                            >
+                              Testing Page
                             </NavLink>
                           </li>
                         </ul>
@@ -298,6 +313,12 @@ export default class MainApp extends Component {
 
                 <Route
                   exact
+                  path="/locations/:locationId/testing-page"
+                  render={props => <TestingPage {...props} />}
+                />
+
+                <Route
+                  exact
                   path="/locations/:locationId/promotional"
                   render={props => <PromotionalPost {...props} />}
                 />
@@ -322,8 +343,25 @@ export default class MainApp extends Component {
                 />
                 <Route
                   exact
+                  path="/setting-main/setting-people"
+                  component={SettingPeople}
+                />
+                <Route
+                  exact
                   path="/setting-main/setting-billing"
                   component={SettingBilling}
+                />
+
+                <Route
+                  exact
+                  path="/setting-main/setting-email"
+                  component={SettingEmail}
+                />
+
+                <Route
+                  exact
+                  path="/setting-main/setting-updateCard"
+                  component={SettingUpdateCard}
                 />
                 <Route
                   exact

@@ -4,11 +4,9 @@ import { all_connection_of_one_location } from "./apis/social_platforms";
 import Spinner from "./common/Spinner";
 import { PieChart } from "react-minimal-pie-chart";
 import Chart from "react-google-charts";
-import { MDBRow, MDBCol, MDBContainer, MDBBtn } from "mdbreact";
-import rev_gen_img1 from "./assets/rev_gen_img1.png";
-import rev_gen_img2 from "./assets/rev_gen_img2.png";
-import rev_gen_img3 from "./assets/rev_gen_img3.png";
-import rev_gen_img4 from "./assets/rev_gen_img4.png";
+// import CanvasJSReact from "./canvas/canvasjs.react";
+// var CanvasJS = CanvasJSReact.CanvasJS;s
+// var CanvasJSChart = CanvasJSReact.CanvasJSChart;
 
 const DjangoConfig = {
   headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
@@ -48,6 +46,35 @@ export default class ReviewGenerationStats extends Component {
     years: [],
 
     all_connections: [],
+    // options: {
+    //   animationEnabled: true,
+    //   title: {
+    //     text: "Google vs Facebook"
+    //   },
+    //   axisY: {
+    //     title: "Reviews",
+    //     includeZero: false
+    //   },
+    //   toolTip: {
+    //     shared: true
+    //   },
+    //   data: [
+    //     {
+    //       type: "spline",
+    //       name: "Google",
+    //       showInLegend: true,
+    //       dataPoints: []
+    //     },
+    //     {
+    //       type: "spline",
+    //       name: "Facebook",
+    //       showInLegend: true,
+    //       dataPoints: []
+    //     }
+    //   ]
+    // },
+    // dataPoints1: [],
+    // dataPoints2: [],
     google_fb_dataPoints: [],
     dailyClicked: false,
     monthlyClicked: true,
@@ -630,6 +657,7 @@ export default class ReviewGenerationStats extends Component {
       yearlyClicked: true
     });
   };
+
   render() {
     let {
       fb_reviews,
@@ -692,123 +720,80 @@ export default class ReviewGenerationStats extends Component {
       }
       // { title: "Foursquare", value: foursquare_all_reviews, color: "#04e38a" }
     ];
+
+    // const options = {
+    //   animationEnabled: true,
+    //   title: {
+    //     text: "Google vs Facebook"
+    //   },
+    //   axisY: {
+    //     title: "Reviews",
+    //     includeZero: false
+    //   },
+    //   toolTip: {
+    //     shared: true
+    //   },
+    //   data: [
+    //     {
+    //       type: "spline",
+    //       name: "Google",
+    //       showInLegend: true,
+    //       dataPoints: dataPoints1
+    //     },
+    //     {
+    //       type: "spline",
+    //       name: "Facebook",
+    //       showInLegend: true,
+    //       dataPoints: dataPoints2
+    //     }
+    //   ]
+    // };
+
     return (
       <div>
+        {/* <div className="content-page"> */}
+
         {this.state.loader ? (
           <div className="rightside_title">
             <Spinner />
           </div>
         ) : (
-          <MDBContainer>
-            <MDBRow>
-              <MDBCol md="7" className="setting-10">
-                <h3> Review Generation Stats</h3>
-              </MDBCol>
-
-              <MDBCol md="2">
-                <select
-                  className="review_select_btn"
-                  style={{ marginTop: "35px" }}
-                >
-                  <option selected value="week">
-                    This Week
-                  </option>
-                  <option value="month">This month</option>
-                  <option value="year">This year</option>
-                </select>
-              </MDBCol>
-              <MDBCol md="3" style={{ marginTop: "25px" }}>
-                <MDBBtn
-                  onClick={() =>
-                    this.props.history.push({
-                      pathname: `review-generation-campaign`
-                    })
-                  }
-                  id="btn_review_gen"
-                >
-                  Create a new campaign
-                </MDBBtn>
-              </MDBCol>
-            </MDBRow>
-            <MDBRow>
-              <MDBCol md="4">
-                <div className="review_container">
-                  <MDBRow>
-                    <div id="traffic_chart">Traffic Chart</div>
-                  </MDBRow>
-                  {all_connections.length != 0 ? (
-                    <MDBRow>
-                      <MDBCol md="8">
-                        {all_reviews != 0 ? (
-                          <div className="text-center mt-30">
-                            {/* <img src={require("../images/pie-chart-2.jpg")} /> */}
-                            {/* pie chart */}
-                            <PieChart
-                              data={dataMock}
-                              lineWidth={23}
-                              rounded
-                              //   style={{ height: "220px" }}
-                            />
-                            {/* pie chart */}
-                          </div>
-                        ) : (
-                          ""
-                        )}
-                      </MDBCol>
-
-                      <MDBCol md="4">
-                        <div>
-                          <div className="pie_contant">Facebook</div>
-                          <div id="fb_perc">
-                            {all_reviews == 0
-                              ? "-"
-                              : ((fb_all_reviews / all_reviews) * 100)
-                                  .toString()
-                                  .slice(0, 4) + "%"}
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="pie_contant">Google</div>
-                          <div id="google_perc">
-                            {all_reviews == 0
-                              ? "-"
-                              : ((google_all_reviews / all_reviews) * 100)
-                                  .toString()
-                                  .slice(0, 4) + "%"}
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="pie_contant">Yelp</div>
-                          <div id="twitter_perc">
-                            {all_reviews == 0
-                              ? "-"
-                              : ((yelp_all_reviews / all_reviews) * 100)
-                                  .toString()
-                                  .slice(0, 4) + "%"}
-                          </div>
-                        </div>
-
-                        <div>
-                          <div className="pie_contant">Foursquare</div>
-                          <div id="dribble_perc">
-                            {all_reviews == 0
-                              ? "-"
-                              : ((foursquare_all_reviews / all_reviews) * 100)
-                                  .toString()
-                                  .slice(0, 4) + "%"}
-                          </div>
-                        </div>
-                      </MDBCol>
-                    </MDBRow>
-                  ) : (
-                    <h4>Connect some listings to see this chart</h4>
-                  )}
+          <div className="main_content">
+            <div className="rightside_title">
+              <h1 className="reviewboxtitle">
+                Review Generation Stats
+                <div className="camgianbox">
+                  <a href="#" className="camaign">
+                    <i className="zmdi zmdi-plus"></i> Create new campaign
+                  </a>
+                  <div className="dropdown">
+                    <a
+                      href="#"
+                      className="last_btn dropdown-toggle"
+                      data-toggle="dropdown"
+                    >
+                      <i className="zmdi zmdi-calendar"></i>
+                      This Week
+                      <span className="zmdi zmdi-caret-down"></span>
+                    </a>
+                    <div className="dropdown-menu">
+                      <ul>
+                        <li>
+                          <a href="#">Last Week</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                  <a href="#" className="settings">
+                    <i className="zmdi zmdi-settings"></i>
+                  </a>
                 </div>
-              </MDBCol>
-              <MDBCol md="8">
-                <div className="review_container">
+              </h1>
+            </div>
+
+            <div className="mt-30">
+              <div className="row">
+                <div className="col-md-8">
                   <div className="viewallreview">
                     <div className="border-bottom d-online-flex">
                       <ul className="review_weekly">
@@ -837,17 +822,41 @@ export default class ReviewGenerationStats extends Component {
                           <a>Yearly</a>
                         </li>
                       </ul>
+                      <div className="onlineshow">
+                        <span>
+                          <input
+                            type="checkbox"
+                            id="online"
+                            name="fruit-1"
+                            value="online"
+                            defaultChecked
+                          />
+                          <label htmlFor="online">Online</label>
+                        </span>
+                        <span>
+                          <input
+                            type="checkbox"
+                            id="store"
+                            name="fruit-1"
+                            value="store"
+                          />
+                          <label htmlFor="store">store</label>
+                        </span>
+                      </div>
                     </div>
 
-                    {/* line chart */}
                     <div className="line-chart">
+                      {/* <img src={require("../images/chart-line.jpg")} alt="" /> */}
+                      {/* line chart */}
+
                       <div>
+                        {/* <CanvasJSChart options={options} /> */}
                         {isGoogleLoggedIn && isFbLoggedIn ? (
                           <Chart
                             width={"600px"}
                             height={"400px"}
                             chartType="LineChart"
-                            loader={<div>Loading Chart...</div>}
+                            loader={<div>Loading Chart</div>}
                             data={this.state.google_fb_dataPoints}
                             options={{
                               hAxis: {
@@ -876,151 +885,219 @@ export default class ReviewGenerationStats extends Component {
                     </div>
                   </div>
                 </div>
-              </MDBCol>
-            </MDBRow>
-            <div style={{ padding: "0px 2%" }}>
-              <MDBRow className="review_container">
-                <MDBCol md="2" className="rev_gen_contant4">
-                  Campaign list
-                </MDBCol>
-                <MDBCol md="10">
-                  <MDBRow>
-                    <MDBCol md="3">
-                      <div className="rev_gen_cards">
-                        <MDBRow>
-                          <MDBCol md="3">
-                            <img
-                              src={rev_gen_img1}
-                              alt=""
-                              className="rev_gen_icon"
+
+                <div className="col-md-4">
+                  <div className="viewallreview traffic-chartbox">
+                    <h3>Traffic Chart</h3>
+
+                    {all_connections.length != 0 ? (
+                      <div>
+                        {all_reviews != 0 ? (
+                          <div className="text-center mt-30">
+                            {/* <img src={require("../images/pie-chart-2.jpg")} /> */}
+                            {/* pie chart */}
+                            <PieChart
+                              data={dataMock}
+                              lineWidth={23}
+                              rounded
+                              //   style={{ height: "220px" }}
                             />
-                          </MDBCol>
+                            {/* pie chart */}
+                          </div>
+                        ) : (
+                          ""
+                        )}
 
-                          <MDBCol md="9">
-                            <MDBRow>
-                              <MDBCol md="5" className="rev_gen_contant1">
-                                {campaign_count}
-                              </MDBCol>
-                              {/* <MDBCol md="6" className="rev_gen_contant3">
-                                <span>+</span>
-                                <span>01.03%</span>
-                              </MDBCol> */}
-                            </MDBRow>
-                            <MDBRow className="rev_gen_contant2">
-                              Total Campaign
-                            </MDBRow>
-                          </MDBCol>
-                        </MDBRow>
+                        <div className="stats-box">
+                          <div className="countboxpie">
+                            <div className="col-md-4">
+                              <div className="facpie sitebox">
+                                <h2>
+                                  {all_reviews == 0
+                                    ? "-"
+                                    : ((google_all_reviews / all_reviews) * 100)
+                                        .toString()
+                                        .slice(0, 4) + "%"}
+                                </h2>
+                                <span>Google</span>
+                              </div>
+                            </div>
+                            <div className="col-md-4">
+                              <div className="facpie facebook_div">
+                                <h2>
+                                  {all_reviews == 0
+                                    ? "-"
+                                    : ((fb_all_reviews / all_reviews) * 100)
+                                        .toString()
+                                        .slice(0, 4) + "%"}
+                                </h2>
+                                <span>Facebook</span>
+                              </div>
+                            </div>
+                            <div className="col-md-4">
+                              <div className="facpie whatsaapbox">
+                                <h2>
+                                  {all_reviews == 0
+                                    ? "-"
+                                    : (
+                                        ((yelp_all_reviews +
+                                          foursquare_all_reviews) /
+                                          all_reviews) *
+                                        100
+                                      )
+                                        .toString()
+                                        .slice(0, 4) + "%"}
+                                </h2>
+                                <span>Other sites</span>
+                              </div>
+                            </div>
+                            {/* <div className="col-md-4">
+                        <div className="facpie whatsaapbox">
+                          <h2>
+                            {all_reviews == 0
+                              ? "-"
+                              : ((yelp_all_reviews / all_reviews) * 100)
+                                  .toString()
+                                  .slice(0, 4) + "%"}
+                          </h2>
+                          <span>Yelp</span>
+                        </div>
+                      </div> */}
+                            {/* <div className="col-md-4">
+                        <div className="facpie foursquarebox">
+                          <h2>
+                            {all_reviews == 0
+                              ? "-"
+                              : ((foursquare_all_reviews / all_reviews) * 100)
+                                  .toString()
+                                  .slice(0, 4) + "%"}
+                          </h2>
+                          <span>Foursquare</span>
+                        </div>
+                      </div> */}
+                          </div>
+                        </div>
                       </div>
-                    </MDBCol>
-
-                    <MDBCol md="3">
-                      <div className="rev_gen_cards">
-                        <MDBRow>
-                          <MDBCol md="3">
-                            <img
-                              src={rev_gen_img2}
-                              alt=""
-                              className="rev_gen_icon"
-                            />
-                          </MDBCol>
-
-                          <MDBCol md="9">
-                            <MDBRow>
-                              <MDBCol md="5" className="rev_gen_contant1">
-                                {all_connections.length != 0
-                                  ? average_rating != 0
-                                    ? average_rating.toString().slice(0, 4)
-                                    : 0
-                                  : "-"}
-                              </MDBCol>
-                              {/* <MDBCol md="6" className="rev_gen_contant3">
-                                <span>+</span>
-                                <span>01.03%</span>
-                              </MDBCol> */}
-                            </MDBRow>
-                            <MDBRow className="rev_gen_contant2">
-                              Overal Rating
-                            </MDBRow>
-                          </MDBCol>
-                        </MDBRow>
-                      </div>
-                    </MDBCol>
-
-                    <MDBCol md="3">
-                      <div className="rev_gen_cards">
-                        <MDBRow>
-                          <MDBCol md="3">
-                            <img
-                              src={rev_gen_img3}
-                              alt=""
-                              className="rev_gen_icon"
-                            />
-                          </MDBCol>
-
-                          <MDBCol md="9">
-                            <MDBRow>
-                              <MDBCol md="5" className="rev_gen_contant1">
-                                {all_connections.length != 0
-                                  ? all_reviews
-                                  : "-"}
-                              </MDBCol>
-                              {/* <MDBCol md="6" className="rev_gen_contant3">
-                                <span>+</span>
-                                <span>01.03%</span>
-                              </MDBCol> */}
-                            </MDBRow>
-                            <MDBRow className="rev_gen_contant2">
-                              Number of reviews
-                            </MDBRow>
-                          </MDBCol>
-                        </MDBRow>
-                      </div>
-                    </MDBCol>
-
-                    <MDBCol md="3">
-                      <div className="rev_gen_cards">
-                        <MDBRow>
-                          <MDBCol md="3">
-                            <img
-                              src={rev_gen_img4}
-                              alt=""
-                              className="rev_gen_icon"
-                            />
-                          </MDBCol>
-
-                          <MDBCol md="9">
-                            <MDBRow>
-                              <MDBCol md="5" className="rev_gen_contant1">
-                                -{" "}
-                                <span>
-                                  <i className="zmdi zmdi-email"></i>
-                                </span>
-                              </MDBCol>
-                              <MDBCol md="5" className="rev_gen_contant1">
-                                -{" "}
-                                <span>
-                                  <i className="zmdi zmdi-comment-more"></i>
-                                </span>
-                              </MDBCol>
-                              {/* <MDBCol md="6" className="rev_gen_contant3">
-                                <span>+</span>
-                                <span>01.03%</span>
-                              </MDBCol> */}
-                            </MDBRow>
-                            <MDBRow className="rev_gen_contant2">
-                              Invites sent
-                            </MDBRow>
-                          </MDBCol>
-                        </MDBRow>
-                      </div>
-                    </MDBCol>
-                  </MDBRow>
-                </MDBCol>
-              </MDBRow>
+                    ) : (
+                      <h4>Connect some listings to see this chart</h4>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
-          </MDBContainer>
+
+            <div className="mt-30">
+              <div className="analytics-whice">
+                <div className="box-space ">
+                  <h2 className="analytics_btnx">campaign list</h2>
+                </div>
+
+                <div className="total_ant">
+                  <div className="row">
+                    <div className="col-md-3">
+                      <div className="totl-listing">
+                        <div className="icon">
+                          <img src={require("../images/c-1.jpg")} />
+                        </div>
+                        <div className="icon-text">
+                          <h2>{campaign_count}</h2>
+                          <h3>Total campaign</h3>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-3">
+                      <div className="totl-listing">
+                        <div className="icon">
+                          <img src={require("../images/c-2.jpg")} />
+                        </div>
+                        <div className="icon-text">
+                          <h2>
+                            {all_connections.length != 0
+                              ? average_rating != 0
+                                ? average_rating.toString().slice(0, 4)
+                                : 0
+                              : "-"}
+                            <div className="dropdown parsent red">
+                              {/* <a
+                                href="#"
+                                className="dropdown-toggle"
+                                data-toggle="dropdown"
+                              >
+                                0.52%
+                                <span className="zmdi zmdi-caret-down"></span>
+                              </a>
+                              <div className="dropdown-menu">
+                              <ul>
+                                <li>0.52%</li>
+                                <li>0.52%</li>
+                              </ul>
+                            </div> */}
+                            </div>
+                          </h2>
+                          <h3>Overall Rating</h3>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-3">
+                      <div className="totl-listing">
+                        <div className="icon">
+                          <img src={require("../images/c-3.jpg")} />
+                        </div>
+                        <div className="icon-text">
+                          <h2>
+                            {all_connections.length != 0 ? all_reviews : "-"}
+                            <div className="dropdown parsent">
+                              {/* <a
+                                href="#"
+                                className="dropdown-toggle"
+                                data-toggle="dropdown"
+                              >
+                                1.34%
+                                <span className="zmdi zmdi-caret-down"></span>
+                              </a>
+                               <div className="dropdown-menu">
+                              <ul>
+                                <li>170%</li>
+                                <li>180%</li>
+                              </ul>
+                            </div> */}
+                            </div>
+                          </h2>
+                          <h3>Number of reviews</h3>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="col-md-3">
+                      <div className="totl-listing">
+                        <div className="icon">
+                          <img src={require("../images/c-4.jpg")} />
+                        </div>
+                        <div className="icon-text">
+                          <h2 className="bo25">
+                            -{" "}
+                            <span>
+                              <i className="zmdi zmdi-email"></i>
+                            </span>
+                            -{" "}
+                            <span>
+                              <i className="zmdi zmdi-comment-more"></i>
+                            </span>
+                          </h2>
+                          <h3>Invites sent</h3>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
+
+        {/* </div> */}
       </div>
     );
   }

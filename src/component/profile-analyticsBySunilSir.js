@@ -26,6 +26,7 @@ import ReactPDF, {
 // import jsPDF from "jspdf";
 // import html2canvas from "html2canvas";
 
+
 const DjangoConfig = {
   headers: { Authorization: "Token " + localStorage.getItem("UserToken") }
 };

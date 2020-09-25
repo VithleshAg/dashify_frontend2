@@ -845,179 +845,504 @@ export default class ProfileAnalytics extends Component {
             </div>
             <div className="col-12">
               <div className="row ">
-                <div className="col-md-5 anacard  ">
-                  <div className="row">
-                    <div className="col-md-2">
-                      <img src={fb1} />
+                {this.state.fbIsLoggedIn ? (
+                  ""
+                ) : (
+                  <div className="col-md-5 anacard  ">
+                    <div className="row">
+                      <div className="col-md-2">
+                        <img src={fb2} />
+                      </div>
+                      <div className="col-md-6  ana-10 ">
+                        <h5>
+                          Connect your Facebook profile to get profile analytics
+                          for your Facebook listing
+                        </h5>
+                      </div>
+                      {/* <div className="col-md-4 button_connect ">
+                        <a href="#" className="btn btn-analy  ">
+                          <h6>Connect</h6>
+                        </a>
+                      </div> */}
+                      <div className="google_btnb col-md-4">
+                        <FacebookLogin
+                          appId="187396122554776"
+                          // appId="3044182972316291"
+                          autoLoad={false}
+                          fields="name,email,picture"
+                          onClick={this.componentClicked}
+                          callback={this.responseFacebook}
+                        />
+                      </div>
                     </div>
-                    <div className="col-md-6  ana-10 ">
-                      <h5>
-                        Connect your Facebook profile to get profile analytics
-                        for your Facebook listing
-                      </h5>
-                    </div>
-                    <div className="col-md-4 button_connect ">
+                  </div>
+                )}
+                {this.state.googleIsLoggedIn ? (
+                  ""
+                ) : (
+                  <div className="col-md-5 anacard ">
+                    <div className="row">
+                      <div className="col-md-2">
+                        <img src={fb1} />
+                      </div>
+                      <div className="col-md-6  ana-10">
+                        <h5>
+                          Connect your Google account to get profile analytics
+                          for your google listing
+                        </h5>
+                      </div>
+                      {/* <div className="col-md-4 button_connect">
                       <a href="#" className="btn btn-analy  ">
                         <h6>Connect</h6>
                       </a>
+                    </div> */}
+                      <div className="col-md-4 button_connect">
+                        <GoogleLogin
+                          //for localhost
+                          clientId="759599444436-po5k7rhkaqdu55toirpt5c8osaqln6ul.apps.googleusercontent.com"
+                          //for server
+                          // clientId="759599444436-5litbq8gav4ku8sj01o00uh6lsk8ebr0.apps.googleusercontent.com"
+                          buttonText="Login"
+                          scope="https://www.googleapis.com/auth/business.manage"
+                          onSuccess={this.responseGoogle}
+                          onFailure={this.responseErrorGoogle}
+                          cookiePolicy={"single_host_origin"}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="col-md-5 anacard ">
-                  <div className="row">
-                    <div className="col-md-2">
-                      <img src={fb1} />
-                    </div>
-                    <div className="col-md-6  ana-10">
-                      <h5>
-                        Connect your Twitter profile to get profile analytics
-                        for your Facebook listing
-                      </h5>
-                    </div>
-                    <div className="col-md-4 button_connect">
-                      <a href="#" className="btn btn-analy  ">
-                        <h6>Connect</h6>
-                      </a>
-                    </div>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
 
             <div className="container analytic-11 ">
               <div className="col-md-12 ">
-                <div className="row ">
-                  <div className="col-md-4 analytic-14">
-                    <div className="row ">
-                      <div className="col-md-6 this_week ">
-                        <a href="#">
-                          This Week <ArrowDropDownIcon />
-                        </a>
+                {this.state.loading ? (
+                  <div style={{ textAlign: "center" }}>
+                    <Loader2
+                      type="Oval"
+                      color="#00BFFF"
+                      height={25}
+                      width={25}
+                      // timeout={3000} //3 secs
+                    />
+                  </div>
+                ) : (
+                  <div className="row ">
+                    <div className="col-md-4 analytic-14">
+                      <div className="row ">
+                        <div className="col-md-6 this_week ">
+                          <a data-toggle="dropdown">
+                            {this.state.range_name} <ArrowDropDownIcon />
+                          </a>
+                          <div className="dropdown-menu">
+                            <ul>
+                              <li
+                                onClick={this.change_states(
+                                  last_week,
+                                  "Last week"
+                                )}
+                              >
+                                Last week
+                              </li>
+                              <li
+                                onClick={this.change_states(
+                                  last_month,
+                                  "Last month"
+                                )}
+                              >
+                                Last month
+                              </li>
+                              <li
+                                onClick={this.change_states(
+                                  last_3_month,
+                                  "Last 3 months"
+                                )}
+                              >
+                                Last 3 months
+                              </li>
+                              <li
+                                onClick={this.change_states(
+                                  last_6_month,
+                                  "Last 6 months"
+                                )}
+                              >
+                                Last 6 months
+                              </li>
+                              <li
+                                onClick={this.change_states(
+                                  last_year,
+                                  "Last year"
+                                )}
+                              >
+                                Last year
+                              </li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div className="col-md-6">
+                          <PDFDownloadLink
+                            document={this.Quixote(pdf_data)}
+                            fileName="profile_analytics_report.pdf"
+                          >
+                            {({ blob, url, loading, error }) =>
+                              loading ? (
+                                <a className="btn btn-analytic-13">
+                                  <h6>Loading...</h6>
+                                </a>
+                              ) : (
+                                <a className="btn btn-analytic-13">
+                                  <h6>Download Report</h6>
+                                </a>
+                              )
+                            }
+                          </PDFDownloadLink>
+                        </div>
                       </div>
-                      <div className="col-md-6">
-                        <a href="#" className="btn btn-analytic-13">
-                          <h6>Download Report</h6>
-                        </a>
+                      <div className="row total_top ">
+                        <div className="col-md-3  ">
+                          <img src={fb2} />
+                        </div>
+                        <div className="col-md-6" style={{ lineHeight: 0 }}>
+                          <p className="analytic-16">
+                            {parseInt(fViews1) + parseInt(profileViews1)}
+                          </p>
+                          <p className="analytic-17">Total profile view</p>
+                        </div>
+                        <div className="col-md-3 ">
+                          {parseInt(profileViews1) - parseInt(profileViews2) >
+                          0 ? (
+                            <div style={{ color: "green" }}>
+                              {"+" +
+                                (
+                                  ((parseInt(profileViews1) -
+                                    parseInt(profileViews2)) *
+                                    100) /
+                                  (parseInt(fViews1) + parseInt(profileViews1))
+                                )
+                                  .toString()
+                                  .slice(0, 4) +
+                                " %"}
+                            </div>
+                          ) : parseInt(profileViews1) -
+                              parseInt(profileViews2) <
+                            0 ? (
+                            <div style={{ color: "red" }}>
+                              {(
+                                ((parseInt(profileViews1) -
+                                  parseInt(profileViews2)) *
+                                  100) /
+                                (parseInt(fViews1) + parseInt(profileViews1))
+                              )
+                                .toString()
+                                .slice(0, 5) + " %"}
+                            </div>
+                          ) : parseInt(profileViews1) -
+                              parseInt(profileViews2) ==
+                            0 ? (
+                            "0%"
+                          ) : (
+                            "-"
+                          )}
+                        </div>
+                      </div>
+                      <div className="row total_top">
+                        <div className="col-md-3  ">
+                          <img src={fb2} />
+                        </div>
+                        <div className="col-md-6" style={{ lineHeight: 0 }}>
+                          <p className="analytic-16">
+                            {" "}
+                            {parseInt(fWeb1) + parseInt(gWeb1)}
+                          </p>
+                          <p className="analytic-17">Website Visit</p>
+                        </div>
+                        <div className="col-md-3  ">
+                          {parseInt(gWeb1) - parseInt(gWeb2) > 0 ? (
+                            <div style={{ color: "green" }}>
+                              {"+" +
+                                (
+                                  ((parseInt(gWeb1) - parseInt(gWeb2)) * 100) /
+                                  (parseInt(fWeb1) + parseInt(gWeb1))
+                                )
+                                  .toString()
+                                  .slice(0, 4) +
+                                " %"}
+                            </div>
+                          ) : parseInt(gWeb1) - parseInt(gWeb2) < 0 ? (
+                            <div style={{ color: "red" }}>
+                              {(
+                                ((parseInt(gWeb1) - parseInt(gWeb2)) * 100) /
+                                (parseInt(fWeb1) + parseInt(gWeb1))
+                              )
+                                .toString()
+                                .slice(0, 5) + " %"}
+                            </div>
+                          ) : parseInt(gWeb1) - parseInt(gWeb2) == 0 ? (
+                            "0%"
+                          ) : (
+                            "-"
+                          )}
+                        </div>
+                      </div>
+                      <div className="row total_top">
+                        <div className="col-md-3  ">
+                          <img src={fb2} />
+                        </div>
+                        <div className="col-md-6" style={{ lineHeight: 0 }}>
+                          <p className="analytic-16">
+                            {" "}
+                            {parseInt(fcalls1) + parseInt(gcalls1)}
+                          </p>
+                          <p className="analytic-17">Phone calls</p>
+                        </div>
+                        <div className="col-md-3  ">
+                          {parseInt(gcalls1) - parseInt(gcalls2) > 0 ? (
+                            <div style={{ color: "green" }}>
+                              {"+" +
+                                (
+                                  ((parseInt(gcalls1) - parseInt(gcalls2)) *
+                                    100) /
+                                  (parseInt(fcalls1) + parseInt(gcalls1))
+                                )
+                                  .toString()
+                                  .slice(0, 4) +
+                                " %"}
+                            </div>
+                          ) : parseInt(gcalls1) - parseInt(gcalls2) < 0 ? (
+                            <div style={{ color: "red" }}>
+                              {(
+                                ((parseInt(gcalls1) - parseInt(gcalls2)) *
+                                  100) /
+                                (parseInt(fcalls1) + parseInt(gcalls1))
+                              )
+                                .toString()
+                                .slice(0, 5) + " %"}
+                            </div>
+                          ) : parseInt(gcalls1) - parseInt(gcalls2) == 0 ? (
+                            "0%"
+                          ) : (
+                            "-"
+                          )}
+                        </div>
+                      </div>
+                      <div className="row total_top">
+                        <div className="col-md-3  ">
+                          <img src={fb2} />
+                        </div>
+                        <div className="col-md-6" style={{ lineHeight: 0 }}>
+                          <p className="analytic-16">
+                            {" "}
+                            {parseInt(fdirection1) + parseInt(gdirection1)}
+                          </p>
+                          <p className="analytic-17">Direction request</p>
+                        </div>
+                        <div className="col-md-3  ">
+                          {parseInt(gdirection1) - parseInt(gdirection2) > 0 ? (
+                            <div style={{ color: "green" }}>
+                              {"+" +
+                                (
+                                  ((parseInt(gdirection1) -
+                                    parseInt(gdirection2)) *
+                                    100) /
+                                  (parseInt(fdirection1) +
+                                    parseInt(gdirection1))
+                                )
+                                  .toString()
+                                  .slice(0, 4) +
+                                " %"}
+                            </div>
+                          ) : parseInt(gdirection1) - parseInt(gdirection2) <
+                            0 ? (
+                            <div style={{ color: "red" }}>
+                              {(
+                                ((parseInt(gdirection1) -
+                                  parseInt(gdirection2)) *
+                                  100) /
+                                (parseInt(fdirection1) + parseInt(gdirection1))
+                              )
+                                .toString()
+                                .slice(0, 5) + " %"}
+                            </div>
+                          ) : parseInt(gdirection1) - parseInt(gdirection2) ==
+                            0 ? (
+                            "0%"
+                          ) : (
+                            "-"
+                          )}
+                        </div>
+                      </div>
+                      <div className="row total_top">
+                        <div className="col-md-3  ">
+                          <img src={fb2} />
+                        </div>
+                        <div className="col-md-6" style={{ lineHeight: 0 }}>
+                          <p className="analytic-16">
+                            {" "}
+                            {parseInt(gcalls1) +
+                              parseInt(gdirection1) +
+                              parseInt(gWeb1) +
+                              parseInt(fclicks1)}
+                          </p>
+                          <p className="analytic-17">Button clicks</p>
+                        </div>
+                        <div className="col-md-3  ">
+                          {parseInt(gdirection1) +
+                            parseInt(gcalls1) +
+                            parseInt(gWeb1) -
+                            parseInt(gdirection2) -
+                            parseInt(gcalls2) -
+                            parseInt(gWeb2) >
+                          0 ? (
+                            <div style={{ color: "green" }}>
+                              {"+" +
+                                (
+                                  ((parseInt(gdirection1) +
+                                    parseInt(gcalls1) +
+                                    parseInt(gWeb1) -
+                                    parseInt(gdirection2) -
+                                    parseInt(gcalls2) -
+                                    parseInt(gWeb2)) *
+                                    100) /
+                                  (parseInt(gcalls1) +
+                                    parseInt(gdirection1) +
+                                    parseInt(gWeb1) +
+                                    parseInt(fclicks1))
+                                )
+                                  .toString()
+                                  .slice(0, 4) +
+                                " %"}
+                            </div>
+                          ) : parseInt(gdirection1) +
+                              parseInt(gcalls1) +
+                              parseInt(gWeb1) -
+                              parseInt(gdirection2) -
+                              parseInt(gcalls2) -
+                              parseInt(gWeb2) <
+                            0 ? (
+                            <div style={{ color: "red" }}>
+                              {(
+                                ((parseInt(gdirection1) +
+                                  parseInt(gcalls1) +
+                                  parseInt(gWeb1) -
+                                  parseInt(gdirection2) -
+                                  parseInt(gcalls2) -
+                                  parseInt(gWeb2)) *
+                                  100) /
+                                (parseInt(gcalls1) +
+                                  parseInt(gdirection1) +
+                                  parseInt(gWeb1) +
+                                  parseInt(fclicks1))
+                              )
+                                .toString()
+                                .slice(0, 5) + " %"}
+                            </div>
+                          ) : parseInt(gdirection1) +
+                              parseInt(gcalls1) +
+                              parseInt(gWeb1) -
+                              parseInt(gdirection2) -
+                              parseInt(gcalls2) -
+                              parseInt(gWeb2) ==
+                            0 ? (
+                            "0%"
+                          ) : (
+                            "-"
+                          )}
+                        </div>
                       </div>
                     </div>
-                    <div className="row total_top ">
-                      <div className="col-md-3  ">
-                        <img src={fb2} />
-                      </div>
-                      <div className="col-md-6" style={{ lineHeight: 0 }}>
-                        <p className="analytic-16"> 2623</p>
-                        <p className="analytic-17">Total profile view</p>
-                      </div>
-                      <div className="col-md-3 ">+01.03%</div>
-                    </div>
-                    <div className="row total_top">
-                      <div className="col-md-3  ">
-                        <img src={fb2} />
-                      </div>
-                      <div className="col-md-6" style={{ lineHeight: 0 }}>
-                        <p className="analytic-16"> 2623</p>
-                        <p className="analytic-17">Total profile view</p>
-                      </div>
-                      <div className="col-md-3  ">+01.03%</div>
-                    </div>
-                    <div className="row total_top">
-                      <div className="col-md-3  ">
-                        <img src={fb2} />
-                      </div>
-                      <div className="col-md-6" style={{ lineHeight: 0 }}>
-                        <p className="analytic-16"> 2623</p>
-                        <p className="analytic-17">Total profile view</p>
-                      </div>
-                      <div className="col-md-3  ">+01.03%</div>
-                    </div>
-                    <div className="row total_top">
-                      <div className="col-md-3  ">
-                        <img src={fb2} />
-                      </div>
-                      <div className="col-md-6" style={{ lineHeight: 0 }}>
-                        <p className="analytic-16"> 2623</p>
-                        <p className="analytic-17">Total profile view</p>
-                      </div>
-                      <div className="col-md-3  ">+01.03%</div>
-                    </div>
-                    <div className="row total_top">
-                      <div className="col-md-3  ">
-                        <img src={fb2} />
-                      </div>
-                      <div className="col-md-6" style={{ lineHeight: 0 }}>
-                        <p className="analytic-16"> 2623</p>
-                        <p className="analytic-17">Total profile view</p>
-                      </div>
-                      <div className="col-md-3  ">+01.03%</div>
+                    <div className="col-md-7  analytic-14">
+                      <table class="table table-hover">
+                        <thead className="head_font">
+                          <tr>
+                            <th scope="col">Profiles 02</th>
+                            <th scope="col">Profiles views</th>
+                            <th scope="col">Website views</th>
+                            <th scope="col">Phone calls</th>
+                            <th scope="col">Direction Request</th>
+                            <th scope="col">Button clicks</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <th scope="row" className="analytics-17">
+                              Consolidated
+                            </th>
+                            <td>
+                              {parseInt(this.state.fViews1) +
+                                parseInt(this.state.profileViews1)}
+                            </td>
+                            <td>
+                              {parseInt(this.state.fWeb1) +
+                                parseInt(this.state.gWeb1)}
+                            </td>
+                            <td>
+                              {parseInt(this.state.fcalls1) +
+                                parseInt(this.state.gcalls1)}
+                            </td>
+                            <td>
+                              {parseInt(this.state.gdirection1) +
+                                parseInt(this.state.fdirection1)}
+                            </td>
+                            <td>
+                              {parseInt(this.state.gcalls1) +
+                                parseInt(this.state.gdirection1) +
+                                parseInt(this.state.gWeb1) +
+                                parseInt(this.state.fclicks1)}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row" className="analytics-17">
+                              Google
+                            </th>
+                            <td>{this.state.profileViews}</td>
+                            <td>{this.state.gWeb}</td>
+                            <td>{this.state.gcalls} </td>
+                            <td>{this.state.gdirection}</td>
+                            <td>
+                              {this.state.gcalls == "-"
+                                ? "-"
+                                : parseInt(this.state.gcalls) +
+                                  parseInt(this.state.gdirection) +
+                                  parseInt(this.state.gWeb)}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th scope="row" className="analytics-17">
+                              Facebook
+                            </th>
+                            <td>{this.state.fViews}</td>
+                            <td>{this.state.fWeb}</td>
+                            <td>{this.state.fcalls} </td>
+                            <td>{this.state.fdirection}</td>
+                            <td>{this.state.fclicks}</td>
+                          </tr>
+                          {/* <tr>
+                            <th scope="row" className="analytics-17">
+                              Bing
+                            </th>
+                            <td> - </td>
+                            <td> - </td>
+                            <td> - </td>
+                            <td> - </td>
+                            <td> - </td>
+                          </tr>
+                          <tr>
+                            <th scope="row" className="analytics-17">
+                              Google
+                            </th>
+                            <td>65</td>
+                            <td>60</td>
+                            <td>112</td>
+                            <td>453</td>
+                            <td>54</td>
+                          </tr> */}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
-                  <div className="col-md-7  analytic-14">
-                    <table class="table table-hover">
-                      <thead className="head_font">
-                        <tr>
-                          <th scope="col">Profiles 02</th>
-                          <th scope="col">Profiles views</th>
-                          <th scope="col">Website views</th>
-                          <th scope="col">Phone calls</th>
-                          <th scope="col">Direction Request</th>
-                          <th scope="col">Button clicks</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <th scope="row" className="analytics-17">
-                            Consolidated
-                          </th>
-                          <td>2636</td>
-                          <td>10876</td>
-                          <td>213</td>
-                          <td>543</td>
-                          <td>1123</td>
-                        </tr>
-                        <tr>
-                          <th scope="row" className="analytics-17">
-                            Google
-                          </th>
-                          <td>65</td>
-                          <td>65</td>
-                          <td>112</td>
-                          <td>453</td>
-                          <td>54</td>
-                        </tr>
-                        <tr>
-                          <th scope="row" className="analytics-17">
-                            Bing
-                          </th>
-                          <td>785</td>
-                          <td>345</td>
-                          <td>432</td>
-                          <td>76</td>
-                          <td>89</td>
-                        </tr>
-                        <tr>
-                          <th scope="row" className="analytics-17">
-                            Bing
-                          </th>
-                          <td> - </td>
-                          <td> - </td>
-                          <td> - </td>
-                          <td> - </td>
-                          <td> - </td>
-                        </tr>
-                        <tr>
-                          <th scope="row" className="analytics-17">
-                            Google
-                          </th>
-                          <td>65</td>
-                          <td>60</td>
-                          <td>112</td>
-                          <td>453</td>
-                          <td>54</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

@@ -86,6 +86,9 @@ class Footer extends Component {
                   <li>
                     <NavLink to="/contactus">Contact us</NavLink>
                   </li>
+                  <li>
+                    <NavLink to="/career">Career</NavLink>
+                  </li>
                 </ul>
                 <div className="bookbox">
                   <button className="btn_demo">Book A Demo</button>

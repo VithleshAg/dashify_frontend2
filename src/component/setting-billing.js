@@ -1,143 +1,95 @@
-
-import React, { Component } from 'react';
-import { NavLink } from 'react-router-dom';
-
-
-
+import React, { Component } from "react";
+import { MDBRow, MDBCol, MDBContainer, MDBBtn } from "mdbreact";
+import ProfileSettingSidebar from "./setting-sidebar";
+import paypal from "./assets/paypal.png";
+import mastercard from "./assets/mastercard.png";
 
 export default class SettingBilling extends Component {
+  render() {
+    return (
+      <div>
+        <MDBContainer>
+          <div className="setting-10">
+            <h3> Profile Setting</h3>
+          </div>
 
-    render() {
+          <MDBRow>
+            <MDBCol md="3">
+              <MDBRow>
+                <ProfileSettingSidebar />
+              </MDBRow>
+            </MDBCol>
 
+            <MDBCol md="8" className="user_container col-md-offset-1">
+              <MDBRow>
+                <MDBCol md="3" id="user7">
+                  Subscription
+                </MDBCol>
+                <MDBCol md="6" className="user12">
+                  Premium Monthly
+                </MDBCol>
+                <MDBCol md="3">
+                  <MDBBtn id="user_save">Save</MDBBtn>
+                </MDBCol>
+              </MDBRow>
+              <MDBRow>
+                <MDBCol md="3" id="user_payment_container">
+                  <div id="user6">$8</div>
+                  <div className="user8">Month</div>
+                  <div className="user9">Per Location</div>
+                  <div className="user9">Billed Monthly</div>
+                </MDBCol>
+                <MDBCol md="7" id="user10">
+                  <div>
+                    <span className="user4">Start Date: </span>
+                    <span className="user5">30 Jan 2020</span>
+                  </div>
 
+                  <div>
+                    <span className="user4">Valid Till: </span>
+                    <span className="user5">30 Jan 2020</span>
+                  </div>
 
+                  <div>
+                    <span className="user4">Min. Commitemnt:</span>
+                    <span className="user5"> 60 Loсation / Monthly </span>
+                  </div>
 
-        return (
-            <div>
+                  <div>
+                    <span className="user4">Currently added: </span>
+                    <span className="user5">637 Locations </span>
+                  </div>
 
-                {/* <div className="content-page"> */}
-
-                <div className="main_content">
-                    <div className="rightside_title">
-                        <h1>Profile Settings</h1>
-                    </div>
-                    <div className="tablediv mb-30">
-
-
-                    <div className="col-md-3">
-                            <div className="leftmenu">
-                                <ul>
-                                    <li><NavLink to="/setting-main/setting-accounts">Accounts</NavLink></li>
-                                    <li><NavLink to="/a">People</NavLink></li>
-                                    <li><NavLink to="/b">Notification Setting</NavLink></li>
-                                    <li><NavLink exact to="/setting-main/setting-billing" className="active">Billing</NavLink></li>
-                                    <li><NavLink to="/c">Integrations</NavLink></li>
-                                    <li><NavLink to="/d">Agency Settings</NavLink></li>
-
-
-                                </ul>
-
-                            </div>
-
-                        </div>
-                        
-                        <div className="col-md-6">
-                            <div className="blue_box">
-                                <div className="premium">
-                                    <ul>
-                                        <li>Subscription</li>
-                                        <li>Premium Monthly</li>
-                                    </ul>
-                                    <a className="active_btn" href="#">Active</a>
-
-                                </div>
-
-                                <div className="perloction">
-                                    <div className="col-md-4">
-                                        <div className="white_bg">
-                                            <div className="month">
-                                                $8 <span>/Month</span>
-
-                                            </div>
-                                            <p>Per Location</p>
-
-                                            <p>Billed Monthly</p>
-
-                                        </div>
-
-                                    </div>
-                                    <div className="start">
-                                        <p>
-                                            Start Date : 30 Jan 2020<br></br>
-Valid Till : 30 Jan 2021<br></br>
-Min. Commitemnt : 60 Location /Monthy<br></br>
-
-Currently added : 637 Locations<br></br>
-Next Billing amount : $5103, 94 On 29 Feb 2020
-
-</p>
-
-                                    </div>
-
-                                </div>
-
-
-
-                            </div>
-
-                        </div>
-
-                        <div className="col-md-3">
-                            <div className="payment_box">
-                                <div className="box_payment">
-                                    <div className="card_box">
-                                        <img src={require('../images/master-card.jpg')} />
-
-
-                                    </div>
-                                    <div className="keybox">
-                                        <input type="password" placeholder="**** **** **** 7056" />
-                                        <input type="text" placeholder="04/21" />
-
-
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div className="paypal_box">
-                                <div className="paypal_icon">
-                                    <img src={require('../images/paypal.jpg')} />
-
-                                </div>
-                                <div className="paypal_text">
-                                    <input type="text" placeholder="recepegncashan@outlook.com" />
-
-                                </div>
-
-                            </div>
-
-                            <div className="add_payment">
-                                <a href="#">Add a payment method</a>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-
-
-                </div>
-
-
-                {/* </div> */}
-
-
-
-
-            </div>);
-    }
-
+                  <div>
+                    <span className="user4">Next Billing amount: </span>
+                    <span className="user5">$5103. 94 On 29 Feb 2020 </span>
+                  </div>
+                </MDBCol>
+              </MDBRow>
+              <MDBRow>
+                <MDBCol md="5">
+                  <img src={mastercard} />{" "}
+                </MDBCol>
+                <MDBCol md="5">
+                  <img src={paypal} />
+                </MDBCol>
+                <MDBCol md="2">
+                  <MDBBtn
+                    onClick={() =>
+                      this.props.history.push({
+                        pathname: "/setting-main/setting-updateCard"
+                      })
+                    }
+                    id="add_more"
+                  >
+                    +
+                  </MDBBtn>
+                </MDBCol>
+              </MDBRow>
+            </MDBCol>
+          </MDBRow>
+        </MDBContainer>
+      </div>
+    );
+  }
 }
